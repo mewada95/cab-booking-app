@@ -7,17 +7,17 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen relative overflow-x-hidden">
 
   <!-- TOP HEADER -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 py-3 flex items-center justify-between shadow-sm">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 py-3 flex items-center justify-between shadow-sm">
     <div class="flex items-center gap-2">
       <div class="bg-blue-600 text-white p-2 rounded-xl flex items-center justify-center">
         <i class="fa-solid fa-car text-lg"></i>
       </div>
       <span class="text-xl font-bold tracking-tight text-blue-900">maketripzy</span>
     </div>
-    <button class="text-slate-600 p-2 text-xl focus:outline-none">
+    <button onclick="toggleDrawer(true)" class="text-slate-700 p-2 text-xl focus:outline-none hover:text-blue-600">
       <i class="fa-solid fa-bars"></i>
     </button>
   </header>
@@ -25,15 +25,15 @@
   <!-- MAIN CONTAINER -->
   <main class="max-w-md mx-auto pb-24">
 
-    <!-- BOOKING FORM SECTION -->
+    <!-- BOOKING SECTION -->
     <div id="bookingSection">
       <div class="bg-blue-700 text-white px-5 pt-7 pb-12 rounded-b-[2rem] text-center shadow-md">
         <span class="inline-flex items-center gap-1.5 bg-blue-600/70 border border-blue-400/40 text-blue-100 text-xs px-3 py-1 rounded-full font-medium mb-3">
-          <i class="fa-solid fa-shield-halved text-amber-300"></i> Zero Advance Payment
+          <i class="fa-solid fa-clock-rotate-left text-amber-300"></i> Pay on Ongoing Trip
         </span>
         <h1 class="text-2xl font-bold mb-2">Your Trusted Travel Companion</h1>
         <p class="text-blue-100 text-xs leading-relaxed px-2">
-          Book reliable outstation cabs and local rentals across India. Pay your driver directly when your trip ends.
+          Reliable outstation cabs across India. ₹0 advance booking — pay partially during the ride.
         </p>
       </div>
 
@@ -43,18 +43,18 @@
           <button class="flex-1 py-2 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center gap-1.5 border border-blue-100">
             <i class="fa-solid fa-car"></i> Cabs
           </button>
-          <button onclick="alert('Flights booking coming soon!')" class="flex-1 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5">
+          <button onclick="alert('Flights service starting soon!')" class="flex-1 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-plane"></i> Flights
           </button>
-          <button onclick="alert('Bus booking coming soon!')" class="flex-1 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5">
+          <button onclick="alert('Buses service starting soon!')" class="flex-1 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-bus"></i> Buses
           </button>
-          <button onclick="alert('Hotels booking coming soon!')" class="flex-1 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5">
+          <button onclick="alert('Hotels service starting soon!')" class="flex-1 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-hotel"></i> Hotels
           </button>
         </div>
 
-        <!-- TRIP TYPE -->
+        <!-- TRIP TYPE SELECTOR -->
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
           <p class="text-[11px] font-bold tracking-wider text-slate-400 uppercase mb-2">Trip Type</p>
           <div class="grid grid-cols-2 gap-2 mb-4">
@@ -85,11 +85,11 @@
             <div class="grid grid-cols-2 gap-3 pt-1">
               <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1">Pickup Date</label>
-                <input id="pickupDate" type="date" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-blue-500 focus:bg-white text-slate-600" />
+                <input id="pickupDate" type="date" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-blue-500 text-slate-600" />
               </div>
               <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1">Pickup Time</label>
-                <select id="pickupTime" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-blue-500 focus:bg-white text-slate-600">
+                <select id="pickupTime" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-blue-500 text-slate-600">
                   <option value="06:00 AM">06:00 AM</option>
                   <option value="08:00 AM">08:00 AM</option>
                   <option value="10:00 AM" selected>10:00 AM</option>
@@ -113,15 +113,15 @@
           <div class="space-y-3">
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Full Name</label>
-              <input id="custName" type="text" placeholder="Enter passenger name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
+              <input id="custName" type="text" placeholder="Enter passenger name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
             </div>
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Phone Number</label>
-              <input id="custPhone" type="tel" maxlength="10" placeholder="10-digit mobile" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
+              <input id="custPhone" type="tel" maxlength="10" placeholder="10-digit mobile" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
             </div>
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Pickup Landmark</label>
-              <input id="custLandmark" type="text" placeholder="Near..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
+              <input id="custLandmark" type="text" placeholder="Near bus stand, hotel, etc." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@
                 <input type="radio" name="vehicle" checked class="text-blue-600" />
                 <div>
                   <p class="text-sm font-bold text-slate-800">Hatchback</p>
-                  <p class="text-[11px] text-slate-500">Mini, Swift, etc.</p>
+                  <p class="text-[11px] text-slate-500">Mini, Swift, WagonR</p>
                 </div>
               </div>
               <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">4 seats</span>
@@ -149,7 +149,7 @@
                 <input type="radio" name="vehicle" class="text-blue-600" />
                 <div>
                   <p class="text-sm font-bold text-slate-800">Sedan</p>
-                  <p class="text-[11px] text-slate-500">Dzire, Etios, etc.</p>
+                  <p class="text-[11px] text-slate-500">Dzire, Etios, Aura</p>
                 </div>
               </div>
               <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">4 seats</span>
@@ -160,28 +160,40 @@
                 <input type="radio" name="vehicle" class="text-blue-600" />
                 <div>
                   <p class="text-sm font-bold text-slate-800">SUV</p>
-                  <p class="text-[11px] text-slate-500">Innova, Ertiga, etc.</p>
+                  <p class="text-[11px] text-slate-500">Innova, Ertiga, Carens</p>
                 </div>
               </div>
               <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">6–7 seats</span>
             </label>
           </div>
 
-          <div class="mt-4 flex items-center gap-2 text-xs text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200/60">
-            <i class="fa-solid fa-circle-check text-amber-600"></i>
-            <span>No advance payment. Pay the driver directly.</span>
+          <!-- PARTIAL PAYMENT SUMMARY BADGE -->
+          <div class="mt-4 bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
+            <p class="font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check text-amber-600"></i> Zero Advance Booking
+            </p>
+            <p class="text-[11px] text-amber-800 leading-relaxed">
+              Trip shuru hone par driver ko fuel ke liye 20% dein, bacha 80% ride khatam hone par dein.
+            </p>
           </div>
 
-          <button onclick="handleBooking()" class="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
+          <!-- T&C LINK -->
+          <div class="mt-3 text-center text-xs text-slate-500">
+            By clicking confirm, you agree to our 
+            <button type="button" onclick="openModal('termsModal')" class="text-blue-600 underline font-semibold">Terms & Conditions</button>
+          </div>
+
+          <button onclick="handleBooking()" class="w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
             Confirm Booking <i class="fa-solid fa-chevron-right text-xs"></i>
           </button>
         </div>
       </div>
     </div>
-    <!-- RECEIPT SCREEN -->
+
+    <!-- CONFIRMATION RECEIPT -->
     <div id="receiptSection" class="hidden px-4 pt-4">
       <button onclick="backToBooking()" class="text-xs font-semibold text-blue-600 flex items-center gap-1 mb-3">
-        <i class="fa-solid fa-arrow-left"></i> Back
+        <i class="fa-solid fa-arrow-left"></i> Book Another Trip
       </button>
 
       <div class="bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4">
@@ -196,7 +208,7 @@
           <div>
             <p class="text-blue-200">Status</p>
             <span class="inline-flex items-center gap-1 font-semibold text-emerald-300">
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Pending
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Confirmed
             </span>
           </div>
           <div class="text-right">
@@ -234,43 +246,170 @@
       </div>
 
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2">
-        <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Passenger Information</h4>
+        <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Passenger Details</h4>
         <p id="receiptCustName" class="font-bold text-slate-800"></p>
         <p id="receiptCustPhone" class="text-slate-500"></p>
         <p class="text-slate-500 pt-1 border-t border-slate-100">Landmark: <span id="receiptCustLandmark"></span></p>
       </div>
 
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2">
+      <!-- PARTIAL PAYMENT FARE SUMMARY -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
+        <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare & Payment Breakdown</h4>
         <div class="flex justify-between text-slate-600">
-          <span>Base Fare (Est. 100km)</span>
+          <span>Base Fare (Estimated)</span>
           <span id="receiptBaseFare" class="font-semibold">₹1200</span>
         </div>
         <div class="flex justify-between text-slate-600">
           <span>Driver Allowance</span>
           <span class="font-semibold">₹300</span>
         </div>
-        <div class="flex justify-between text-slate-600">
-          <span>Taxes & Fees</span>
-          <span class="text-emerald-600 font-semibold">Included</span>
-        </div>
-        <div class="flex justify-between pt-2 border-t border-slate-200 text-sm font-bold text-slate-900">
+        <div class="flex justify-between border-t border-slate-100 pt-2 text-sm font-bold text-slate-900">
           <span>Total Fare</span>
           <span id="receiptTotalFare">₹1500</span>
         </div>
-      </div>
 
-      <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200/70 text-xs text-amber-900 mb-4">
-        <p class="font-bold mb-1"><i class="fa-solid fa-wallet"></i> Zero Advance Payment</p>
-        <p class="text-[11px] text-amber-800">Please pay the total amount directly to the driver via Cash or UPI at the end of your trip.</p>
+        <!-- STAGED PAYMENTS -->
+        <div class="bg-blue-50/70 rounded-xl p-3 border border-blue-100 space-y-1.5 mt-2">
+          <div class="flex justify-between text-blue-900 font-medium">
+            <span>1. Advance Amount (Now):</span>
+            <span class="text-emerald-600 font-bold">₹0</span>
+          </div>
+          <div class="flex justify-between text-blue-900 font-medium">
+            <span>2. At Pickup (Trip Start - 20%):</span>
+            <span id="receiptPickupAmount" class="font-bold">₹300</span>
+          </div>
+          <div class="flex justify-between text-blue-900 font-medium">
+            <span>3. At Dropoff (Trip End - 80%):</span>
+            <span id="receiptDropAmount" class="font-bold">₹1200</span>
+          </div>
+        </div>
+        <p class="text-[10px] text-slate-400 italic text-center">*Tolls, state taxes & parking extra if applicable.</p>
       </div>
 
       <button onclick="sendToWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
-        <i class="fa-brands fa-whatsapp text-lg"></i> Confirm on WhatsApp
+        <i class="fa-brands fa-whatsapp text-lg"></i> Send Details on WhatsApp
+      </button>
+    </div>
+  </main>
+    <!-- SLIDE-OVER HAMBURGER DRAWER -->
+  <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+  <aside id="sideDrawer" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <!-- Drawer Header -->
+    <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-blue-600 text-white">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg">
+          <i class="fa-regular fa-user"></i>
+        </div>
+        <div>
+          <p id="drawerUserTitle" class="text-sm font-bold">Customer Account</p>
+          <p id="drawerUserSub" class="text-[11px] text-blue-200">Save your rides & history</p>
+        </div>
+      </div>
+      <button onclick="toggleDrawer(false)" class="text-white hover:text-slate-200 text-xl">
+        <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
-  </main>
+    <!-- Navigation Links -->
+    <div class="p-4 space-y-2 flex-1 overflow-y-auto text-sm font-medium text-slate-700">
+      <button onclick="openModal('historyModal')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left">
+        <i class="fa-solid fa-clock-rotate-left text-blue-600 w-5"></i>
+        <span>My Bookings</span>
+      </button>
+      <button onclick="openModal('aboutModal')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left">
+        <i class="fa-solid fa-shield-halved text-emerald-600 w-5"></i>
+        <span>About MakeTripzy</span>
+      </button>
+      <button onclick="openModal('termsModal')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left">
+        <i class="fa-solid fa-file-contract text-amber-600 w-5"></i>
+        <span>Terms & Conditions</span>
+      </button>
+      <button onclick="openModal('driverPartnerModal')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left">
+        <i class="fa-solid fa-handshake text-purple-600 w-5"></i>
+        <span>Attach Taxi / Partner</span>
+      </button>
+      <a href="https://wa.me/918409504684?text=Hello%20Support" target="_blank" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left text-emerald-700">
+        <i class="fa-brands fa-whatsapp text-emerald-600 text-lg w-5"></i>
+        <span>24x7 Help Desk</span>
+      </a>
+    </div>
 
+    <div class="p-4 border-t border-slate-100 text-center text-xs text-slate-400">
+      MakeTripzy Cab Services v1.2
+    </div>
+  </aside>
+
+  <!-- MODAL: MY BOOKINGS HISTORY -->
+  <div id="historyModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
+      <div class="p-4 border-b border-slate-200 flex justify-between items-center">
+        <h3 class="font-bold text-slate-800 text-sm">Booking History</h3>
+        <button onclick="closeModal('historyModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="historyListContainer" class="p-4 overflow-y-auto space-y-3 flex-1 text-xs">
+        <!-- Dynamic History Cards Inserted Here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: TERMS & CONDITIONS -->
+  <div id="termsModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
+      <div class="p-4 border-b border-slate-200 flex justify-between items-center">
+        <h3 class="font-bold text-slate-800 text-sm">Terms & Conditions</h3>
+        <button onclick="closeModal('termsModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-600 leading-relaxed flex-1">
+        <p class="font-bold text-slate-800">1. Partial Payment Terms</p>
+        <p>Advance booking is ₹0. Customer must pay 20% of total fare directly to the driver at trip origin (start point), and remaining 80% upon arrival at dropoff.</p>
+        
+        <p class="font-bold text-slate-800">2. Tolls, Taxes & Parking</p>
+        <p>All highway tolls, state border permit taxes, and parking fees are strictly NOT included in estimated fare. They must be paid as actuals during the journey.</p>
+
+        <p class="font-bold text-slate-800">3. Night Driving Allowance</p>
+        <p>A driver night allowance of ₹250 applies if travel extends between 10:00 PM and 06:00 AM.</p>
+
+        <p class="font-bold text-slate-800">4. Free Cancellation</p>
+        <p>Zero charges if canceled at least 2 hours before pickup. Standard minimum fee applies if cab has reached pickup point.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ABOUT US -->
+  <div id="aboutModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
+      <div class="p-4 border-b border-slate-200 flex justify-between items-center">
+        <h3 class="font-bold text-slate-800 text-sm">About MakeTripzy</h3>
+        <button onclick="closeModal('aboutModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-600 leading-relaxed flex-1">
+        <p>MakeTripzy is India's premier outstation taxi booking platform delivering safe, dependable, and affordable rides.</p>
+        <p><strong>Verified Fleet:</strong> Every driver partner is verified with clean, air-conditioned commercial vehicles.</p>
+        <p><strong>Transparent Pricing:</strong> No hidden commission markups. Clear pay-as-you-travel model.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DRIVER PARTNER -->
+  <div id="driverPartnerModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden text-center p-5">
+      <i class="fa-solid fa-car-tunnel text-4xl text-blue-600 mb-2"></i>
+      <h3 class="font-bold text-slate-800 text-sm mb-1">Attach Your Taxi</h3>
+      <p class="text-xs text-slate-500 mb-4 leading-relaxed">Earn guaranteed outstation bookings with zero commission on your first 10 trips.</p>
+      <a href="https://wa.me/918409504684?text=Hi,%20I%20want%20to%20attach%20my%20cab%20with%20MakeTripzy" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2">
+        <i class="fa-brands fa-whatsapp text-base"></i> Join on WhatsApp
+      </a>
+      <button onclick="closeModal('driverPartnerModal')" class="mt-3 text-xs text-slate-400 hover:text-slate-600">Close</button>
+    </div>
+  </div>
+
+  <!-- FLOATING WHATSAPP BUTTON -->
+  <a href="https://wa.me/918409504684?text=Hi,%20I%20need%20cab%20booking%20support" target="_blank" class="fixed bottom-4 right-4 z-30 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold transition transform active:scale-95">
+    <i class="fa-brands fa-whatsapp text-lg"></i>
+    <span>WhatsApp Support</span>
+  </a>
+
+  <!-- SCRIPTS -->
   <script>
     let selectedTripType = 'One Way';
     let selectedVehicle = 'Hatchback';
@@ -278,6 +417,29 @@
     const driverAllowance = 300;
 
     document.getElementById('pickupDate').valueAsDate = new Date();
+
+    // Drawer Controls
+    function toggleDrawer(open) {
+      const drawer = document.getElementById('sideDrawer');
+      const overlay = document.getElementById('drawerOverlay');
+      if (open) {
+        overlay.classList.remove('hidden');
+        setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
+      } else {
+        drawer.classList.add('translate-x-full');
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+      }
+    }
+
+    // Modal Controls
+    function openModal(id) {
+      toggleDrawer(false);
+      if (id === 'historyModal') renderBookingHistory();
+      document.getElementById(id).classList.remove('hidden');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
 
     function selectTripType(type, element) {
       selectedTripType = type;
@@ -311,17 +473,29 @@
       const time = document.getElementById('pickupTime').value;
 
       if (!from || !to) {
-        alert('Kripya Pickup aur Dropoff location daalein!');
+        alert('Kripya Pickup aur Drop location daalein!');
         return;
       }
       if (!name || phone.length < 10) {
-        alert('Kripya apna naam aur valid 10-digit mobile number daalein!');
+        alert('Kripya valid name aur 10-digit phone number daalein!');
         return;
       }
 
+      const total = baseFare + driverAllowance;
+      const pickupPay = Math.round(total * 0.20);
+      const dropPay = total - pickupPay;
       const randomId = 'MTZ-' + Math.floor(1000 + Math.random() * 9000);
+      const bookedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+      // Save Booking to Local Storage for History
+      const bookingData = { id: randomId, from, to, date, time, vehicle: selectedVehicle, type: selectedTripType, name, phone, landmark, total, pickupPay, dropPay, bookedDate };
+      let history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
+      history.unshift(bookingData);
+      localStorage.setItem('maketripzy_history', JSON.stringify(history));
+
+      // Populate Receipt Screen
       document.getElementById('bookingIdBadge').innerText = randomId;
-      document.getElementById('receiptBookingDate').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      document.getElementById('receiptBookingDate').innerText = bookedDate;
       document.getElementById('receiptPickup').innerText = from;
       document.getElementById('receiptDrop').innerText = to;
       document.getElementById('receiptDateTime').innerText = `${date} • ${time}`;
@@ -329,15 +503,38 @@
       document.getElementById('receiptVehicle').innerText = selectedVehicle;
       document.getElementById('receiptCustName').innerText = name;
       document.getElementById('receiptCustPhone').innerText = phone;
-      document.getElementById('receiptCustLandmark').innerText = landmark || 'Not specified';
-      
-      const total = baseFare + driverAllowance;
+      document.getElementById('receiptCustLandmark').innerText = landmark || 'Direct Pickup';
       document.getElementById('receiptBaseFare').innerText = '₹' + baseFare;
       document.getElementById('receiptTotalFare').innerText = '₹' + total;
+      document.getElementById('receiptPickupAmount').innerText = '₹' + pickupPay;
+      document.getElementById('receiptDropAmount').innerText = '₹' + dropPay;
 
       document.getElementById('bookingSection').classList.add('hidden');
       document.getElementById('receiptSection').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderBookingHistory() {
+      const container = document.getElementById('historyListContainer');
+      const history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
+      if (history.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-slate-400">No bookings yet! Confirm a cab to view your receipts here.</div>`;
+        return;
+      }
+      container.innerHTML = history.map(item => `
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-bold text-blue-700">${item.id}</span>
+            <span class="text-[10px] text-slate-400">${item.bookedDate}</span>
+          </div>
+          <p class="font-semibold text-slate-800">${item.from} → ${item.to}</p>
+          <p class="text-[11px] text-slate-500">${item.date} • ${item.vehicle}</p>
+          <div class="flex justify-between items-center mt-2 pt-2 border-t border-slate-200">
+            <span class="text-emerald-600 font-bold">Total: ₹${item.total}</span>
+            <span class="text-[10px] text-slate-500">Pickup Pay: ₹${item.pickupPay}</span>
+          </div>
+        </div>
+      `).join('');
     }
 
     function backToBooking() {
@@ -346,24 +543,27 @@
     }
 
     function sendToWhatsApp() {
-      const bookingId = document.getElementById('bookingIdBadge').innerText;
+      const id = document.getElementById('bookingIdBadge').innerText;
       const from = document.getElementById('receiptPickup').innerText;
       const to = document.getElementById('receiptDrop').innerText;
-      const dateTime = document.getElementById('receiptDateTime').innerText;
+      const time = document.getElementById('receiptDateTime').innerText;
       const vehicle = document.getElementById('receiptVehicle').innerText;
-      const fare = document.getElementById('receiptTotalFare').innerText;
+      const total = document.getElementById('receiptTotalFare').innerText;
+      const pickupPay = document.getElementById('receiptPickupAmount').innerText;
+      const dropPay = document.getElementById('receiptDropAmount').innerText;
       const name = document.getElementById('receiptCustName').innerText;
       const phone = document.getElementById('receiptCustPhone').innerText;
 
-      const message = `*New Booking Confirmed!* 🚖%0A` +
-        `*Booking ID:* ${bookingId}%0A` +
+      const message = `*MakeTripzy Booking Confirmation* 🚖%0A` +
+        `*ID:* ${id}%0A` +
         `*Customer:* ${name} (${phone})%0A` +
-        `*From:* ${from}%0A` +
-        `*To:* ${to}%0A` +
-        `*Schedule:* ${dateTime}%0A` +
-        `*Vehicle:* ${vehicle}%0A` +
-        `*Total Fare:* ${fare}%0A` +
-        `*Payment:* Cash/UPI to driver`;
+        `*Route:* ${from} to ${to}%0A` +
+        `*Date/Time:* ${time}%0A` +
+        `*Vehicle:* ${vehicle}%0A%0A` +
+        `*Total Fare:* ${total}%0A` +
+        `*Pay at Pickup (20%):* ${pickupPay}%0A` +
+        `*Pay at Drop (80%):* ${dropPay}%0A` +
+        `*Advance:* ₹0`;
 
       window.open(`https://wa.me/918889637244?text=${message}`, '_blank');
     }
@@ -371,3 +571,4 @@
 </body>
 </html>
 
+  
