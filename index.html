@@ -3,17 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MakeTripzy - Cab Booking</title>
+  <title>MakeTripzy - Professional Cab Aggregator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCgW1xv0x3uITNKcZg7SNmPpUeIsOxJCww&libraries=places&callback=initGooglePlaces" async defer></script>
-  
 
-  <!-- INSTANT MENU SCRIPT -->
   <script>
     function toggleDrawer(open) {
       var drawer = document.getElementById('sideDrawer');
@@ -58,11 +55,11 @@
     <div id="bookingSection">
       <div class="bg-blue-700 text-white px-5 pt-7 pb-12 rounded-b-[2rem] text-center shadow-md">
         <span class="inline-flex items-center gap-1.5 bg-blue-600/70 border border-blue-400/40 text-blue-100 text-xs px-3 py-1 rounded-full font-medium mb-3">
-          <i class="fa-solid fa-clock-rotate-left text-amber-300"></i> Pay on Ongoing Trip
+          <i class="fa-solid fa-shield-halved text-amber-300"></i> North, West & Central Plain Corridors
         </span>
         <h1 class="text-2xl font-bold mb-2">Your Trusted Travel Companion</h1>
         <p class="text-blue-100 text-xs leading-relaxed px-2">
-          Reliable outstation cabs across India. ₹0 advance booking — pay partially during the ride.
+          ₹0 Advance Booking • 20% Fuel Allowance at Pickup • 80% at Drop
         </p>
       </div>
 
@@ -98,22 +95,29 @@
             <button type="button" onclick="selectTripType('Airport Transfer', this)" class="trip-type-btn py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600">Airport Transfer</button>
           </div>
 
-          <!-- INPUTS -->
+          <!-- INPUTS WITH LIVE SEARCH & AUTOCOMPLETE -->
           <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">From</label>
+            <div class="relative">
+              <label class="block text-xs font-medium text-slate-600 mb-1">From (Pickup City/Locality)</label>
               <div class="relative flex items-center">
                 <i class="fa-solid fa-location-dot absolute left-3 text-slate-400 text-sm"></i>
-                <input id="pickupLocation" type="text" placeholder="Pickup City or Area" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
+                <input id="pickupLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'pickup')" placeholder="Type city e.g. Bhopal, Jaipur, Ahmedabad" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
               </div>
+              <div id="pickupSuggestions" class="hidden absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-2xl mt-1 z-50 max-h-52 overflow-y-auto text-xs"></div>
             </div>
 
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">To</label>
+            <div class="relative">
+              <label class="block text-xs font-medium text-slate-600 mb-1">To (Drop City/Destination)</label>
               <div class="relative flex items-center">
                 <i class="fa-solid fa-location-crosshairs absolute left-3 text-amber-500 text-sm"></i>
-                <input id="dropLocation" type="text" placeholder="Dropoff City or Area" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
+                <input id="dropLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'drop')" placeholder="Type destination e.g. Indore, Delhi, Udaipur" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
               </div>
+              <div id="dropSuggestions" class="hidden absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-2xl mt-1 z-50 max-h-52 overflow-y-auto text-xs"></div>
+            </div>
+
+            <!-- DISTANCE & ROUTE BADGE -->
+            <div id="distanceBadgeBox" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-2.5 text-center text-xs text-blue-800 font-semibold">
+              <i class="fa-solid fa-route text-blue-600 mr-1"></i> <span id="distanceBadgeText">Calculating route...</span>
             </div>
 
             <div class="grid grid-cols-2 gap-3 pt-1">
@@ -155,97 +159,112 @@
             </div>
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Pickup Landmark</label>
-              <input id="custLandmark" type="text" placeholder="Near bus stand, hotel, etc." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+              <input id="custLandmark" type="text" placeholder="Near bus stand, railway station, colony gate, etc." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
             </div>
           </div>
         </div>
 
-        <!-- VEHICLE CATEGORY -->
+        <!-- VEHICLE CATEGORY (LIVE MULTIPLIERS & SLABS) -->
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
-          <div class="flex items-center gap-2 mb-3">
-            <i class="fa-solid fa-car-side text-blue-600"></i>
-            <h3 class="text-sm font-bold text-slate-800">Vehicle Category</h3>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-car-side text-blue-600"></i>
+              <h3 class="text-sm font-bold text-slate-800">Select Vehicle</h3>
+            </div>
+            <span id="rateModeBadge" class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-md">Auto KM Engine</span>
           </div>
-          <div class="space-y-2">
+
+          <div class="space-y-2.5">
             <!-- Hatchback -->
-            <label class="flex items-center justify-between p-3 border-2 border-blue-600 bg-blue-50/50 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('Hatchback', 1200, this)">
+            <label class="flex items-center justify-between p-3 border-2 border-blue-600 bg-blue-50/50 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('Hatchback', this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" checked class="text-blue-600" />
                 <div>
                   <p class="text-sm font-bold text-slate-800">Hatchback</p>
-                  <p class="text-[11px] text-slate-500">Mini, Swift, WagonR</p>
+                  <p class="text-[11px] text-slate-500">WagonR, Swift • ₹11/KM (1.65x)</p>
                 </div>
               </div>
-              <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">4 seats</span>
+              <div class="text-right">
+                <span id="priceTagHatchback" class="text-sm font-bold text-slate-900">₹1,815</span>
+                <p class="text-[10px] text-slate-400">4 seats</p>
+              </div>
             </label>
 
             <!-- Sedan -->
-            <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('Sedan', 1600, this)">
+            <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('Sedan', this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" class="text-blue-600" />
                 <div>
                   <p class="text-sm font-bold text-slate-800">Sedan</p>
-                  <p class="text-[11px] text-slate-500">Dzire, Etios, Aura</p>
+                  <p class="text-[11px] text-slate-500">Dzire, Etios, Aura • ₹12/KM (1.70x)</p>
                 </div>
               </div>
-              <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">4 seats</span>
+              <div class="text-right">
+                <span id="priceTagSedan" class="text-sm font-bold text-slate-900">₹2,040</span>
+                <p class="text-[10px] text-slate-400">4 seats</p>
+              </div>
             </label>
 
-            <!-- MUV -->
-            <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('MUV', 2200, this)">
+            <!-- Ertiga (MUV) -->
+            <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('MUV', this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" class="text-blue-600" />
                 <div>
-                  <p class="text-sm font-bold text-slate-800">MUV</p>
-                  <p class="text-[11px] text-slate-500">Ertiga and similar</p>
+                  <p class="text-sm font-bold text-slate-800">Ertiga (MUV)</p>
+                  <p class="text-[11px] text-slate-500">Maruti Ertiga • ₹14/KM (1.85x)</p>
                 </div>
               </div>
-              <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">6 seats</span>
+              <div class="text-right">
+                <span id="priceTagMUV" class="text-sm font-bold text-slate-900">₹2,590</span>
+                <p class="text-[10px] text-slate-400">6 seats</p>
+              </div>
             </label>
 
-            <!-- SUV -->
-            <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('SUV', 2800, this)">
+            <!-- Crysta (SUV) -->
+            <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('SUV', this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" class="text-blue-600" />
                 <div>
-                  <p class="text-sm font-bold text-slate-800">SUV</p>
-                  <p class="text-[11px] text-slate-500">Innova Crysta and similar</p>
+                  <p class="text-sm font-bold text-slate-800">Innova Crysta</p>
+                  <p class="text-[11px] text-slate-500">Toyota Crysta • ₹20/KM (2.0x)</p>
                 </div>
               </div>
-              <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">6–7 seats</span>
+              <div class="text-right">
+                <span id="priceTagSUV" class="text-sm font-bold text-slate-900">₹4,000</span>
+                <p class="text-[10px] text-slate-400">6–7 seats</p>
+              </div>
             </label>
           </div>
 
-          <!-- SUMMARY BADGE -->
+          <!-- ZERO ADVANCE POLICY SUMMARY -->
           <div class="mt-4 bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
             <p class="font-bold flex items-center gap-1.5">
-              <i class="fa-solid fa-circle-check text-amber-600"></i> Zero Advance Booking
+              <i class="fa-solid fa-circle-check text-amber-600"></i> ₹0 Advance Booking Guarantee
             </p>
             <p class="text-[11px] text-amber-800 leading-relaxed">
-              Trip shuru hone par driver ko 20% dein, bacha 80% drop par dein.
+              No prepayment required. 20% fuel payment collected at pickup, remaining 80% at destination.
             </p>
           </div>
 
-          <!-- T&C LINK -->
           <div class="mt-3 text-center text-xs text-slate-500">
-            By clicking confirm, you agree to our 
-            <button type="button" onclick="openModal('termsModal')" class="text-blue-600 underline font-semibold">Terms & Conditions</button>
+            By confirming, you agree to MakeTripzy's 
+            <button type="button" onclick="openModal('termsModal')" class="text-blue-600 underline font-semibold">Terms & Cancellation Policy</button>
           </div>
 
-          <button id="bookSubmitBtn" onclick="handleBooking()" class="w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
+          <button id="bookSubmitBtn" onclick="handleBooking()" class="w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
             Confirm Booking <i class="fa-solid fa-chevron-right text-xs"></i>
           </button>
         </div>
       </div>
     </div>
-        <!-- CONFIRMATION RECEIPT -->
+        <!-- CONFIRMATION RECEIPT SCREEN -->
     <div id="receiptSection" class="hidden px-4 pt-4">
       <button onclick="backToBooking()" class="text-xs font-semibold text-blue-600 flex items-center gap-1 mb-3">
         <i class="fa-solid fa-arrow-left"></i> Book Another Trip
       </button>
 
       <!-- RECEIPT HEADER -->
-      <div id="receiptHeaderBox" class="bg-amber-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors">
+      <div id="receiptHeaderBox" class="bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-car text-lg"></i>
@@ -255,13 +274,13 @@
         </div>
         <div class="flex items-center justify-between text-xs">
           <div>
-            <p class="text-amber-100">Booking Status</p>
+            <p class="text-blue-100">Booking Status</p>
             <span id="receiptStatusBadge" class="inline-flex items-center gap-1.5 font-bold text-white text-xs mt-0.5">
               <span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmation Pending from Partner
             </span>
           </div>
           <div class="text-right">
-            <p class="text-amber-100">Booked On</p>
+            <p class="text-blue-100">Booked On</p>
             <p id="receiptBookingDate" class="font-semibold"></p>
           </div>
         </div>
@@ -336,8 +355,8 @@
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
         <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare & Payment Breakdown</h4>
         <div class="flex justify-between text-slate-600">
-          <span>Base Fare (Estimated)</span>
-          <span id="receiptBaseFare" class="font-semibold">₹1200</span>
+          <span>Base Fare (<span id="receiptEstimatedKm">Calculated Fare</span>)</span>
+          <span id="receiptBaseFare" class="font-semibold">₹1815</span>
         </div>
         <div class="flex justify-between text-slate-600">
           <span>Driver Allowance</span>
@@ -345,7 +364,7 @@
         </div>
         <div class="flex justify-between border-t border-slate-100 pt-2 text-sm font-bold text-slate-900">
           <span>Total Fare</span>
-          <span id="receiptTotalFare">₹1500</span>
+          <span id="receiptTotalFare">₹2115</span>
         </div>
 
         <div class="bg-blue-50/70 rounded-xl p-3 border border-blue-100 space-y-1.5 mt-2">
@@ -355,11 +374,11 @@
           </div>
           <div class="flex justify-between text-blue-900 font-medium">
             <span>2. At Pickup (Trip Start - 20%):</span>
-            <span id="receiptPickupAmount" class="font-bold">₹300</span>
+            <span id="receiptPickupAmount" class="font-bold text-slate-900">₹423</span>
           </div>
           <div class="flex justify-between text-blue-900 font-medium">
             <span>3. At Dropoff (Trip End - 80%):</span>
-            <span id="receiptDropAmount" class="font-bold">₹1200</span>
+            <span id="receiptDropAmount" class="font-bold text-slate-900">₹1692</span>
           </div>
         </div>
       </div>
@@ -379,7 +398,6 @@
   <!-- SLIDE-OVER HAMBURGER DRAWER -->
   <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
   <aside id="sideDrawer" style="transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl z-50 flex flex-col">
-    <!-- Profile Header -->
     <div onclick="openModal('authModal')" class="p-5 border-b border-slate-200 flex items-center justify-between bg-blue-600 text-white cursor-pointer active:bg-blue-700">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg">
@@ -395,7 +413,6 @@
       </button>
     </div>
 
-    <!-- Navigation Links -->
     <div class="p-4 space-y-2 flex-1 overflow-y-auto text-sm font-medium text-slate-700">
       <button onclick="openModal('historyModal')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left">
         <i class="fa-solid fa-clock-rotate-left text-blue-600 w-5"></i>
@@ -420,7 +437,7 @@
     </div>
 
     <div class="p-4 border-t border-slate-100 text-center text-xs text-slate-400">
-      MakeTripzy Cab Services v1.5 (Firebase Live)
+      MakeTripzy Platform v2.0 (Automatic Pricing & Admin Ready)
     </div>
   </aside>
 
@@ -476,9 +493,9 @@
         <p>• Pickup time se 6 ghante pehle cancellation bilkul <b>FREE (₹0 Penalty)</b> hai.</p>
         <p>• Pickup time ke 6 ghante ke andar cancel karne par total fare ka <b>10% (Minimum ₹300, Maximum ₹1,000)</b> late fee charge hoga.</p>
         <p class="font-bold text-slate-800">2. Partner Guarantee</p>
-        <p>Ride accept karne ke baad partner dwara cancel hone par partner par bhi penalty charge ki jaati hai.</p>
+        <p>Ride accept karne ke baad partner dwara cancel hone par partner par bhi penalty charge ki jaati hai aur customer ko bina rukawat naya driver assign hota hai.</p>
         <p class="font-bold text-slate-800">3. ₹0 Advance Policy</p>
-        <p>Booking ke samay advance ₹0 hai. 20% pickup par aur 80% drop par dena hota hai.</p>
+        <p>Booking ke samay advance ₹0 hai. 20% pickup par driver ko fuel allowance ke roop me aur bacha hua 80% drop par dena hota hai.</p>
       </div>
     </div>
   </div>
@@ -490,17 +507,16 @@
         <button onclick="closeModal('aboutModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-600 leading-relaxed flex-1">
-        <p>MakeTripzy connects verified taxi partners across India with travelers for seamless outstation rides.</p>
+        <p>MakeTripzy connects verified taxi partners across India with travelers for seamless outstation rides with zero advance payment and verified fares.</p>
       </div>
     </div>
   </div>
 
-  <!-- FLOATING WHATSAPP BUTTON -->
   <a href="https://wa.me/918889637244?text=Hi,%20I%20need%20cab%20booking%20support" target="_blank" class="fixed bottom-4 right-4 z-30 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold transition transform active:scale-95">
     <i class="fa-brands fa-whatsapp text-lg"></i>
     <span>WhatsApp Support</span>
   </a>
-    <!-- SCRIPTS & FIREBASE INTEGRATION -->
+    <!-- SCRIPTS & FARE ENGINE INTEGRATION -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
@@ -517,38 +533,229 @@
     }
     const db = firebase.firestore();
 
+    // 1. VEHICLE BASE RATES & ONE-WAY MULTIPLIERS
+    const CAB_CONFIG = {
+      'Hatchback': { baseRate: 11, oneWayMultiplier: 1.65 },
+      'Sedan':     { baseRate: 12, oneWayMultiplier: 1.70 },
+      'MUV':       { baseRate: 14, oneWayMultiplier: 1.85 }, // Ertiga
+      'SUV':       { baseRate: 20, oneWayMultiplier: 2.00 }  // Innova Crysta
+    };
+
     let selectedTripType = 'One Way';
     let selectedVehicle = 'Hatchback';
-    let baseFare = 1200;
+    let baseFare = 1815;
     const driverAllowance = 300;
     let currentDocId = '';
     let currentBookingData = null;
     let unsubscribeBooking = null;
 
+    let pickupCoords = null;
+    let dropCoords = null;
+    let pickupCityName = '';
+    let dropCityName = '';
+    let calculatedDistanceKm = 0;
+    let searchDebounceTimer = null;
+
+    // 2. ADMIN ROUTE OVERRIDE CACHE (FIRESTORE REAL-TIME SYNC)
+    let adminFixedRoutes = {};
+    db.collection("pricing_rules").doc("fixed_routes").onSnapshot((doc) => {
+      if (doc.exists) {
+        adminFixedRoutes = doc.data() || {};
+        console.log("Admin fixed routes live synced:", adminFixedRoutes);
+        updateDynamicVehicleFares(calculatedDistanceKm);
+      }
+    });
+
     if (document.getElementById('pickupDate')) {
       document.getElementById('pickupDate').valueAsDate = new Date();
     }
 
-    function openModal(id) {
-      toggleDrawer(false);
-      if (id === 'historyModal') renderBookingHistory();
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.remove('hidden');
+    // HILLY / RESTRICTED TERRAIN FILTER
+    const HILLY_REGIONS = [
+      "shimla", "manali", "dharamshala", "kullu", "mussoorie", "nainital", 
+      "rishikesh", "haridwar", "leh", "ladakh", "srinagar", "mount abu", 
+      "kedarnath", "badrinath", "uttarakhand", "himachal", "chamoli", "almora"
+    ];
+
+    function checkHillyTerrain(address) {
+      const lower = (address || '').toLowerCase();
+      return HILLY_REGIONS.find(h => lower.includes(h));
     }
 
-    function closeModal(id) {
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.add('hidden');
+    // FREE ADDRESS AUTOCOMPLETE SEARCH (INDIA FOCUS)
+    function handleAddressSearch(query, type) {
+      clearTimeout(searchDebounceTimer);
+      const listContainer = document.getElementById(type === 'pickup' ? 'pickupSuggestions' : 'dropSuggestions');
+
+      if (!query || query.trim().length < 2) {
+        listContainer.classList.add('hidden');
+        listContainer.innerHTML = '';
+        return;
+      }
+
+      searchDebounceTimer = setTimeout(() => {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=6&addressdetails=1`;
+
+        fetch(url, { headers: { 'Accept-Language': 'en' } })
+          .then(res => res.json())
+          .then(data => {
+            if (!data || data.length === 0) {
+              listContainer.innerHTML = `<div class="p-2.5 text-slate-400 text-center">No location found</div>`;
+              listContainer.classList.remove('hidden');
+              return;
+            }
+
+            listContainer.innerHTML = data.map(item => {
+              const displayName = item.display_name;
+              const shortName = item.name || displayName.split(',')[0];
+              const subDetails = displayName.split(',').slice(1, 4).join(',');
+              const city = item.address?.city || item.address?.town || item.address?.state_district || shortName;
+
+              return `
+                <div onclick="selectLocation('${type}', '${item.lat}', '${item.lon}', '${shortName.replace(/'/g, "\\'")}, ${subDetails.replace(/'/g, "\\'")}', '${city.replace(/'/g, "\\'")}')" class="p-2.5 hover:bg-blue-50 border-b border-slate-100 last:border-none cursor-pointer flex items-start gap-2">
+                  <i class="fa-solid fa-location-dot text-blue-500 text-xs mt-0.5"></i>
+                  <div>
+                    <p class="font-bold text-slate-800">${shortName}</p>
+                    <p class="text-[10px] text-slate-400 line-clamp-1">${subDetails}</p>
+                  </div>
+                </div>
+              `;
+            }).join('');
+            listContainer.classList.remove('hidden');
+          })
+          .catch(() => {
+            listContainer.classList.add('hidden');
+          });
+      }, 300);
     }
 
-    function resetBookingForm() {
-      if (confirm('Kya aap form ka saara data reset karna chahte hain?')) {
-        document.getElementById('pickupLocation').value = '';
-        document.getElementById('dropLocation').value = '';
-        document.getElementById('custLandmark').value = '';
-        document.getElementById('pickupDate').valueAsDate = new Date();
-        document.getElementById('pickupTime').value = '10:00 AM';
-        loadSavedProfile();
+    // ON SELECT LOCATION
+    function selectLocation(type, lat, lon, fullAddress, city) {
+      const hilly = checkHillyTerrain(fullAddress);
+      if (hilly) {
+        alert(`⚠️ Outstation Service Notice:\n\nMakeTripzy currently plain (non-hilly) corridors me operate karta hai. Hilly/Ghat terrains (${hilly.toUpperCase()}) ke commercial permits aur hill climb charges alag rehte hain. Kripya plain city corridor chunein.`);
+      }
+
+      if (type === 'pickup') {
+        document.getElementById('pickupLocation').value = fullAddress;
+        pickupCoords = { lat: parseFloat(lat), lon: parseFloat(lon) };
+        pickupCityName = city.trim().toLowerCase();
+        document.getElementById('pickupSuggestions').classList.add('hidden');
+      } else {
+        document.getElementById('dropLocation').value = fullAddress;
+        dropCoords = { lat: parseFloat(lat), lon: parseFloat(lon) };
+        dropCityName = city.trim().toLowerCase();
+        document.getElementById('dropSuggestions').classList.add('hidden');
+      }
+
+      if (pickupCoords && dropCoords) {
+        calculateRoadDrivingDistance();
+      }
+    }
+
+    // FREE OSRM DRIVING DISTANCE CALCULATION
+    function calculateRoadDrivingDistance() {
+      const badgeBox = document.getElementById('distanceBadgeBox');
+      const badgeText = document.getElementById('distanceBadgeText');
+      if (badgeBox && badgeText) {
+        badgeBox.classList.remove('hidden');
+        badgeText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Calculating exact road route...`;
+      }
+
+      const url = `https://router.project-osrm.org/route/v1/driving/${pickupCoords.lon},${pickupCoords.lat};${dropCoords.lon},${dropCoords.lat}?overview=false`;
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === "Ok" && data.routes && data.routes.length > 0) {
+            calculatedDistanceKm = Math.round(data.routes[0].distance / 1000);
+            updateDynamicVehicleFares(calculatedDistanceKm);
+          }
+        })
+        .catch(err => {
+          console.error("Route calculation error:", err);
+        });
+    }
+
+    // MAIN FARE ENGINE (EXCEL/ADMIN OVERRIDE + SLABS & MULTIPLIERS)
+    function calculateSegmentFare(vehicleType, oneWayDistanceKm, tripType) {
+      // 1. ADMIN OVERRIDE CHECK
+      if (pickupCityName && dropCityName && tripType === 'One Way') {
+        const forwardKey = `${pickupCityName}-${dropCityName}`;
+        const reverseKey = `${dropCityName}-${pickupCityName}`;
+        const fixedPackage = adminFixedRoutes[forwardKey] || adminFixedRoutes[reverseKey];
+
+        if (fixedPackage && fixedPackage[vehicleType]) {
+          return { fare: Number(fixedPackage[vehicleType]), isAdminOverride: true };
+        }
+      }
+
+      // 2. AUTOMATIC KM ENGINE
+      const config = CAB_CONFIG[vehicleType] || CAB_CONFIG['Sedan'];
+      const dist = Number(oneWayDistanceKm) || 100;
+
+      if (tripType === 'One Way') {
+        // ONE WAY: Min 100 KM Slab + Multiplier
+        const billableKm = Math.max(100, dist);
+        const fare = Math.round(billableKm * config.baseRate * config.oneWayMultiplier);
+        return { fare: fare, isAdminOverride: false, billableKm: billableKm };
+
+      } else if (tripType === 'Round Trip') {
+        // ROUND TRIP: Min 300 KM Slab, Pure Base Rate (NO Multiplier)
+        const totalRoundKm = dist * 2;
+        const billableKm = Math.max(300, totalRoundKm);
+        const fare = Math.round(billableKm * config.baseRate);
+        return { fare: fare, isAdminOverride: false, billableKm: billableKm };
+
+      } else {
+        const billableKm = Math.max(100, dist);
+        return { fare: Math.round(billableKm * config.baseRate), isAdminOverride: false, billableKm: billableKm };
+      }
+    }
+
+    // UPDATE VEHICLE CARDS FARES DYNAMICALLY
+    function updateDynamicVehicleFares(distanceKm) {
+      const dist = distanceKm || calculatedDistanceKm || 100;
+
+      const hRes = calculateSegmentFare('Hatchback', dist, selectedTripType);
+      const sRes = calculateSegmentFare('Sedan', dist, selectedTripType);
+      const mRes = calculateSegmentFare('MUV', dist, selectedTripType);
+      const uRes = calculateSegmentFare('SUV', dist, selectedTripType);
+
+      document.getElementById('priceTagHatchback').innerText = `₹${hRes.fare.toLocaleString('en-IN')}`;
+      document.getElementById('priceTagSedan').innerText = `₹${sRes.fare.toLocaleString('en-IN')}`;
+      document.getElementById('priceTagMUV').innerText = `₹${mRes.fare.toLocaleString('en-IN')}`;
+      document.getElementById('priceTagSUV').innerText = `₹${uRes.fare.toLocaleString('en-IN')}`;
+
+      // Update current selected baseFare
+      const cur = calculateSegmentFare(selectedVehicle, dist, selectedTripType);
+      baseFare = cur.fare;
+
+      // Mode Badge (Auto KM vs Admin Fixed Route)
+      const modeBadge = document.getElementById('rateModeBadge');
+      if (modeBadge) {
+        if (cur.isAdminOverride) {
+          modeBadge.className = 'text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-md';
+          modeBadge.innerText = 'Admin Fixed Rate';
+        } else {
+          modeBadge.className = 'text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-md';
+          modeBadge.innerText = selectedTripType === 'Round Trip' ? 'Round Trip (Min 300 KM)' : 'Auto KM Engine';
+        }
+      }
+
+      // Badge Label update
+      const badgeText = document.getElementById('distanceBadgeText');
+      if (badgeText && calculatedDistanceKm > 0) {
+        if (cur.isAdminOverride) {
+          badgeText.innerText = `Route: ${calculatedDistanceKm} KM (Special Fixed Rate from Admin Panel)`;
+        } else if (selectedTripType === 'Round Trip') {
+          const totalKm = calculatedDistanceKm * 2;
+          const billable = Math.max(300, totalKm);
+          badgeText.innerText = `Round Trip: ${totalKm} KM (${billable} KM Billable Slab @ Base Rate)`;
+        } else {
+          const billable = Math.max(100, calculatedDistanceKm);
+          badgeText.innerText = `One Way: ${calculatedDistanceKm} KM (${billable} KM Billable Slab with Multiplier)`;
+        }
       }
     }
 
@@ -560,11 +767,15 @@
       });
       element.classList.remove('bg-slate-100', 'text-slate-600');
       element.classList.add('bg-blue-600', 'text-white');
+
+      updateDynamicVehicleFares(calculatedDistanceKm);
     }
 
-    function selectVehicle(name, price, element) {
+    function selectVehicle(name, element) {
       selectedVehicle = name;
-      baseFare = price;
+      const res = calculateSegmentFare(name, calculatedDistanceKm || 100, selectedTripType);
+      baseFare = res.fare;
+
       document.querySelectorAll('.vehicle-card').forEach(card => {
         card.classList.remove('border-2', 'border-blue-600', 'bg-blue-50/50');
         card.classList.add('border', 'border-slate-200');
@@ -575,6 +786,25 @@
       if (radio) radio.checked = true;
     }
 
+    function resetBookingForm() {
+      if (confirm('Kya aap form reset karna chahte hain?')) {
+        document.getElementById('pickupLocation').value = '';
+        document.getElementById('dropLocation').value = '';
+        document.getElementById('custLandmark').value = '';
+        document.getElementById('pickupDate').valueAsDate = new Date();
+        document.getElementById('pickupTime').value = '10:00 AM';
+        document.getElementById('distanceBadgeBox').classList.add('hidden');
+        pickupCoords = null;
+        dropCoords = null;
+        pickupCityName = '';
+        dropCityName = '';
+        calculatedDistanceKm = 0;
+        updateDynamicVehicleFares(100);
+        loadSavedProfile();
+      }
+    }
+
+    // CREATE BOOKING HANDLER
     function handleBooking() {
       const from = document.getElementById('pickupLocation').value.trim();
       const to = document.getElementById('dropLocation').value.trim();
@@ -585,11 +815,11 @@
       const time = document.getElementById('pickupTime').value;
 
       if (!from || !to) {
-        alert('Kripya Pickup aur Drop location daalein!');
+        alert('Kripya Pickup aur Drop location select karein!');
         return;
       }
       if (!name || phone.length < 10) {
-        alert('Kripya valid name aur 10-digit phone number daalein!');
+        alert('Kripya valid passenger name aur 10-digit phone number daalein!');
         return;
       }
 
@@ -603,6 +833,7 @@
         bookingId: bookingId,
         from: from,
         to: to,
+        estimatedDistanceKm: calculatedDistanceKm || 100,
         date: date,
         time: time,
         vehicle: selectedVehicle,
@@ -647,10 +878,11 @@
           document.getElementById('receiptCustName').innerText = name;
           document.getElementById('receiptCustPhone').innerText = phone;
           document.getElementById('receiptCustLandmark').innerText = landmark || 'Direct Pickup';
-          document.getElementById('receiptBaseFare').innerText = '₹' + baseFare;
-          document.getElementById('receiptTotalFare').innerText = '₹' + total;
-          document.getElementById('receiptPickupAmount').innerText = '₹' + pickupPay;
-          document.getElementById('receiptDropAmount').innerText = '₹' + dropPay;
+          document.getElementById('receiptEstimatedKm').innerText = `${calculatedDistanceKm || 100} KM Route`;
+          document.getElementById('receiptBaseFare').innerText = '₹' + baseFare.toLocaleString('en-IN');
+          document.getElementById('receiptTotalFare').innerText = '₹' + total.toLocaleString('en-IN');
+          document.getElementById('receiptPickupAmount').innerText = '₹' + pickupPay.toLocaleString('en-IN');
+          document.getElementById('receiptDropAmount').innerText = '₹' + dropPay.toLocaleString('en-IN');
 
           document.getElementById('bookingSection').classList.add('hidden');
           document.getElementById('receiptSection').classList.remove('hidden');
@@ -665,6 +897,7 @@
         });
     }
 
+    // REAL-TIME LISTENER FOR DISPATCH & SAFE RE-ASSIGNMENT
     function listenToBooking(docId) {
       if (unsubscribeBooking) unsubscribeBooking();
 
@@ -808,7 +1041,7 @@
           cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
         }).then(() => {
           if (finalPenalty > 0) {
-            alert(`Booking cancel ho gayi hai. Policy anusaar ₹${finalPenalty} penalty account par record ho chuki hai.`);
+            alert(`Booking cancel ho gayi hai. Policy anusaar ₹${finalPenalty} penalty record ho chuki hai.`);
           } else {
             alert('Booking bina kisi penalty ke successfully cancel ho gayi hai.');
           }
@@ -975,6 +1208,18 @@
       loadSavedProfile();
       closeModal('authModal');
     }
+
+    // CLOSE SUGGESTIONS ON OUTSIDE CLICK
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#pickupLocation') && !e.target.closest('#pickupSuggestions')) {
+        const p = document.getElementById('pickupSuggestions');
+        if (p) p.classList.add('hidden');
+      }
+      if (!e.target.closest('#dropLocation') && !e.target.closest('#dropSuggestions')) {
+        const d = document.getElementById('dropSuggestions');
+        if (d) d.classList.add('hidden');
+      }
+    });
 
     loadSavedProfile();
   </script>
