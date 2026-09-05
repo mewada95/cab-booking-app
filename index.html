@@ -242,7 +242,7 @@
         </div>
       </div>
 
-      <!-- DRIVER ASSIGNMENT CARD (With Live Phone Link) -->
+      <!-- DRIVER ASSIGNMENT CARD -->
       <div id="driverStatusCard" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
         <div id="driverPendingState" class="text-center py-2">
           <i class="fa-solid fa-hourglass-half text-amber-500 text-2xl mb-1.5 animate-pulse"></i>
@@ -351,9 +351,10 @@
     </div>
   </main>
 
-  <!-- SLIDE-OVER HAMBURGER DRAWER -->
-  <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden transition-opacity"></div>
-  <aside id="sideDrawer" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+  <!-- SLIDE-OVER HAMBURGER DRAWER (DIRECT TRANSFORM SLIDE FIX) -->
+  <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+  <aside id="sideDrawer" style="transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl z-50 flex flex-col">
+    <!-- Clickable Profile Header -->
     <div onclick="openModal('authModal')" class="p-5 border-b border-slate-200 flex items-center justify-between bg-blue-600 text-white cursor-pointer active:bg-blue-700">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg">
@@ -369,6 +370,7 @@
       </button>
     </div>
 
+    <!-- Navigation Links -->
     <div class="p-4 space-y-2 flex-1 overflow-y-auto text-sm font-medium text-slate-700">
       <button onclick="openModal('historyModal')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left">
         <i class="fa-solid fa-clock-rotate-left text-blue-600 w-5"></i>
@@ -386,7 +388,7 @@
         <i class="fa-solid fa-taxi text-purple-600 w-5"></i>
         <span>Vendor / Partner Portal</span>
       </a>
-      <a href="https://wa.me/918409504684?text=Hello%20Support" target="_blank" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left text-emerald-700">
+      <a href="https://wa.me/918889637244?text=Hello%20Support" target="_blank" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left text-emerald-700">
         <i class="fa-brands fa-whatsapp text-emerald-600 text-lg w-5"></i>
         <span>24x7 Help Desk</span>
       </a>
@@ -468,11 +470,12 @@
     </div>
   </div>
 
+  <!-- FLOATING WHATSAPP BUTTON -->
   <a href="https://wa.me/918889637244?text=Hi,%20I%20need%20cab%20booking%20support" target="_blank" class="fixed bottom-4 right-4 z-30 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold transition transform active:scale-95">
     <i class="fa-brands fa-whatsapp text-lg"></i>
     <span>WhatsApp Support</span>
-  </a>
-    <!-- SCRIPTS & FIREBASE INTEGRATION -->
+        </a>
+          <!-- SCRIPTS & FIREBASE INTEGRATION -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
@@ -495,7 +498,38 @@
     let currentBookingData = null;
     let unsubscribeBooking = null;
 
-    document.getElementById('pickupDate').valueAsDate = new Date();
+    if (document.getElementById('pickupDate')) {
+      document.getElementById('pickupDate').valueAsDate = new Date();
+    }
+
+    // RELIABLE SLIDE DRAWER CONTROLLER (Fix for 3 lines menu)
+    function toggleDrawer(open) {
+      const drawer = document.getElementById('sideDrawer');
+      const overlay = document.getElementById('drawerOverlay');
+      if (!drawer || !overlay) return;
+
+      if (open) {
+        overlay.classList.remove('hidden');
+        drawer.style.transform = 'translateX(0%)';
+      } else {
+        drawer.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          overlay.classList.add('hidden');
+        }, 300);
+      }
+    }
+
+    function openModal(id) {
+      toggleDrawer(false);
+      if (id === 'historyModal') renderBookingHistory();
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('hidden');
+    }
 
     function resetBookingForm() {
       if (confirm('Kya aap form ka saara data reset karna chahte hain?')) {
@@ -506,27 +540,6 @@
         document.getElementById('pickupTime').value = '10:00 AM';
         loadSavedProfile();
       }
-    }
-
-    function toggleDrawer(open) {
-      const drawer = document.getElementById('sideDrawer');
-      const overlay = document.getElementById('drawerOverlay');
-      if (open) {
-        overlay.classList.remove('hidden');
-        setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
-      } else {
-        drawer.classList.add('translate-x-full');
-        setTimeout(() => overlay.classList.add('hidden'), 300);
-      }
-    }
-
-    function openModal(id) {
-      toggleDrawer(false);
-      if (id === 'historyModal') renderBookingHistory();
-      document.getElementById(id).classList.remove('hidden');
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
     }
 
     function selectTripType(type, element) {
@@ -854,6 +867,7 @@
       document.getElementById('bookingSection').classList.remove('hidden');
     }
 
+    // WHATSAPP DISPATCH TO UPDATED NUMBER: 8889637244
     function sendToWhatsApp() {
       const id = document.getElementById('bookingIdBadge').innerText;
       const from = document.getElementById('receiptPickup').innerText;
@@ -881,20 +895,32 @@
       window.open(`https://wa.me/918889637244?text=${message}`, '_blank');
     }
 
+    // SAFE PROFILE LOADER WITH ERROR HANDLING
     function loadSavedProfile() {
-      const user = JSON.parse(localStorage.getItem('maketripzy_user'));
-      if (user && user.name) {
-        document.getElementById('drawerUserTitle').innerText = user.name;
-        document.getElementById('drawerUserSub').innerText = user.phone;
-        document.getElementById('custName').value = user.name;
-        document.getElementById('custPhone').value = user.phone;
-        document.getElementById('loginName').value = user.name;
-        document.getElementById('loginPhone').value = user.phone;
-        document.getElementById('logoutBtn').classList.remove('hidden');
-      } else {
-        document.getElementById('drawerUserTitle').innerText = 'Login / Sign In';
-        document.getElementById('drawerUserSub').innerText = 'Tap to manage profile';
-        document.getElementById('logoutBtn').classList.add('hidden');
+      try {
+        const raw = localStorage.getItem('maketripzy_user');
+        if (!raw) {
+          const t = document.getElementById('drawerUserTitle');
+          const s = document.getElementById('drawerUserSub');
+          const b = document.getElementById('logoutBtn');
+          if (t) t.innerText = 'Login / Sign In';
+          if (s) s.innerText = 'Tap to manage profile';
+          if (b) b.classList.add('hidden');
+          return;
+        }
+
+        const user = JSON.parse(raw);
+        if (user && user.name) {
+          if (document.getElementById('drawerUserTitle')) document.getElementById('drawerUserTitle').innerText = user.name;
+          if (document.getElementById('drawerUserSub')) document.getElementById('drawerUserSub').innerText = user.phone || '';
+          if (document.getElementById('custName')) document.getElementById('custName').value = user.name;
+          if (document.getElementById('custPhone')) document.getElementById('custPhone').value = user.phone || '';
+          if (document.getElementById('loginName')) document.getElementById('loginName').value = user.name;
+          if (document.getElementById('loginPhone')) document.getElementById('loginPhone').value = user.phone || '';
+          if (document.getElementById('logoutBtn')) document.getElementById('logoutBtn').classList.remove('hidden');
+        }
+      } catch (e) {
+        console.error("Profile load error:", e);
       }
     }
 
@@ -914,4 +940,15 @@
 
     function logoutUser() {
       localStorage.removeItem('maketripzy_user');
-      document.getElementById('loginName').value = 
+      if (document.getElementById('loginName')) document.getElementById('loginName').value = '';
+      if (document.getElementById('loginPhone')) document.getElementById('loginPhone').value = '';
+      if (document.getElementById('custName')) document.getElementById('custName').value = '';
+      if (document.getElementById('custPhone')) document.getElementById('custPhone').value = '';
+      loadSavedProfile();
+      closeModal('authModal');
+    }
+
+    loadSavedProfile();
+  </script>
+</body>
+</html>
