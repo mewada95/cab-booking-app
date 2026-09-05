@@ -70,7 +70,7 @@
       </button>
     </div>
   </div>
-  <!-- MAIN CONTAINER -->
+    <!-- MAIN CONTAINER -->
   <main class="max-w-md mx-auto p-4 pb-24">
 
     <!-- VIEW 1: LIVE RADAR (Bookings) -->
@@ -167,7 +167,7 @@
     </div>
   </main>
 
-  <!-- MODAL: ASSIGN DRIVER & CAB ON ACCEPT -->
+  <!-- MODAL: ASSIGN DRIVER & CAB -->
   <div id="assignModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4">
       <div class="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -190,7 +190,7 @@
         </div>
 
         <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200 text-[11px] text-amber-800 leading-tight">
-          Ye details turant customer ki live screen par unlock ho jayengi aur customer contact details yahan reveal hongi.
+          Ye details turant customer ki live screen par unlock ho jayengi aur customer contact details reveal hongi.
         </div>
 
         <button onclick="confirmAssignmentAndAccept()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md">
@@ -199,7 +199,78 @@
       </div>
     </div>
   </div>
-    <!-- JAVASCRIPT LOGIC -->
+
+  <!-- MODAL: COMPLETE TRIP & BILLING -->
+  <div id="billingModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+        <div>
+          <h3 class="font-bold text-slate-900 text-sm">Complete Trip & Bill</h3>
+          <p id="billModalSub" class="text-[11px] text-slate-400">Generate Final Settlement</p>
+        </div>
+        <button onclick="closeBillingModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Extra Run Kilometers (KM)</label>
+          <input id="billExtraKm" type="number" min="0" value="0" oninput="calculateLiveBill()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-bold" />
+          <p id="billRateHint" class="text-[10px] text-slate-400 mt-0.5">Rate: ₹12/KM</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Toll Tax (₹)</label>
+            <input id="billToll" type="number" min="0" value="0" oninput="calculateLiveBill()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-bold" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Parking / State Tax (₹)</label>
+            <input id="billParking" type="number" min="0" value="0" oninput="calculateLiveBill()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-bold" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Pickup Payment Received (20%)?</label>
+          <select id="billPickupReceived" onchange="calculateLiveBill()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
+            <option value="yes" selected>Yes, Received at Pickup</option>
+            <option value="no">No, Collect Full Amount Now</option>
+          </select>
+        </div>
+
+        <!-- LIVE BILL CALCULATION DISPLAY -->
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-3 space-y-1 text-xs">
+          <div class="flex justify-between text-slate-600 text-[11px]">
+            <span>Base Total:</span>
+            <span id="dispBaseFare">₹0</span>
+          </div>
+          <div class="flex justify-between text-slate-600 text-[11px]">
+            <span>Extra KM Charge:</span>
+            <span id="dispExtraCharge">₹0</span>
+          </div>
+          <div class="flex justify-between text-slate-600 text-[11px]">
+            <span>Toll + Parking:</span>
+            <span id="dispTollParking">₹0</span>
+          </div>
+          <div class="flex justify-between text-rose-600 text-[11px]">
+            <span>Already Paid at Pickup:</span>
+            <span id="dispDeduction">- ₹0</span>
+          </div>
+          <div class="flex justify-between text-emerald-800 font-bold text-sm pt-1 border-t border-blue-200">
+            <span>Net Cash/UPI To Collect:</span>
+            <span id="dispFinalToCollect">₹0</span>
+          </div>
+        </div>
+
+        <p class="text-[10px] text-slate-400 italic">Note: Toll aur Parking ki physical slip/fastag screenshot customer ko dena zaroori hai.</p>
+
+        <button onclick="submitFinalBill()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md">
+          <i class="fa-solid fa-receipt"></i> Finish Trip & Issue Bill
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
@@ -218,6 +289,14 @@
 
     let currentVendor = null;
     let selectedAcceptDocId = null;
+    let activeBillingRide = null;
+
+    const EXTRA_KM_RATES = {
+      'Hatchback': 11,
+      'Sedan': 12,
+      'MUV': 15,
+      'SUV': 18
+    };
 
     function checkAuth() {
       const stored = localStorage.getItem("maketripzy_partner_auth");
@@ -366,7 +445,7 @@
       }
     }
 
-    // LIVE RADAR FIRESTORE LISTENER
+      // LIVE RADAR FIRESTORE LISTENER
     db.collection("bookings")
       .orderBy("createdAt", "desc")
       .onSnapshot((snapshot) => {
@@ -394,28 +473,31 @@
           const commission15 = Math.round(totalFare * 0.15);
           const vendorNetEarning = totalFare - commission15;
 
-          // PENALTY: 10% Fare (Min ₹300, Max ₹1000)
           const tenPercent = Math.round(totalFare * 0.10);
           const vendorPenalty = Math.max(300, Math.min(1000, tenPercent));
 
           const isPending = b.status === "Confirmation Pending";
           const isConfirmed = b.status === "Confirmed";
+          const isTripStarted = b.status === "Trip Started";
+          const isCompleted = b.status === "Trip Completed";
           const isCustomerCancelled = b.status === "Cancelled";
 
           const maskedPhone = b.phone ? b.phone.substring(0, 2) + "******" + b.phone.substring(b.phone.length - 2) : "**********";
 
           html += `
-            <div class="bg-white rounded-2xl p-4 shadow-sm border ${isCustomerCancelled ? 'border-rose-300 bg-rose-50/40' : isConfirmed ? 'border-emerald-300' : 'border-amber-300'} text-xs space-y-3">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border ${isCompleted ? 'border-purple-300' : isTripStarted ? 'border-blue-400' : isCustomerCancelled ? 'border-rose-300 bg-rose-50/40' : isConfirmed ? 'border-emerald-300' : 'border-amber-300'} text-xs space-y-3">
               <div class="flex justify-between items-center pb-2 border-b border-slate-100">
                 <div>
                   <span class="font-bold font-mono text-slate-800 text-sm">${b.bookingId || docId.substring(0,8)}</span>
                   <span class="ml-1 text-[10px] text-slate-400">${b.date || ''} • ${b.time || ''}</span>
                 </div>
                 <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
+                  isCompleted ? 'bg-purple-100 text-purple-800' :
+                  isTripStarted ? 'bg-blue-100 text-blue-800' :
                   isConfirmed ? 'bg-emerald-100 text-emerald-800' :
                   isCustomerCancelled ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
                 }">
-                  ${isPending && b.reassignedNotice ? 'Re-assigning Alternate Partner' : b.status}
+                  ${isTripStarted ? 'On Going Trip' : isCompleted ? 'Completed' : b.status}
                 </span>
               </div>
 
@@ -425,13 +507,13 @@
                 <p class="text-[11px] text-blue-600 font-semibold mt-0.5">Required: ${b.vehicle} • ${b.type || 'One Way'}</p>
               </div>
 
-              <!-- PASSENGER DETAILS (MASKED UNTIL ACCEPTED) -->
+              <!-- PASSENGER DETAILS -->
               <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex justify-between items-center">
                 <div>
                   <p class="text-[10px] text-slate-400 uppercase font-bold">Passenger Details</p>
-                  <p class="font-bold text-slate-800">${isConfirmed ? b.name : b.name.split(' ')[0] + ' (Customer)'}</p>
+                  <p class="font-bold text-slate-800">${(isConfirmed || isTripStarted || isCompleted) ? b.name : b.name.split(' ')[0] + ' (Customer)'}</p>
                   <p class="text-[11px] font-mono mt-0.5">
-                    ${isConfirmed ? `
+                    ${(isConfirmed || isTripStarted || isCompleted) ? `
                       <a href="tel:${b.phone}" class="text-blue-600 font-bold inline-flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
                         <i class="fa-solid fa-phone text-[10px]"></i> ${b.phone} (Call Customer)
                       </a>
@@ -445,11 +527,11 @@
                 </div>
                 <div class="text-right text-[11px]">
                   <p class="text-slate-400 text-[10px] uppercase font-bold">Pickup Landmark</p>
-                  <p class="text-slate-600">${isConfirmed ? (b.landmark || 'Direct Pickup') : '<span class="text-slate-400 italic">Locked</span>'}</p>
+                  <p class="text-slate-600">${(isConfirmed || isTripStarted || isCompleted) ? (b.landmark || 'Direct Pickup') : '<span class="text-slate-400 italic">Locked</span>'}</p>
                 </div>
               </div>
 
-              <!-- 15% COMMISSION CALCULATION -->
+              <!-- FARE CALCULATION -->
               <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 space-y-1">
                 <div class="flex justify-between text-slate-600 text-[11px]">
                   <span>Customer Total:</span>
@@ -465,7 +547,7 @@
                 </div>
               </div>
 
-              <!-- ACTIONS BASED ON STATUS -->
+              <!-- ACTIONS BASED ON TRIP LIFECYCLE -->
               ${isPending ? `
                 <button onclick="openAssignModal('${docId}', '${b.bookingId}', '${b.vehicle}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow-sm text-xs flex items-center justify-center gap-1.5">
                   <i class="fa-solid fa-check"></i> Accept & Assign Fleet (Unlock Contact)
@@ -476,9 +558,38 @@
                     <p class="font-bold">✓ Assigned Driver: ${b.driverName} (${b.driverPhone || ''})</p>
                     <p class="font-mono">Cab: ${b.cabNumber} (${b.cabVariant || ''})</p>
                   </div>
+
+                  <!-- START TRIP (PICKUP) BUTTON -->
+                  <button onclick="startTripPickup('${docId}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-car-side"></i> Mark Pickup (Start Trip)
+                  </button>
+
                   <button onclick="vendorCancelBooking('${docId}', ${totalFare}, '${b.bookingId}')" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-2 rounded-xl border border-rose-200 text-xs flex items-center justify-center gap-1.5 transition">
                     <i class="fa-solid fa-triangle-exclamation"></i> Cancel This Ride (Penalty: ₹${vendorPenalty})
                   </button>
+                </div>
+              ` : isTripStarted ? `
+                <div class="space-y-2">
+                  <div class="p-2.5 bg-blue-50 border border-blue-200 rounded-xl text-[11px] text-blue-800">
+                    <p class="font-bold">🚗 Trip In Progress (Passenger On-Board)</p>
+                    <p class="text-[10px] text-slate-500">Pickup marked. Complete trip at drop location.</p>
+                  </div>
+                  <!-- COMPLETE TRIP & BILLING BUTTON -->
+                  <button onclick="openBillingModal('${docId}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-flag-checkered"></i> Mark Drop & Generate Final Bill
+                  </button>
+                </div>
+              ` : isCompleted ? `
+                <div class="p-3 bg-purple-50 border border-purple-200 rounded-xl text-xs space-y-1">
+                  <p class="font-bold text-purple-900">✓ Trip Completed & Settled</p>
+                  <div class="flex justify-between text-[11px] text-slate-600">
+                    <span>Final Collected:</span>
+                    <span class="font-bold text-slate-900">₹${b.finalPaidAmount || b.total}</span>
+                  </div>
+                  <div class="flex justify-between text-[10px] text-slate-400">
+                    <span>Extra KM: ${b.extraKm || 0} KM</span>
+                    <span>Toll/Tax: ₹${(Number(b.tollFee)||0) + (Number(b.parkingFee)||0)}</span>
+                  </div>
                 </div>
               ` : `
                 <div class="p-2.5 bg-rose-100 border border-rose-200 rounded-xl text-[11px] text-rose-800 space-y-0.5">
@@ -520,7 +631,6 @@
       selectedAcceptDocId = null;
     }
 
-    // CONFIRM ASSIGNMENT
     function confirmAssignmentAndAccept() {
       if (!selectedAcceptDocId) return;
       const fleet = getFleetData();
@@ -555,7 +665,100 @@
       });
     }
 
-    // VENDOR CANCELLATION (10% Fare, Min ₹300, Max ₹1000) WITH AUTO RE-DISPATCH
+    // STAGE 1: MARK PICKUP
+    function startTripPickup(docId) {
+      if (confirm("Kya passenger cab me baith chuka hai? Trip Start mark karein?")) {
+        db.collection("bookings").doc(docId).update({
+          status: "Trip Started",
+          tripStartedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          alert("Trip Start ho chuki hai! Status customer ko dikhai de raha hai.");
+        });
+      }
+    }
+
+    // STAGE 2: OPEN BILLING MODAL
+    function openBillingModal(docId) {
+      db.collection("bookings").doc(docId).get().then(doc => {
+        if (!doc.exists) return;
+        activeBillingRide = { id: doc.id, ...doc.data() };
+
+        const rate = EXTRA_KM_RATES[activeBillingRide.vehicle] || 12;
+        document.getElementById("billRateHint").innerText = `Rate for ${activeBillingRide.vehicle}: ₹${rate}/Extra KM`;
+        document.getElementById("billExtraKm").value = 0;
+        document.getElementById("billToll").value = 0;
+        document.getElementById("billParking").value = 0;
+
+        calculateLiveBill();
+        document.getElementById("billingModal").classList.remove("hidden");
+      });
+    }
+
+    function closeBillingModal() {
+      document.getElementById("billingModal").classList.add("hidden");
+      activeBillingRide = null;
+    }
+
+    function calculateLiveBill() {
+      if (!activeBillingRide) return;
+
+      const baseFare = Number(activeBillingRide.total) || 1500;
+      const rate = EXTRA_KM_RATES[activeBillingRide.vehicle] || 12;
+
+      const extraKm = Number(document.getElementById("billExtraKm").value) || 0;
+      const toll = Number(document.getElementById("billToll").value) || 0;
+      const parking = Number(document.getElementById("billParking").value) || 0;
+      const isPickupReceived = document.getElementById("billPickupReceived").value === "yes";
+
+      const extraCharge = extraKm * rate;
+      const tollParkingTotal = toll + parking;
+      const grandTotal = baseFare + extraCharge + tollParkingTotal;
+
+      const pickup20Amount = Math.round(baseFare * 0.20);
+      const deduction = isPickupReceived ? pickup20Amount : 0;
+      const finalToCollect = grandTotal - deduction;
+
+      document.getElementById("dispBaseFare").innerText = `₹${baseFare}`;
+      document.getElementById("dispExtraCharge").innerText = `₹${extraCharge} (${extraKm} KM × ₹${rate})`;
+      document.getElementById("dispTollParking").innerText = `₹${tollParkingTotal}`;
+      document.getElementById("dispDeduction").innerText = `- ₹${deduction}`;
+      document.getElementById("dispFinalToCollect").innerText = `₹${finalToCollect}`;
+
+      return {
+        grandTotal,
+        extraCharge,
+        extraKm,
+        toll,
+        parking,
+        deduction,
+        finalToCollect
+      };
+    }
+
+    function submitFinalBill() {
+      if (!activeBillingRide) return;
+      const bill = calculateLiveBill();
+
+      if (confirm(`Final Amount to Collect: ₹${bill.finalToCollect}\n\nKya trip complete karke bill generate karein?`)) {
+        db.collection("bookings").doc(activeBillingRide.id).update({
+          status: "Trip Completed",
+          extraKm: bill.extraKm,
+          extraKmCharge: bill.extraCharge,
+          tollFee: bill.toll,
+          parkingFee: bill.parking,
+          grandTotalBill: bill.grandTotal,
+          finalPaidAmount: bill.finalToCollect,
+          completedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          closeBillingModal();
+          alert(`Trip successfully completed! Final collect amount: ₹${bill.finalToCollect}`);
+        }).catch(err => {
+          alert("Error: " + err.message);
+        });
+      }
+    }
+
+    // VENDOR CANCELLATION
     function vendorCancelBooking(docId, totalFare, bookingId) {
       const tenPercent = Math.round(totalFare * 0.10);
       const penalty = Math.max(300, Math.min(1000, tenPercent));
