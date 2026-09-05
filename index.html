@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-  <!-- INSTANT MENU SCRIPT (Head level execution) -->
+  <!-- INSTANT MENU SCRIPT -->
   <script>
     function toggleDrawer(open) {
       var drawer = document.getElementById('sideDrawer');
@@ -214,7 +214,7 @@
             </label>
           </div>
 
-          <!-- PARTIAL PAYMENT SUMMARY BADGE -->
+          <!-- SUMMARY BADGE -->
           <div class="mt-4 bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
             <p class="font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-circle-check text-amber-600"></i> Zero Advance Booking
@@ -374,10 +374,10 @@
     </div>
   </main>
 
-  <!-- SLIDE-OVER HAMBURGER DRAWER (DIRECT TRANSFORM SLIDE FIX) -->
+  <!-- SLIDE-OVER HAMBURGER DRAWER -->
   <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
   <aside id="sideDrawer" style="transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl z-50 flex flex-col">
-    <!-- Clickable Profile Header -->
+    <!-- Profile Header -->
     <div onclick="openModal('authModal')" class="p-5 border-b border-slate-200 flex items-center justify-between bg-blue-600 text-white cursor-pointer active:bg-blue-700">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg">
@@ -497,8 +497,8 @@
   <a href="https://wa.me/918889637244?text=Hi,%20I%20need%20cab%20booking%20support" target="_blank" class="fixed bottom-4 right-4 z-30 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold transition transform active:scale-95">
     <i class="fa-brands fa-whatsapp text-lg"></i>
     <span>WhatsApp Support</span>
-        </a>
-          <!-- SCRIPTS & FIREBASE INTEGRATION -->
+  </a>
+    <!-- SCRIPTS & FIREBASE INTEGRATION -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
@@ -510,7 +510,9 @@
       measurementId: "G-ZBZZHGGTQX"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
 
     let selectedTripType = 'One Way';
@@ -523,23 +525,6 @@
 
     if (document.getElementById('pickupDate')) {
       document.getElementById('pickupDate').valueAsDate = new Date();
-    }
-
-    // RELIABLE SLIDE DRAWER CONTROLLER (Fix for 3 lines menu)
-    function toggleDrawer(open) {
-      const drawer = document.getElementById('sideDrawer');
-      const overlay = document.getElementById('drawerOverlay');
-      if (!drawer || !overlay) return;
-
-      if (open) {
-        overlay.classList.remove('hidden');
-        drawer.style.transform = 'translateX(0%)';
-      } else {
-        drawer.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-          overlay.classList.add('hidden');
-        }, 300);
-      }
     }
 
     function openModal(id) {
@@ -584,10 +569,10 @@
       });
       element.classList.remove('border', 'border-slate-200');
       element.classList.add('border-2', 'border-blue-600', 'bg-blue-50/50');
-      element.querySelector('input[type="radio"]').checked = true;
+      const radio = element.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
     }
 
-    // CREATE BOOKING
     function handleBooking() {
       const from = document.getElementById('pickupLocation').value.trim();
       const to = document.getElementById('dropLocation').value.trim();
@@ -628,6 +613,7 @@
         dropPay: dropPay,
         bookedDate: bookedDate,
         status: 'Confirmation Pending',
+        reassignedNotice: false,
         driverName: '',
         driverPhone: '',
         cabNumber: '',
@@ -677,7 +663,6 @@
         });
     }
 
-    // REAL-TIME LISTENER FOR PARTNER ACCEPTANCE
     function listenToBooking(docId) {
       if (unsubscribeBooking) unsubscribeBooking();
 
@@ -688,42 +673,61 @@
 
         syncLocalStorage(docId, data);
 
+        const headerBox = document.getElementById('receiptHeaderBox');
+        const statusBadge = document.getElementById('receiptStatusBadge');
+        const pendingState = document.getElementById('driverPendingState');
+        const confirmedState = document.getElementById('driverConfirmedState');
+        const cancelBtn = document.getElementById('cancelBookingBtn');
+
         if (data.status === 'Confirmed') {
-          document.getElementById('receiptHeaderBox').className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
-          document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Booking Confirmed';
+          if (headerBox) headerBox.className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
+          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Booking Confirmed';
 
-          document.getElementById('driverPendingState').classList.add('hidden');
-          document.getElementById('driverConfirmedState').classList.remove('hidden');
-          document.getElementById('assignedDriverName').innerText = data.driverName || 'Verified Partner';
-          document.getElementById('assignedCabNumber').innerText = data.cabNumber || 'Assigned';
+          if (pendingState) pendingState.classList.add('hidden');
+          if (confirmedState) confirmedState.classList.remove('hidden');
+          if (document.getElementById('assignedDriverName')) document.getElementById('assignedDriverName').innerText = data.driverName || 'Verified Partner';
+          if (document.getElementById('assignedCabNumber')) document.getElementById('assignedCabNumber').innerText = data.cabNumber || 'Assigned';
 
-          // Driver Call Link
-          if (data.driverPhone) {
-            document.getElementById('assignedDriverPhoneContainer').innerHTML = `
-              <a href="tel:${data.driverPhone}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
-                <i class="fa-solid fa-phone text-[10px]"></i> ${data.driverPhone} (Call Driver)
-              </a>`;
-          } else {
-            document.getElementById('assignedDriverPhoneContainer').innerHTML = `<span class="text-slate-400 text-[11px]">Verified Partner</span>`;
+          const phoneBox = document.getElementById('assignedDriverPhoneContainer');
+          if (phoneBox) {
+            if (data.driverPhone) {
+              phoneBox.innerHTML = `
+                <a href="tel:${data.driverPhone}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                  <i class="fa-solid fa-phone text-[10px]"></i> ${data.driverPhone} (Call Driver)
+                </a>`;
+            } else {
+              phoneBox.innerHTML = `<span class="text-slate-400 text-[11px]">Verified Partner</span>`;
+            }
           }
-        } else if (data.status === 'Cancelled by Vendor') {
-          document.getElementById('receiptHeaderBox').className = 'bg-rose-700 text-white rounded-2xl p-5 shadow-sm mb-4';
-          document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Cancelled by Partner';
-          document.getElementById('driverPendingState').classList.remove('hidden');
-          document.getElementById('driverConfirmedState').classList.add('hidden');
-          document.getElementById('driverPendingState').innerHTML = `
-            <div class="text-center py-2 text-rose-700">
-              <i class="fa-solid fa-circle-xmark text-3xl mb-1 text-rose-600"></i>
-              <p class="font-bold text-xs">Partner dwara ride cancel kar di gayi hai.</p>
-              <p class="text-[10px] text-slate-500 mt-1">Partner par policy ke anusaar penalty apply ki gayi hai. Aap nayi cab book kar sakte hain.</p>
-            </div>
-          `;
-          document.getElementById('cancelBookingBtn').classList.add('hidden');
+        } else if (data.status === 'Confirmation Pending') {
+          if (headerBox) headerBox.className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
+          if (confirmedState) confirmedState.classList.add('hidden');
+          if (pendingState) pendingState.classList.remove('hidden');
+
+          if (data.reassignedNotice) {
+            if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmed • Assigning New Cab';
+            pendingState.innerHTML = `
+              <div class="text-center py-2">
+                <i class="fa-solid fa-arrows-rotate text-blue-600 text-2xl mb-1 animate-spin"></i>
+                <p class="text-xs font-bold text-slate-800">Booking Confirmed</p>
+                <p class="text-[11px] text-blue-600 font-semibold mt-0.5">Nearby alternate cab partner being assigned...</p>
+                <p class="text-[10px] text-slate-400 mt-1">Driver and vehicle details sharing soon.</p>
+              </div>
+            `;
+          } else {
+            if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmation Pending';
+            pendingState.innerHTML = `
+              <i class="fa-solid fa-hourglass-half text-amber-500 text-2xl mb-1.5 animate-pulse"></i>
+              <p class="text-xs font-bold text-slate-800">Waiting for Partner to Accept...</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Partner accept karte hi driver details aur phone number yahan live unlock honge.</p>
+            `;
+          }
         } else if (data.status === 'Cancelled') {
-          document.getElementById('receiptHeaderBox').className = 'bg-slate-700 text-white rounded-2xl p-5 shadow-sm mb-4';
-          document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled by You';
-          document.getElementById('driverPendingState').classList.add('hidden');
-          document.getElementById('cancelBookingBtn').classList.add('hidden');
+          if (headerBox) headerBox.className = 'bg-slate-700 text-white rounded-2xl p-5 shadow-sm mb-4';
+          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled by You';
+          if (pendingState) pendingState.classList.add('hidden');
+          if (confirmedState) confirmedState.classList.add('hidden');
+          if (cancelBtn) cancelBtn.classList.add('hidden');
         }
       });
     }
@@ -739,7 +743,6 @@
       localStorage.setItem('maketripzy_history', JSON.stringify(history));
     }
 
-    // CUSTOMER CANCELLATION: 6-HOUR RULE & PENALTY
     function cancelCurrentBooking() {
       if (!currentDocId || !currentBookingData) return;
 
@@ -783,7 +786,7 @@
         confirmMsg = 
           `⚠️ CANCELLATION POLICY WARNING:\n\n` +
           `Aapki ride shuru hone me 6 ghante se kam samay bacha hai (${hoursRemaining > 0 ? hoursRemaining.toFixed(1) + ' ghante' : 'Pickup time shuru ho chuka hai'}).\n\n` +
-          `MakeTripzy policy ke mutabik 6 ghante ke andar cancel karne par total fare ka 10% (Min ₹300, Max ₹1,000) late fee penalty lagegi.\n\n` +
+          `MakeTripzy policy anusaar 6 ghante ke andar cancel karne par total fare ka 10% (Min ₹300, Max ₹1,000) late fee penalty lagegi.\n\n` +
           `Late Fee Penalty: ₹${finalPenalty}\n\n` +
           `Kya aap booking cancel karna chahte hain?`;
       } else {
@@ -807,67 +810,12 @@
           } else {
             alert('Booking bina kisi penalty ke successfully cancel ho gayi hai.');
           }
-    // REAL-TIME LISTENER FOR PARTNER UPDATES (WITH SAFE RE-DISPATCH UI)
-    function listenToBooking(docId) {
-      if (unsubscribeBooking) unsubscribeBooking();
-
-      unsubscribeBooking = db.collection("bookings").doc(docId).onSnapshot((doc) => {
-        if (!doc.exists) return;
-        const data = doc.data();
-        currentBookingData = data;
-
-        syncLocalStorage(docId, data);
-
-        if (data.status === 'Confirmed') {
-          document.getElementById('receiptHeaderBox').className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
-          document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Booking Confirmed';
-
-          document.getElementById('driverPendingState').classList.add('hidden');
-          document.getElementById('driverConfirmedState').classList.remove('hidden');
-          document.getElementById('assignedDriverName').innerText = data.driverName || 'Verified Partner';
-          document.getElementById('assignedCabNumber').innerText = data.cabNumber || 'Assigned';
-
-          if (data.driverPhone) {
-            document.getElementById('assignedDriverPhoneContainer').innerHTML = `
-              <a href="tel:${data.driverPhone}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
-                <i class="fa-solid fa-phone text-[10px]"></i> ${data.driverPhone} (Call Driver)
-              </a>`;
-          } else {
-            document.getElementById('assignedDriverPhoneContainer').innerHTML = `<span class="text-slate-400 text-[11px]">Verified Partner</span>`;
-          }
-        } else if (data.status === 'Confirmation Pending') {
-          // Ride pool me hai ya vendor cancel hone ke baad re-assign ho rahi hai
-          document.getElementById('receiptHeaderBox').className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
-          
-          if (data.reassignedNotice) {
-            document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Booking Confirmed • Re-assigning Driver';
-            document.getElementById('driverPendingState').classList.remove('hidden');
-            document.getElementById('driverConfirmedState').classList.add('hidden');
-            document.getElementById('driverPendingState').innerHTML = `
-              <div class="text-center py-2">
-                <i class="fa-solid fa-arrows-rotate text-blue-600 text-2xl mb-1 animate-spin"></i>
-                <p class="text-xs font-bold text-slate-800">Booking Confirmed</p>
-                <p class="text-[11px] text-blue-600 font-semibold mt-0.5">Assigning nearby alternate cab partner...</p>
-                <p class="text-[10px] text-slate-400 mt-1">Driver and vehicle details sharing soon.</p>
-              </div>
-            `;
-          } else {
-            document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmation Pending';
-            document.getElementById('driverPendingState').classList.remove('hidden');
-            document.getElementById('driverConfirmedState').classList.add('hidden');
-          }
-        } else if (data.status === 'Cancelled') {
-          // Jab customer khud cancel kare
-          document.getElementById('receiptHeaderBox').className = 'bg-slate-700 text-white rounded-2xl p-5 shadow-sm mb-4';
-          document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled by You';
-          document.getElementById('driverPendingState').classList.add('hidden');
-          document.getElementById('driverConfirmedState').classList.add('hidden');
-          document.getElementById('cancelBookingBtn').classList.add('hidden');
-        }
-      });
+        }).catch(err => {
+          alert("Error: " + err.message);
+        });
+      }
     }
 
-    // LIVE HISTORY SYNC
     async function renderBookingHistory() {
       const container = document.getElementById('historyListContainer');
       let history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
@@ -898,7 +846,6 @@
       container.innerHTML = liveHistory.map(item => {
         const isConfirmed = item.status === 'Confirmed';
         const isReassigning = item.status === 'Confirmation Pending' && item.reassignedNotice;
-        const isPending = item.status === 'Confirmation Pending' && !item.reassignedNotice;
         const isCustomerCancelled = item.status === 'Cancelled';
 
         return `
@@ -936,7 +883,6 @@
       }).join('');
     }
 
-
     function clearAllHistory() {
       if (confirm('Kya aap saari booking history delete karna chahte hain?')) {
         localStorage.removeItem('maketripzy_history');
@@ -949,7 +895,6 @@
       document.getElementById('bookingSection').classList.remove('hidden');
     }
 
-    // WHATSAPP DISPATCH TO UPDATED NUMBER: 8889637244
     function sendToWhatsApp() {
       const id = document.getElementById('bookingIdBadge').innerText;
       const from = document.getElementById('receiptPickup').innerText;
@@ -977,7 +922,6 @@
       window.open(`https://wa.me/918889637244?text=${message}`, '_blank');
     }
 
-    // SAFE PROFILE LOADER WITH ERROR HANDLING
     function loadSavedProfile() {
       try {
         const raw = localStorage.getItem('maketripzy_user');
