@@ -29,8 +29,8 @@
           <label class="block text-xs font-semibold text-slate-600 mb-1">Master Security PIN</label>
           <input id="adminPinInput" type="password" maxlength="6" placeholder="Enter 4 or 6-digit PIN" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-center tracking-widest text-lg font-bold focus:outline-none focus:border-blue-600" />
         </div>
-        <p class="text-[11px] text-slate-400 text-center">Default PIN: <span class="font-mono font-bold text-blue-600">8889</span> (Changeable anytime)</p>
-        <button onclick="handleAdminLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-md transition active:scale-95">
+        <p class="text-[11px] text-slate-400 text-center">Default PIN: <span class="font-mono font-bold text-blue-600">8889</span></p>
+        <button id="adminLoginBtn" onclick="handleAdminLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-md transition active:scale-95">
           Access Admin Dashboard
         </button>
       </div>
@@ -81,7 +81,7 @@
       <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
         <p class="text-[10px] uppercase font-bold text-slate-400">Total Rides Booked</p>
         <p id="kpiTotalRides" class="text-xl font-black text-slate-900 mt-0.5">0</p>
-        <span class="text-[10px] text-blue-600 font-semibold">Real-time Firestore</span>
+        <span class="text-[10px] text-blue-600 font-semibold">Real-time Sync</span>
       </div>
       <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
         <p class="text-[10px] uppercase font-bold text-slate-400">15% MakeTripzy Fee</p>
@@ -91,12 +91,296 @@
       <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
         <p class="text-[10px] uppercase font-bold text-slate-400">Vendor Net Payout</p>
         <p id="kpiTotalVendorPayout" class="text-xl font-black text-slate-800 mt-0.5">₹0</p>
-        <span class="text-[10px] text-slate-500 font-semibold">After 15% Platform Cut</span>
+        <span class="text-[10px] text-slate-500 font-semibold">Net Payouts</span>
       </div>
       <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
         <p class="text-[10px] uppercase font-bold text-slate-400">Cancellation Fees</p>
         <p id="kpiTotalPenalties" class="text-xl font-black text-rose-600 mt-0.5">₹0</p>
-        <span class="text-[10px] text-rose-600 font-semibold">Vendor & Cust Penalties</span>
+        <span class="text-[10px] text-rose-600 font-semibold">Total Recoveries</span>
       </div>
     </div>
-    
+
+    <!-- TAB 1: PRICING ENGINE & CSV IMPORT -->
+    <div id="viewPricing" class="space-y-4">
+
+      <!-- ADD / UPDATE SINGLE ROUTE FORM -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-plus text-blue-600"></i> Set Fixed Route Rate Package
+            </h3>
+            <p class="text-[11px] text-slate-400">Customer app par standard KM engine bypass hokar direct yahi package show hoga.</p>
+          </div>
+          <span class="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md">Live Push</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">From City</label>
+            <input id="routeFromCity" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-semibold" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">To City</label>
+            <input id="routeToCity" type="text" placeholder="e.g. Indore" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-semibold" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Hatchback (₹)</label>
+            <input id="rateHatch" type="number" placeholder="2499" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-mono font-bold" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Sedan (₹)</label>
+            <input id="rateSedan" type="number" placeholder="2799" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-mono font-bold" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Ertiga / MUV (₹)</label>
+            <input id="rateMuv" type="number" placeholder="3899" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-mono font-bold" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Crysta / SUV (₹)</label>
+            <input id="rateSuv" type="number" placeholder="5499" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-mono font-bold" />
+          </div>
+        </div>
+
+        <button onclick="saveSingleRoutePrice()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Save & Live Sync Route
+        </button>
+      </div>
+
+      <!-- BULK CSV IMPORT / EXPORT -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-file-excel text-emerald-600"></i> Bulk Update Routes via CSV / Excel
+          </h3>
+          <button onclick="downloadSampleCsv()" class="text-[11px] text-blue-600 hover:text-blue-700 font-semibold underline flex items-center gap-1">
+            <i class="fa-solid fa-download"></i> Sample CSV
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-500">Excel me banayi CSV file upload karke saikdo routes ke rates ek baar me update karein.</p>
+        
+        <div class="flex flex-col sm:flex-row gap-2 pt-1">
+          <input type="file" id="csvFileInput" accept=".csv" class="flex-1 text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-slate-200 rounded-xl p-1 bg-slate-50" />
+          <button onclick="uploadCsvPricing()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-upload"></i> Import & Override
+          </button>
+        </div>
+      </div>
+
+      <!-- ACTIVE FIXED ROUTES LIST -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-list-check text-blue-600"></i> Active Override Packages
+          </h3>
+          <span id="activeRoutesCount" class="text-[11px] bg-slate-100 font-bold px-2 py-0.5 rounded-md text-slate-600">0 Routes</span>
+        </div>
+
+        <div id="activeRoutesContainer" class="space-y-2 max-h-80 overflow-y-auto text-xs">
+          <div class="text-center py-6 text-slate-400">Loading active routes...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: LIVE RIDES MONITOR -->
+    <div id="viewRides" class="hidden space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Central Ride Dispatch Log</h3>
+        <select id="rideFilterStatus" onchange="filterRideList()" class="text-xs bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold focus:outline-none">
+          <option value="ALL">All Statuses</option>
+          <option value="Confirmation Pending">Pending Partner</option>
+          <option value="Confirmed">Confirmed / Assigned</option>
+          <option value="Trip Started">On-Going Trip</option>
+          <option value="Trip Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      <div id="adminRidesContainer" class="space-y-3">
+        <div class="text-center py-12 text-slate-400 text-xs">
+          <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-slate-300"></i>
+          <p>Loading bookings from Firestore...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: FINANCIAL AUDIT -->
+    <div id="viewFinance" class="hidden space-y-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800">Platform Financial Audit (15% Net Cut)</h3>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Har booking par 15% platform commission cut rehta hai. Fuel allowance (20%) pickup par milti hai aur 80% vendor settlement drop par hoti hai.
+        </p>
+
+        <div class="border-t border-slate-100 pt-3 space-y-2 text-xs">
+          <div class="flex justify-between py-1 border-b border-slate-50">
+            <span class="text-slate-600">Total Gross GMV (Customer Fare):</span>
+            <span id="finGrossGmv" class="font-bold text-slate-900">₹0</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-50">
+            <span class="text-emerald-700 font-semibold">Platform Fee Collected (15%):</span>
+            <span id="finPlatformCommission" class="font-bold text-emerald-700">₹0</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-50">
+            <span class="text-slate-600">Total Vendor Net Payable:</span>
+            <span id="finVendorPayable" class="font-bold text-slate-900">₹0</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-50">
+            <span class="text-rose-600 font-semibold">Total Cancellation Penalty Recoveries:</span>
+            <span id="finTotalPenalties" class="font-bold text-rose-600">₹0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- JAVASCRIPT & DATABASE CONTROLLER -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
+      authDomain: "maketripzy.firebaseapp.com",
+      projectId: "maketripzy",
+      storageBucket: "maketripzy.firebasestorage.app",
+      messagingSenderId: "484778826837",
+      appId: "1:484778826837:web:b9652dbd1fee4c1ccd08dc",
+      measurementId: "G-ZBZZHGGTQX"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    const MASTER_ADMIN_PIN = "8889";
+    let allBookingsCache = [];
+    let currentFixedRoutesCache = {};
+
+    function checkAdminAuth() {
+      const isAuth = localStorage.getItem("maketripzy_admin_auth");
+      const authScreen = document.getElementById("adminAuthScreen");
+      if (isAuth === "true") {
+        if (authScreen) {
+          authScreen.classList.add("hidden");
+          authScreen.style.display = "none";
+        }
+        initDashboard();
+      } else {
+        if (authScreen) {
+          authScreen.classList.remove("hidden");
+          authScreen.style.display = "flex";
+        }
+      }
+    }
+
+    function handleAdminLogin() {
+      const input = document.getElementById("adminPinInput");
+      const pin = input ? input.value.trim() : "";
+      
+      if (pin === MASTER_ADMIN_PIN) {
+        localStorage.setItem("maketripzy_admin_auth", "true");
+        const authScreen = document.getElementById("adminAuthScreen");
+        if (authScreen) {
+          authScreen.classList.add("hidden");
+          authScreen.style.display = "none";
+        }
+        initDashboard();
+      } else {
+        alert("Invalid PIN! Correct Master PIN is 8889");
+      }
+    }
+
+    function adminLogout() {
+      if (confirm("Kya aap Admin panel se logout karna chahte hain?")) {
+        localStorage.removeItem("maketripzy_admin_auth");
+        location.reload();
+      }
+    }
+
+    function switchAdminTab(tab) {
+      const vPricing = document.getElementById('viewPricing');
+      const vRides = document.getElementById('viewRides');
+      const vFinance = document.getElementById('viewFinance');
+
+      if (vPricing) vPricing.classList.add('hidden');
+      if (vRides) vRides.classList.add('hidden');
+      if (vFinance) vFinance.classList.add('hidden');
+
+      document.getElementById('tabPricingBtn').className = "flex-1 py-3 text-slate-500 border-b-2 border-transparent flex items-center justify-center gap-1.5";
+      document.getElementById('tabRidesBtn').className = "flex-1 py-3 text-slate-500 border-b-2 border-transparent flex items-center justify-center gap-1.5";
+      document.getElementById('tabFinanceBtn').className = "flex-1 py-3 text-slate-500 border-b-2 border-transparent flex items-center justify-center gap-1.5";
+
+      if (tab === 'pricing') {
+        if (vPricing) vPricing.classList.remove('hidden');
+        document.getElementById('tabPricingBtn').className = "flex-1 py-3 text-blue-600 border-b-2 border-blue-600 flex items-center justify-center gap-1.5";
+      } else if (tab === 'rides') {
+        if (vRides) vRides.classList.remove('hidden');
+        document.getElementById('tabRidesBtn').className = "flex-1 py-3 text-blue-600 border-b-2 border-blue-600 flex items-center justify-center gap-1.5";
+      } else {
+        if (vFinance) vFinance.classList.remove('hidden');
+        document.getElementById('tabFinanceBtn').className = "flex-1 py-3 text-blue-600 border-b-2 border-blue-600 flex items-center justify-center gap-1.5";
+      }
+    }
+
+    function initDashboard() {
+      listenToPricingRules();
+      listenToAllBookings();
+    }
+
+    function listenToPricingRules() {
+      db.collection("pricing_rules").doc("fixed_routes").onSnapshot((doc) => {
+        currentFixedRoutesCache = doc.exists ? (doc.data() || {}) : {};
+        renderActiveRoutes(currentFixedRoutesCache);
+      }, (err) => {
+        console.error("Pricing rules fetch error:", err);
+      });
+    }
+
+    function renderActiveRoutes(routes) {
+      const container = document.getElementById("activeRoutesContainer");
+      const countBadge = document.getElementById("activeRoutesCount");
+      if (!container || !countBadge) return;
+
+      const keys = Object.keys(routes);
+      countBadge.innerText = `${keys.length} Routes Active`;
+
+      if (keys.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-6 text-slate-400">
+            Koi fixed override package set nahi hai. Saare routes dynamic KM engine se chal rahe hain.
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = keys.map(key => {
+        const item = routes[key];
+        const parts = key.split('-');
+        const from = parts[0] || '';
+        const to = parts[1] || '';
+
+        return `
+          <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl flex justify-between items-center">
+            <div>
+              <p class="font-bold text-slate-900 capitalize text-sm">${from} ➔ ${to}</p>
+              <div class="flex flex-wrap gap-2 text-[11px] text-slate-500 mt-1">
+                <span>Hatch: <b>₹${item.Hatchback || 0}</b></span>
+                <span>•</span>
+                <span>Sedan: <b>₹${item.Sedan || 0}</b></span>
+                <span>•</span>
+                <span>MUV: <b>₹${item.MUV || 0}</b></span>
+                <span>•</span>
+                <span>SUV: <b>₹${item.SUV || 0}</b></span>
+              </div>
+            </div>
+            <button onclick="deleteRoutePackage('${key}')" class="text-rose-500 hover:text-rose-700 p-2 rounded-lg hover:bg-rose-50 transition" title="Delete Override">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function saveSingleRoutePrice() {
+      const
