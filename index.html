@@ -126,7 +126,7 @@
           </div>
         </div>
 
-                <!-- VEHICLE CATEGORY -->
+        <!-- VEHICLE CATEGORY -->
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
           <div class="flex items-center gap-2 mb-3">
             <i class="fa-solid fa-car-side text-blue-600"></i>
@@ -181,53 +181,6 @@
               <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">6–7 seats</span>
             </label>
           </div>
-
-          <!-- PARTIAL PAYMENT BADGE -->
-          <div class="mt-4 bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
-            <p class="font-bold flex items-center gap-1.5">
-              <i class="fa-solid fa-circle-check text-amber-600"></i> Zero Advance Booking
-            </p>
-            <p class="text-[11px] text-amber-800 leading-relaxed">
-              Trip shuru hone par driver ko fuel ke liye 20% dein, bacha 80% ride khatam hone par dein.
-            </p>
-          </div>
-
-          <!-- TERMS LINK -->
-          <div class="mt-3 text-center text-xs text-slate-500">
-            By clicking confirm, you agree to our 
-            <button type="button" onclick="openModal('termsModal')" class="text-blue-600 underline font-semibold">Terms & Conditions</button>
-          </div>
-
-          <!-- CONFIRM BUTTON -->
-          <button onclick="handleBooking()" class="w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
-            Confirm Booking <i class="fa-solid fa-chevron-right text-xs"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-
-
-          <!-- PARTIAL PAYMENT SUMMARY BADGE -->
-          <div class="mt-4 bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
-            <p class="font-bold flex items-center gap-1.5">
-              <i class="fa-solid fa-circle-check text-amber-600"></i> Zero Advance Booking
-            </p>
-            <p class="text-[11px] text-amber-800 leading-relaxed">
-              Trip shuru hone par driver ko fuel ke liye 20% dein, bacha 80% ride khatam hone par dein.
-            </p>
-          </div>
-
-          <!-- T&C LINK -->
-          <div class="mt-3 text-center text-xs text-slate-500">
-            By clicking confirm, you agree to our 
-            <button type="button" onclick="openModal('termsModal')" class="text-blue-600 underline font-semibold">Terms & Conditions</button>
-          </div>
-
-          <button onclick="handleBooking()" class="w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
-            Confirm Booking <i class="fa-solid fa-chevron-right text-xs"></i>
-          </button>
-        </div>
-
 
           <!-- PARTIAL PAYMENT SUMMARY BADGE -->
           <div class="mt-4 bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
@@ -314,7 +267,7 @@
         <p class="text-slate-500 pt-1 border-t border-slate-100">Landmark: <span id="receiptCustLandmark"></span></p>
       </div>
 
-      <!-- PARTIAL PAYMENT FARE SUMMARY -->
+      <!-- FARE BREAKDOWN -->
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
         <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare & Payment Breakdown</h4>
         <div class="flex justify-between text-slate-600">
@@ -330,7 +283,6 @@
           <span id="receiptTotalFare">₹1500</span>
         </div>
 
-        <!-- STAGED PAYMENTS -->
         <div class="bg-blue-50/70 rounded-xl p-3 border border-blue-100 space-y-1.5 mt-2">
           <div class="flex justify-between text-blue-900 font-medium">
             <span>1. Advance Amount (Now):</span>
@@ -356,18 +308,18 @@
     <!-- SLIDE-OVER HAMBURGER DRAWER -->
   <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden transition-opacity"></div>
   <aside id="sideDrawer" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
-    <!-- Drawer Header -->
-    <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-blue-600 text-white">
+    <!-- Clickable Profile Header -->
+    <div onclick="openModal('authModal')" class="p-5 border-b border-slate-200 flex items-center justify-between bg-blue-600 text-white cursor-pointer active:bg-blue-700">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg">
           <i class="fa-regular fa-user"></i>
         </div>
         <div>
-          <p id="drawerUserTitle" class="text-sm font-bold">Customer Account</p>
-          <p id="drawerUserSub" class="text-[11px] text-blue-200">Save your rides & history</p>
+          <p id="drawerUserTitle" class="text-sm font-bold">Login / Sign In</p>
+          <p id="drawerUserSub" class="text-[11px] text-blue-200">Tap to manage profile</p>
         </div>
       </div>
-      <button onclick="toggleDrawer(false)" class="text-white hover:text-slate-200 text-xl">
+      <button onclick="event.stopPropagation(); toggleDrawer(false)" class="text-white hover:text-slate-200 text-xl p-1">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
@@ -401,6 +353,32 @@
     </div>
   </aside>
 
+  <!-- MODAL: CUSTOMER LOGIN / PROFILE -->
+  <div id="authModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col overflow-hidden">
+      <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+        <h3 class="font-bold text-slate-800 text-sm">Customer Profile / Login</h3>
+        <button onclick="closeModal('authModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="p-5 space-y-3 text-xs">
+        <div>
+          <label class="block font-medium text-slate-600 mb-1">Full Name</label>
+          <input id="loginName" type="text" placeholder="Enter your full name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+        </div>
+        <div>
+          <label class="block font-medium text-slate-600 mb-1">Mobile Number</label>
+          <input id="loginPhone" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+        </div>
+        <button onclick="saveUserProfile()" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-sm transition">
+          Save & Login
+        </button>
+        <button id="logoutBtn" onclick="logoutUser()" class="w-full hidden bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold py-2.5 rounded-xl text-xs border border-rose-200">
+          Log Out
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: MY BOOKINGS HISTORY -->
   <div id="historyModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
@@ -408,9 +386,7 @@
         <h3 class="font-bold text-slate-800 text-sm">Booking History</h3>
         <button onclick="closeModal('historyModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-      <div id="historyListContainer" class="p-4 overflow-y-auto space-y-3 flex-1 text-xs">
-        <!-- Dynamic History Cards Inserted Here -->
-      </div>
+      <div id="historyListContainer" class="p-4 overflow-y-auto space-y-3 flex-1 text-xs"></div>
     </div>
   </div>
 
@@ -424,15 +400,10 @@
       <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-600 leading-relaxed flex-1">
         <p class="font-bold text-slate-800">1. Partial Payment Terms</p>
         <p>Advance booking is ₹0. Customer must pay 20% of total fare directly to the driver at trip origin (start point), and remaining 80% upon arrival at dropoff.</p>
-        
         <p class="font-bold text-slate-800">2. Tolls, Taxes & Parking</p>
-        <p>All highway tolls, state border permit taxes, and parking fees are strictly NOT included in estimated fare. They must be paid as actuals during the journey.</p>
-
+        <p>All highway tolls, state border permit taxes, and parking fees are strictly NOT included in estimated fare. They must be paid as actuals during journey.</p>
         <p class="font-bold text-slate-800">3. Night Driving Allowance</p>
         <p>A driver night allowance of ₹250 applies if travel extends between 10:00 PM and 06:00 AM.</p>
-
-        <p class="font-bold text-slate-800">4. Free Cancellation</p>
-        <p>Zero charges if canceled at least 2 hours before pickup. Standard minimum fee applies if cab has reached pickup point.</p>
       </div>
     </div>
   </div>
@@ -445,9 +416,7 @@
         <button onclick="closeModal('aboutModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-600 leading-relaxed flex-1">
-        <p>MakeTripzy is India's premier outstation taxi booking platform delivering safe, dependable, and affordable rides.</p>
-        <p><strong>Verified Fleet:</strong> Every driver partner is verified with clean, air-conditioned commercial vehicles.</p>
-        <p><strong>Transparent Pricing:</strong> No hidden commission markups. Clear pay-as-you-travel model.</p>
+        <p>MakeTripzy is India's premier outstation taxi booking platform delivering safe, dependable, and affordable rides with verified drivers.</p>
       </div>
     </div>
   </div>
@@ -465,8 +434,8 @@
     </div>
   </div>
 
-  <!-- FLOATING WHATSAPP BUTTON -->
-  <a href="https://wa.me/918889637244?text=Hi,%20I%20need%20cab%20booking%20support" target="_blank" class="fixed bottom-4 right-4 z-30 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold transition transform active:scale-95">
+  <!-- FLOATING WHATSAPP -->
+  <a href="https://wa.me/918409504684?text=Hi,%20I%20need%20cab%20booking%20support" target="_blank" class="fixed bottom-4 right-4 z-30 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold transition transform active:scale-95">
     <i class="fa-brands fa-whatsapp text-lg"></i>
     <span>WhatsApp Support</span>
   </a>
@@ -480,7 +449,6 @@
 
     document.getElementById('pickupDate').valueAsDate = new Date();
 
-    // Drawer Controls
     function toggleDrawer(open) {
       const drawer = document.getElementById('sideDrawer');
       const overlay = document.getElementById('drawerOverlay');
@@ -493,7 +461,6 @@
       }
     }
 
-    // Modal Controls
     function openModal(id) {
       toggleDrawer(false);
       if (id === 'historyModal') renderBookingHistory();
@@ -549,7 +516,7 @@
       const randomId = 'MTZ-' + Math.floor(1000 + Math.random() * 9000);
       const bookedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-      // Save Booking to Local Storage for History
+      // Save Booking to Local Storage
       const bookingData = { id: randomId, from, to, date, time, vehicle: selectedVehicle, type: selectedTripType, name, phone, landmark, total, pickupPay, dropPay, bookedDate };
       let history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
       history.unshift(bookingData);
@@ -580,7 +547,7 @@
       const container = document.getElementById('historyListContainer');
       const history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
       if (history.length === 0) {
-        container.innerHTML = `<div class="text-center py-6 text-slate-400">No bookings yet! Confirm a cab to view your receipts here.</div>`;
+        container.innerHTML = `<div class="text-center py-6 text-slate-400">No bookings yet!</div>`;
         return;
       }
       container.innerHTML = history.map(item => `
@@ -629,8 +596,50 @@
 
       window.open(`https://wa.me/918889637244?text=${message}`, '_blank');
     }
+
+    // User Profile Management
+    function loadSavedProfile() {
+      const user = JSON.parse(localStorage.getItem('maketripzy_user'));
+      if (user && user.name) {
+        document.getElementById('drawerUserTitle').innerText = user.name;
+        document.getElementById('drawerUserSub').innerText = user.phone;
+        document.getElementById('custName').value = user.name;
+        document.getElementById('custPhone').value = user.phone;
+        document.getElementById('loginName').value = user.name;
+        document.getElementById('loginPhone').value = user.phone;
+        document.getElementById('logoutBtn').classList.remove('hidden');
+      } else {
+        document.getElementById('drawerUserTitle').innerText = 'Login / Sign In';
+        document.getElementById('drawerUserSub').innerText = 'Tap to manage profile';
+        document.getElementById('logoutBtn').classList.add('hidden');
+      }
+    }
+
+    function saveUserProfile() {
+      const name = document.getElementById('loginName').value.trim();
+      const phone = document.getElementById('loginPhone').value.trim();
+
+      if (!name || phone.length < 10) {
+        alert('Kripya apna naam aur valid 10-digit mobile number daalein!');
+        return;
+      }
+
+      localStorage.setItem('maketripzy_user', JSON.stringify({ name, phone }));
+      loadSavedProfile();
+      closeModal('authModal');
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('maketripzy_user');
+      document.getElementById('loginName').value = '';
+      document.getElementById('loginPhone').value = '';
+      document.getElementById('custName').value = '';
+      document.getElementById('custPhone').value = '';
+      loadSavedProfile();
+      closeModal('authModal');
+    }
+
+    loadSavedProfile();
   </script>
 </body>
 </html>
-
-  
