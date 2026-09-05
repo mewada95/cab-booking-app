@@ -197,7 +197,7 @@
               <i class="fa-solid fa-circle-check text-amber-600"></i> Zero Advance Booking
             </p>
             <p class="text-[11px] text-amber-800 leading-relaxed">
-              Trip shuru hone par driver ko fuel ke liye 20% dein, bacha 80% ride khatam hone par dein.
+              Trip shuru hone par driver ko 20% dein, bacha 80% drop par dein.
             </p>
           </div>
 
@@ -242,12 +242,12 @@
         </div>
       </div>
 
-      <!-- DRIVER ASSIGNMENT CARD -->
+      <!-- DRIVER ASSIGNMENT CARD (With Live Phone Link) -->
       <div id="driverStatusCard" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
         <div id="driverPendingState" class="text-center py-2">
           <i class="fa-solid fa-hourglass-half text-amber-500 text-2xl mb-1.5 animate-pulse"></i>
           <p class="text-xs font-bold text-slate-800">Waiting for Partner to Accept...</p>
-          <p class="text-[11px] text-slate-500 mt-0.5">Partner ride accept karte hi driver aur cab number yahan live show hoga.</p>
+          <p class="text-[11px] text-slate-500 mt-0.5">Partner accept karte hi driver details aur phone number yahan live unlock honge.</p>
         </div>
 
         <div id="driverConfirmedState" class="hidden space-y-2.5 text-xs">
@@ -257,14 +257,14 @@
             </span>
             <span class="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-md border border-emerald-200">On The Way</span>
           </div>
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-start">
             <div>
-              <p class="text-slate-400 text-[10px]">Driver Partner</p>
+              <p class="text-slate-400 text-[10px] uppercase font-bold">Driver Partner</p>
               <p id="assignedDriverName" class="font-bold text-slate-800 text-sm">-</p>
-              <p id="assignedDriverPhone" class="text-slate-500 text-[11px]">Verified Partner</p>
+              <div id="assignedDriverPhoneContainer" class="mt-1"></div>
             </div>
             <div class="text-right">
-              <p class="text-slate-400 text-[10px]">Cab Number</p>
+              <p class="text-slate-400 text-[10px] uppercase font-bold">Cab Number</p>
               <p id="assignedCabNumber" class="font-bold font-mono text-slate-800 text-sm">-</p>
               <p id="assignedCabModel" class="text-slate-500 text-[11px]">Commercial Taxi</p>
             </div>
@@ -354,7 +354,6 @@
   <!-- SLIDE-OVER HAMBURGER DRAWER -->
   <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden transition-opacity"></div>
   <aside id="sideDrawer" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
-    <!-- Profile Header -->
     <div onclick="openModal('authModal')" class="p-5 border-b border-slate-200 flex items-center justify-between bg-blue-600 text-white cursor-pointer active:bg-blue-700">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg">
@@ -370,7 +369,6 @@
       </button>
     </div>
 
-    <!-- Navigation Links -->
     <div class="p-4 space-y-2 flex-1 overflow-y-auto text-sm font-medium text-slate-700">
       <button onclick="openModal('historyModal')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left">
         <i class="fa-solid fa-clock-rotate-left text-blue-600 w-5"></i>
@@ -399,7 +397,7 @@
     </div>
   </aside>
 
-  <!-- MODAL: CUSTOMER LOGIN -->
+  <!-- MODALS -->
   <div id="authModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -425,7 +423,6 @@
     </div>
   </div>
 
-  <!-- MODAL: MY BOOKINGS HISTORY -->
   <div id="historyModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center">
@@ -441,25 +438,24 @@
     </div>
   </div>
 
-  <!-- MODAL: TERMS & CONDITIONS -->
   <div id="termsModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center">
-        <h3 class="font-bold text-slate-800 text-sm">Terms & Conditions</h3>
+        <h3 class="font-bold text-slate-800 text-sm">Terms & Cancellation Policy</h3>
         <button onclick="closeModal('termsModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-600 leading-relaxed flex-1">
-        <p class="font-bold text-slate-800">1. Partner Confirmation</p>
-        <p>Ride is confirmed when a verified vendor accepts your trip in real time.</p>
-        <p class="font-bold text-slate-800">2. Partial Payment Terms</p>
-        <p>Advance booking is ₹0. Pay 20% to driver at pickup, and remaining 80% at destination.</p>
-        <p class="font-bold text-slate-800">3. Tolls, Taxes & Parking</p>
-        <p>Tolls, state taxes, and parking fees are paid directly as actuals during journey.</p>
+        <p class="font-bold text-slate-800">1. Cancellation & Late Fee Policy</p>
+        <p>• Pickup time se 6 ghante pehle cancellation bilkul <b>FREE (₹0 Penalty)</b> hai.</p>
+        <p>• Pickup time ke 6 ghante ke andar cancel karne par total fare ka <b>10% (Minimum ₹300, Maximum ₹1,000)</b> late fee charge hoga.</p>
+        <p class="font-bold text-slate-800">2. Partner Guarantee</p>
+        <p>Ride accept karne ke baad partner dwara cancel hone par partner par bhi penalty charge ki jaati hai.</p>
+        <p class="font-bold text-slate-800">3. ₹0 Advance Policy</p>
+        <p>Booking ke samay advance ₹0 hai. 20% pickup par aur 80% drop par dena hota hai.</p>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: ABOUT US -->
   <div id="aboutModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center">
@@ -472,12 +468,10 @@
     </div>
   </div>
 
-  <!-- FLOATING WHATSAPP BUTTON -->
   <a href="https://wa.me/918889637244?text=Hi,%20I%20need%20cab%20booking%20support" target="_blank" class="fixed bottom-4 right-4 z-30 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold transition transform active:scale-95">
     <i class="fa-brands fa-whatsapp text-lg"></i>
     <span>WhatsApp Support</span>
   </a>
-  <!-- SCRIPTS & FIREBASE INTEGRATION -->
     <!-- SCRIPTS & FIREBASE INTEGRATION -->
   <script>
     const firebaseConfig = {
@@ -498,6 +492,7 @@
     let baseFare = 1200;
     const driverAllowance = 300;
     let currentDocId = '';
+    let currentBookingData = null;
     let unsubscribeBooking = null;
 
     document.getElementById('pickupDate').valueAsDate = new Date();
@@ -556,7 +551,7 @@
       element.querySelector('input[type="radio"]').checked = true;
     }
 
-    // CREATE REAL-TIME BOOKING IN FIREBASE
+    // CREATE BOOKING
     function handleBooking() {
       const from = document.getElementById('pickupLocation').value.trim();
       const to = document.getElementById('dropLocation').value.trim();
@@ -598,6 +593,7 @@
         bookedDate: bookedDate,
         status: 'Confirmation Pending',
         driverName: '',
+        driverPhone: '',
         cabNumber: '',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
@@ -606,19 +602,17 @@
       btn.innerText = 'Creating Booking...';
       btn.disabled = true;
 
-      // Save to Firestore
       db.collection("bookings").add(bookingPayload)
         .then((docRef) => {
           btn.innerText = 'Confirm Booking';
           btn.disabled = false;
           currentDocId = docRef.id;
+          currentBookingData = bookingPayload;
 
-          // Save to Local History with DocId
           let history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
           history.unshift({ ...bookingPayload, docId: currentDocId });
           localStorage.setItem('maketripzy_history', JSON.stringify(history));
 
-          // Set Receipt Info
           document.getElementById('bookingIdBadge').innerText = bookingId;
           document.getElementById('receiptBookingDate').innerText = bookedDate;
           document.getElementById('receiptPickup').innerText = from;
@@ -638,7 +632,6 @@
           document.getElementById('receiptSection').classList.remove('hidden');
           window.scrollTo({ top: 0, behavior: 'smooth' });
 
-          // Real-time listen
           listenToBooking(currentDocId);
         })
         .catch((error) => {
@@ -655,8 +648,8 @@
       unsubscribeBooking = db.collection("bookings").doc(docId).onSnapshot((doc) => {
         if (!doc.exists) return;
         const data = doc.data();
+        currentBookingData = data;
 
-        // Update local storage so history stays updated
         syncLocalStorage(docId, data);
 
         if (data.status === 'Confirmed') {
@@ -667,9 +660,32 @@
           document.getElementById('driverConfirmedState').classList.remove('hidden');
           document.getElementById('assignedDriverName').innerText = data.driverName || 'Verified Partner';
           document.getElementById('assignedCabNumber').innerText = data.cabNumber || 'Assigned';
+
+          // Driver Call Link
+          if (data.driverPhone) {
+            document.getElementById('assignedDriverPhoneContainer').innerHTML = `
+              <a href="tel:${data.driverPhone}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                <i class="fa-solid fa-phone text-[10px]"></i> ${data.driverPhone} (Call Driver)
+              </a>`;
+          } else {
+            document.getElementById('assignedDriverPhoneContainer').innerHTML = `<span class="text-slate-400 text-[11px]">Verified Partner</span>`;
+          }
+        } else if (data.status === 'Cancelled by Vendor') {
+          document.getElementById('receiptHeaderBox').className = 'bg-rose-700 text-white rounded-2xl p-5 shadow-sm mb-4';
+          document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Cancelled by Partner';
+          document.getElementById('driverPendingState').classList.remove('hidden');
+          document.getElementById('driverConfirmedState').classList.add('hidden');
+          document.getElementById('driverPendingState').innerHTML = `
+            <div class="text-center py-2 text-rose-700">
+              <i class="fa-solid fa-circle-xmark text-3xl mb-1 text-rose-600"></i>
+              <p class="font-bold text-xs">Partner dwara ride cancel kar di gayi hai.</p>
+              <p class="text-[10px] text-slate-500 mt-1">Partner par policy ke anusaar penalty apply ki gayi hai. Aap nayi cab book kar sakte hain.</p>
+            </div>
+          `;
+          document.getElementById('cancelBookingBtn').classList.add('hidden');
         } else if (data.status === 'Cancelled') {
           document.getElementById('receiptHeaderBox').className = 'bg-slate-700 text-white rounded-2xl p-5 shadow-sm mb-4';
-          document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled';
+          document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled by You';
           document.getElementById('driverPendingState').classList.add('hidden');
           document.getElementById('cancelBookingBtn').classList.add('hidden');
         }
@@ -687,7 +703,79 @@
       localStorage.setItem('maketripzy_history', JSON.stringify(history));
     }
 
-    // LIVE HISTORY SYNC DIRECTLY FROM FIREBASE
+    // CUSTOMER CANCELLATION: 6-HOUR RULE & PENALTY
+    function cancelCurrentBooking() {
+      if (!currentDocId || !currentBookingData) return;
+
+      const totalFare = Number(currentBookingData.total) || 1500;
+      const tenPercent = Math.round(totalFare * 0.10);
+      const calculatedPenalty = Math.max(300, Math.min(1000, tenPercent));
+
+      let isWithin6Hours = false;
+      let hoursRemaining = 0;
+
+      try {
+        const pickupDateStr = currentBookingData.date;
+        const pickupTimeStr = currentBookingData.time;
+
+        if (pickupDateStr && pickupTimeStr) {
+          const [timePart, modifier] = pickupTimeStr.split(' ');
+          let [hours, minutes] = timePart.split(':').map(Number);
+          if (modifier === 'PM' && hours < 12) hours += 12;
+          if (modifier === 'AM' && hours === 12) hours = 0;
+
+          const scheduledDate = new Date(pickupDateStr);
+          scheduledDate.setHours(hours, minutes, 0, 0);
+          const now = new Date();
+
+          const diffMs = scheduledDate.getTime() - now.getTime();
+          hoursRemaining = diffMs / (1000 * 60 * 60);
+
+          if (hoursRemaining < 6) {
+            isWithin6Hours = true;
+          }
+        }
+      } catch (e) {
+        console.error("Time parsing error:", e);
+      }
+
+      let confirmMsg = "";
+      let finalPenalty = 0;
+
+      if (isWithin6Hours) {
+        finalPenalty = calculatedPenalty;
+        confirmMsg = 
+          `⚠️ CANCELLATION POLICY WARNING:\n\n` +
+          `Aapki ride shuru hone me 6 ghante se kam samay bacha hai (${hoursRemaining > 0 ? hoursRemaining.toFixed(1) + ' ghante' : 'Pickup time shuru ho chuka hai'}).\n\n` +
+          `MakeTripzy policy ke mutabik 6 ghante ke andar cancel karne par total fare ka 10% (Min ₹300, Max ₹1,000) late fee penalty lagegi.\n\n` +
+          `Late Fee Penalty: ₹${finalPenalty}\n\n` +
+          `Kya aap booking cancel karna chahte hain?`;
+      } else {
+        finalPenalty = 0;
+        confirmMsg = 
+          `ℹ️ FREE CANCELLATION:\n\n` +
+          `Aapki ride me abhi 6 ghante se zyada samay hai (${hoursRemaining.toFixed(1)} ghante bache hain).\n\n` +
+          `Aapka cancellation bilkul FREE hai (₹0 Penalty).\n\n` +
+          `Kya aap ride cancel karna chahte hain?`;
+      }
+
+      if (confirm(confirmMsg)) {
+        db.collection("bookings").doc(currentDocId).update({
+          status: 'Cancelled',
+          cancelledBy: 'customer',
+          customerPenalty: finalPenalty,
+          cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          if (finalPenalty > 0) {
+            alert(`Booking cancel ho gayi hai. Policy anusaar ₹${finalPenalty} penalty account par record ho chuki hai.`);
+          } else {
+            alert('Booking bina kisi penalty ke successfully cancel ho gayi hai.');
+          }
+        });
+      }
+    }
+
+    // LIVE HISTORY SYNC DIRECTLY FROM FIRESTORE
     async function renderBookingHistory() {
       const container = document.getElementById('historyListContainer');
       let history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
@@ -697,9 +785,8 @@
         return;
       }
 
-      container.innerHTML = `<div class="text-center py-4 text-slate-400"><i class="fa-solid fa-spinner fa-spin text-base mr-1 text-blue-600"></i> Checking live partner status...</div>`;
+      container.innerHTML = `<div class="text-center py-4 text-slate-400"><i class="fa-solid fa-spinner fa-spin text-base mr-1 text-blue-600"></i> Checking live status...</div>`;
 
-      // Sync each ride with Firebase cloud
       const liveHistory = await Promise.all(history.map(async (item) => {
         if (item.docId) {
           try {
@@ -714,12 +801,12 @@
         return item;
       }));
 
-      // Save latest status in phone storage
       localStorage.setItem('maketripzy_history', JSON.stringify(liveHistory));
 
       container.innerHTML = liveHistory.map(item => {
         const isConfirmed = item.status === 'Confirmed';
-        const isCancelled = item.status === 'Cancelled';
+        const isVendorCancelled = item.status === 'Cancelled by Vendor';
+        const isCustomerCancelled = item.status === 'Cancelled';
 
         return `
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-1.5">
@@ -727,7 +814,7 @@
               <span class="font-bold text-blue-700">${item.bookingId || 'MTZ'}</span>
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
                 isConfirmed ? 'bg-emerald-100 text-emerald-700' :
-                isCancelled ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-800'
+                (isCustomerCancelled || isVendorCancelled) ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-800'
               }">
                 ${item.status || 'Confirmation Pending'}
               </span>
@@ -736,27 +823,23 @@
             <p class="text-[11px] text-slate-500">${item.date || ''} • ${item.vehicle}</p>
 
             ${isConfirmed ? `
-              <div class="mt-2 pt-2 border-t border-slate-200 text-[11px] text-emerald-800 bg-emerald-50/70 p-2 rounded-lg">
+              <div class="mt-2 pt-2 border-t border-slate-200 text-[11px] text-emerald-800 bg-emerald-50/80 p-2.5 rounded-lg space-y-1">
                 <p><b>Driver:</b> ${item.driverName || 'Assigned Driver'}</p>
-                <p><b>Cab No:</b> ${item.cabNumber || 'Assigned'}</p>
+                <p><b>Driver Contact:</b> <a href="tel:${item.driverPhone}" class="text-blue-600 font-bold underline"><i class="fa-solid fa-phone text-[10px]"></i> ${item.driverPhone || 'N/A'}</a></p>
+                <p><b>Cab No:</b> <span class="font-mono font-bold">${item.cabNumber || 'Assigned'}</span></p>
+              </div>
+            ` : isVendorCancelled ? `
+              <div class="mt-2 pt-1 border-t border-rose-200 text-[10px] text-rose-700 bg-rose-50 p-2 rounded-lg">
+                <i class="fa-solid fa-triangle-exclamation"></i> Ride cancelled by partner. Penalty recorded.
+              </div>
+            ` : isCustomerCancelled ? `
+              <div class="mt-2 pt-1 border-t border-rose-200 text-[10px] text-rose-700 bg-rose-50 p-2 rounded-lg">
+                <i class="fa-solid fa-ban"></i> ${item.customerPenalty ? `Cancelled within 6 hrs (Late Fee: ₹${item.customerPenalty})` : 'Cancelled before 6 hrs (No Penalty)'}
               </div>
             ` : ''}
           </div>
         `;
       }).join('');
-    }
-
-    function cancelCurrentBooking() {
-      if (confirm('Kya aap sach me ye booking cancel karna chahte hain?')) {
-        if (currentDocId) {
-          db.collection("bookings").doc(currentDocId).update({
-            status: 'Cancelled',
-            cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
-          }).then(() => {
-            alert('Booking cancel kar di gayi hai.');
-          });
-        }
-      }
     }
 
     function clearAllHistory() {
@@ -795,7 +878,7 @@
         `*At Pickup (20%):* ${pickupPay}%0A` +
         `*At Drop (80%):* ${dropPay}`;
 
-      window.open(`https://wa.me/918409504684?text=${message}`, '_blank');
+      window.open(`https://wa.me/918889637244?text=${message}`, '_blank');
     }
 
     function loadSavedProfile() {
@@ -831,16 +914,4 @@
 
     function logoutUser() {
       localStorage.removeItem('maketripzy_user');
-      document.getElementById('loginName').value = '';
-      document.getElementById('loginPhone').value = '';
-      document.getElementById('custName').value = '';
-      document.getElementById('custPhone').value = '';
-      loadSavedProfile();
-      closeModal('authModal');
-    }
-
-    loadSavedProfile();
-  </script>
-</body>
-</html>
-
+      document.getElementById('loginName').value = 
