@@ -7,11 +7,13 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
+  <!-- Firebase Compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen">
 
+  <!-- VENDOR LOGIN SCREEN -->
   <div id="vendorAuthScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4">
       <div class="text-center space-y-1">
@@ -39,6 +41,7 @@
     </div>
   </div>
 
+  <!-- TOP HEADER -->
   <header class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-md">
     <div class="flex items-center gap-2">
       <div class="bg-amber-500 text-slate-900 p-1.5 rounded-lg flex items-center justify-center font-bold">
@@ -56,6 +59,7 @@
     </div>
   </header>
 
+  <!-- NAVIGATION TABS -->
   <div class="bg-white border-b border-slate-200 sticky top-[53px] z-20">
     <div class="max-w-md mx-auto flex text-xs font-bold text-center">
       <button onclick="switchTab('radar')" id="tabRadarBtn" class="flex-1 py-3 text-amber-600 border-b-2 border-amber-500 flex items-center justify-center gap-1.5">
@@ -66,8 +70,10 @@
       </button>
     </div>
   </div>
-    <main class="max-w-md mx-auto p-4 pb-24">
+    <!-- MAIN CONTAINER -->
+  <main class="max-w-md mx-auto p-4 pb-24">
 
+    <!-- VIEW 1: LIVE RADAR (Bookings) -->
     <div id="radarView" class="space-y-4">
       <div class="flex justify-between items-center">
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Live Ride Requests</h2>
@@ -82,8 +88,9 @@
       </div>
     </div>
 
+    <!-- VIEW 2: FLEET MANAGEMENT (Unlimited Drivers & Cabs) -->
     <div id="fleetView" class="hidden space-y-4">
-      
+      <!-- ADD DRIVER FORM -->
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
         <div class="flex justify-between items-center">
           <h3 class="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider">
@@ -110,10 +117,10 @@
             <i class="fa-solid fa-plus"></i> Save Driver to Fleet
           </button>
         </div>
-
         <div id="savedDriversList" class="space-y-1.5 pt-2 border-t border-slate-100 max-h-40 overflow-y-auto"></div>
       </div>
 
+      <!-- ADD CAB FORM -->
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
         <div class="flex justify-between items-center">
           <h3 class="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider">
@@ -155,12 +162,12 @@
             <i class="fa-solid fa-plus"></i> Save Cab to Fleet
           </button>
         </div>
-
         <div id="savedCabsList" class="space-y-1.5 pt-2 border-t border-slate-100 max-h-40 overflow-y-auto"></div>
       </div>
     </div>
   </main>
 
+  <!-- MODAL: ASSIGN DRIVER & CAB ON ACCEPT -->
   <div id="assignModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4">
       <div class="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -183,7 +190,7 @@
         </div>
 
         <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200 text-[11px] text-amber-800 leading-tight">
-          Ye details turant customer ki live screen par display ho jayengi.
+          Ye details turant customer ki live screen par unlock ho jayengi aur customer contact details yahan reveal hongi.
         </div>
 
         <button onclick="confirmAssignmentAndAccept()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md">
@@ -192,7 +199,8 @@
       </div>
     </div>
   </div>
-    <script>
+    <!-- JAVASCRIPT LOGIC -->
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
       authDomain: "maketripzy.firebaseapp.com",
@@ -209,7 +217,6 @@
     let currentVendor = null;
     let selectedAcceptDocId = null;
 
-    // VENDOR AUTHENTICATION
     function checkAuth() {
       const stored = localStorage.getItem("maketripzy_partner_auth");
       if (stored) {
@@ -245,7 +252,6 @@
       }
     }
 
-    // TABS SWITCHING
     function switchTab(tab) {
       if (tab === 'radar') {
         document.getElementById('radarView').classList.remove('hidden');
@@ -261,7 +267,6 @@
       }
     }
 
-    // FLEET MANAGEMENT: DRIVERS & CABS (Unlimited)
     function getFleetData() {
       return JSON.parse(localStorage.getItem(`fleet_${currentVendor?.phone}`) || '{"drivers":[], "cabs":[]}');
     }
@@ -277,7 +282,7 @@
       const licence = document.getElementById("newDriverLicence").value.trim();
 
       if (!name || phone.length < 10 || !licence) {
-        alert("Kripya Driver ka Name, 10-digit Phone aur Licence number teeno daalein!");
+        alert("Kripya Driver Name, 10-digit Phone aur DL number bharein!");
         return;
       }
 
@@ -288,7 +293,7 @@
       document.getElementById("newDriverName").value = '';
       document.getElementById("newDriverPhone").value = '';
       document.getElementById("newDriverLicence").value = '';
-      alert("Driver successfully add ho gaya!");
+      alert("Driver save ho gaya!");
     }
 
     function deleteDriver(id) {
@@ -312,7 +317,7 @@
       saveFleetData(fleet);
 
       document.getElementById("newCabReg").value = '';
-      alert("Cab successfully add ho gayi!");
+      alert("Cab save ho gayi!");
     }
 
     function deleteCab(id) {
@@ -325,11 +330,9 @@
       if (!currentVendor) return;
       const fleet = getFleetData();
 
-      // Badges
       document.getElementById("driverCountBadge").innerText = `${fleet.drivers.length} Drivers`;
       document.getElementById("cabCountBadge").innerText = `${fleet.cabs.length} Cabs`;
 
-      // Render Drivers
       const driverList = document.getElementById("savedDriversList");
       if (fleet.drivers.length === 0) {
         driverList.innerHTML = `<p class="text-[11px] text-slate-400 py-1">Koi driver add nahi hai.</p>`;
@@ -337,7 +340,7 @@
         driverList.innerHTML = fleet.drivers.map(d => `
           <div class="flex justify-between items-center bg-slate-50 border border-slate-200 p-2 rounded-xl text-xs">
             <div>
-              <p class="font-bold text-slate-800">${d.name} <span class="text-[10px] text-slate-500 font-normal">(${d.phone})</span></p>
+              <p class="font-bold text-slate-800">${d.name} <span class="text-[10px] text-slate-500">(${d.phone})</span></p>
               <p class="text-[10px] text-slate-400">DL: ${d.licence}</p>
             </div>
             <button onclick="deleteDriver(${d.id})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash"></i></button>
@@ -345,7 +348,6 @@
         `).join('');
       }
 
-      // Render Cabs
       const cabList = document.getElementById("savedCabsList");
       if (fleet.cabs.length === 0) {
         cabList.innerHTML = `<p class="text-[11px] text-slate-400 py-1">Koi cab add nahi hai.</p>`;
@@ -354,7 +356,7 @@
           <div class="flex justify-between items-center bg-slate-50 border border-slate-200 p-2 rounded-xl text-xs">
             <div>
               <p class="font-bold text-slate-800 font-mono">${c.reg} <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded ml-1 font-sans font-semibold">${c.variant}</span></p>
-              <p class="text-[10px] text-slate-400">Model Year: ${c.year}</p>
+              <p class="text-[10px] text-slate-400">Year: ${c.year}</p>
             </div>
             <button onclick="deleteCab(${c.id})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash"></i></button>
           </div>
@@ -362,7 +364,7 @@
       }
     }
 
-    // LIVE RADAR: REALTIME FIRESTORE LISTENER
+    // LIVE RADAR FIRESTORE LISTENER WITH CONTACT MASKING & 10% / ₹300-₹1000 PENALTY
     db.collection("bookings")
       .orderBy("createdAt", "desc")
       .onSnapshot((snapshot) => {
@@ -390,12 +392,19 @@
           const commission15 = Math.round(totalFare * 0.15);
           const vendorNetEarning = totalFare - commission15;
 
+          // PENALTY CALCULATION: 10% Fare (Min ₹300, Max ₹1000)
+          const tenPercent = Math.round(totalFare * 0.10);
+          const vendorPenalty = Math.max(300, Math.min(1000, tenPercent));
+
           const isPending = b.status === "Confirmation Pending";
           const isConfirmed = b.status === "Confirmed";
-          const isCancelled = b.status === "Cancelled";
+          const isCustomerCancelled = b.status === "Cancelled";
+          const isVendorCancelled = b.status === "Cancelled by Vendor";
+
+          const maskedPhone = b.phone ? b.phone.substring(0, 2) + "******" + b.phone.substring(b.phone.length - 2) : "**********";
 
           html += `
-            <div class="bg-white rounded-2xl p-4 shadow-sm border ${isCancelled ? 'border-rose-300 bg-rose-50/40' : isConfirmed ? 'border-emerald-300' : 'border-amber-300'} text-xs space-y-3">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border ${isCustomerCancelled || isVendorCancelled ? 'border-rose-300 bg-rose-50/40' : isConfirmed ? 'border-emerald-300' : 'border-amber-300'} text-xs space-y-3">
               <div class="flex justify-between items-center pb-2 border-b border-slate-100">
                 <div>
                   <span class="font-bold font-mono text-slate-800 text-sm">${b.bookingId || docId.substring(0,8)}</span>
@@ -403,7 +412,7 @@
                 </div>
                 <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
                   isConfirmed ? 'bg-emerald-100 text-emerald-800' :
-                  isCancelled ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
+                  (isCustomerCancelled || isVendorCancelled) ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
                 }">
                   ${b.status}
                 </span>
@@ -415,18 +424,31 @@
                 <p class="text-[11px] text-blue-600 font-semibold mt-0.5">Required: ${b.vehicle} • ${b.type || 'One Way'}</p>
               </div>
 
-              <div class="bg-slate-50 p-2.5 rounded-xl flex justify-between items-center">
+              <!-- PASSENGER DETAILS (MASKED UNTIL ACCEPTED) -->
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex justify-between items-center">
                 <div>
-                  <p class="text-[10px] text-slate-400 uppercase font-bold">Passenger</p>
-                  <p class="font-bold text-slate-800">${b.name}</p>
-                  <p class="text-[10px] text-slate-500">${b.phone}</p>
+                  <p class="text-[10px] text-slate-400 uppercase font-bold">Passenger Details</p>
+                  <p class="font-bold text-slate-800">${isConfirmed ? b.name : b.name.split(' ')[0] + ' (Customer)'}</p>
+                  <p class="text-[11px] font-mono mt-0.5">
+                    ${isConfirmed ? `
+                      <a href="tel:${b.phone}" class="text-blue-600 font-bold inline-flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                        <i class="fa-solid fa-phone text-[10px]"></i> ${b.phone} (Call Customer)
+                      </a>
+                    ` : `
+                      <span class="text-slate-400 flex items-center gap-1">
+                        <i class="fa-solid fa-lock text-amber-500 text-[10px]"></i> ${maskedPhone}
+                        <span class="text-[9px] text-amber-600 font-sans font-semibold">(Accept to Unlock)</span>
+                      </span>
+                    `}
+                  </p>
                 </div>
                 <div class="text-right text-[11px]">
-                  <p class="text-slate-400 text-[10px] uppercase font-bold">Landmark</p>
-                  <p class="text-slate-600">${b.landmark || 'Direct Pickup'}</p>
+                  <p class="text-slate-400 text-[10px] uppercase font-bold">Pickup Landmark</p>
+                  <p class="text-slate-600">${isConfirmed ? (b.landmark || 'Direct Pickup') : '<span class="text-slate-400 italic">Locked</span>'}</p>
                 </div>
               </div>
 
+              <!-- 15% COMMISSION CALCULATION -->
               <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 space-y-1">
                 <div class="flex justify-between text-slate-600 text-[11px]">
                   <span>Customer Total:</span>
@@ -442,18 +464,30 @@
                 </div>
               </div>
 
+              <!-- ACTIONS BASED ON STATUS -->
               ${isPending ? `
                 <button onclick="openAssignModal('${docId}', '${b.bookingId}', '${b.vehicle}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow-sm text-xs flex items-center justify-center gap-1.5">
-                  <i class="fa-solid fa-check"></i> Accept & Assign Fleet
+                  <i class="fa-solid fa-check"></i> Accept & Assign Fleet (Unlock Contact)
                 </button>
               ` : isConfirmed ? `
-                <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-[11px] text-emerald-800 space-y-0.5">
-                  <p class="font-bold">✓ Assigned Driver: ${b.driverName} (${b.driverPhone || ''})</p>
-                  <p class="font-mono">Cab: ${b.cabNumber} (${b.cabVariant || ''})</p>
+                <div class="space-y-2">
+                  <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-[11px] text-emerald-800 space-y-0.5">
+                    <p class="font-bold">✓ Assigned Driver: ${b.driverName} (${b.driverPhone || ''})</p>
+                    <p class="font-mono">Cab: ${b.cabNumber} (${b.cabVariant || ''})</p>
+                  </div>
+                  <button onclick="vendorCancelBooking('${docId}', ${totalFare}, '${b.bookingId}')" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-2 rounded-xl border border-rose-200 text-xs flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Cancel This Ride (Penalty: ₹${vendorPenalty})
+                  </button>
+                </div>
+              ` : isVendorCancelled ? `
+                <div class="p-2.5 bg-rose-100 border border-rose-200 rounded-xl text-[11px] text-rose-800 space-y-0.5">
+                  <p class="font-bold flex items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> Ride Cancelled by Vendor</p>
+                  <p class="text-rose-700">Penalty Incurred: <b>₹${b.penaltyAmount || vendorPenalty}</b> (Due)</p>
                 </div>
               ` : `
-                <div class="p-2 bg-rose-100 rounded-xl text-center text-[11px] text-rose-800 font-bold">
-                  Ride Cancelled by Customer (Do Not Dispatch)
+                <div class="p-2.5 bg-rose-100 border border-rose-200 rounded-xl text-[11px] text-rose-800 space-y-0.5">
+                  <p class="font-bold">Ride Cancelled by Customer</p>
+                  <p class="text-[10px] text-slate-600">${b.customerPenalty ? `Customer Late Fee: ₹${b.customerPenalty}` : 'Cancelled before 6 hours (No Fee)'}</p>
                 </div>
               `}
             </div>
@@ -463,7 +497,7 @@
         container.innerHTML = html;
       });
 
-    // OPEN ASSIGN MODAL ON ACCEPT
+    // OPEN ASSIGN MODAL
     function openAssignModal(docId, bookingId, requiredVehicle) {
       const fleet = getFleetData();
 
@@ -476,11 +510,9 @@
       selectedAcceptDocId = docId;
       document.getElementById("assignModalSub").innerText = `Booking: ${bookingId} | Required: ${requiredVehicle}`;
 
-      // Populate Driver dropdown
       const dSelect = document.getElementById("modalDriverSelect");
       dSelect.innerHTML = fleet.drivers.map(d => `<option value="${d.id}">${d.name} (${d.phone})</option>`).join('');
 
-      // Populate Cab dropdown
       const cSelect = document.getElementById("modalCabSelect");
       cSelect.innerHTML = fleet.cabs.map(c => `<option value="${c.id}">${c.reg} - ${c.variant} (${c.year})</option>`).join('');
 
@@ -492,7 +524,7 @@
       selectedAcceptDocId = null;
     }
 
-    // CONFIRM ASSIGNMENT IN FIRESTORE
+    // CONFIRM ASSIGNMENT
     function confirmAssignmentAndAccept() {
       if (!selectedAcceptDocId) return;
       const fleet = getFleetData();
@@ -520,13 +552,45 @@
         acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
         closeAssignModal();
-        alert("Ride Confirmed! Driver aur Cab details customer ki live screen par display ho gayi hain.");
+        alert("Ride Confirmed! Customer contact unlock ho gaya hai.");
       }).catch(err => {
         alert("Error: " + err.message);
       });
+    }
+
+    // VENDOR CANCELLATION (10% Fare, Min ₹300, Max ₹1000)
+    function vendorCancelBooking(docId, totalFare, bookingId) {
+      const tenPercent = Math.round(totalFare * 0.10);
+      const penalty = Math.max(300, Math.min(1000, tenPercent));
+
+      const confirmMsg = 
+        `⚠️ VENDOR PENALTY WARNING:\n\n` +
+        `MakeTripzy policy ke taht confirmed ride cancel karne par 10% fare (Min ₹300, Max ₹1,000) penalty lagti hai.\n\n` +
+        `Total Fare: ₹${totalFare}\n` +
+        `Vendor Penalty: ₹${penalty}\n\n` +
+        `Kya aap sach me ride cancel karna chahte hain?`;
+
+      if (confirm(confirmMsg)) {
+        const reason = prompt("Cancellation reason enter karein:", "Vehicle breakdown / Driver emergency");
+        if (reason) {
+          db.collection("bookings").doc(docId).update({
+            status: "Cancelled by Vendor",
+            cancelledBy: "vendor",
+            penaltyAmount: penalty,
+            cancelReason: reason,
+            cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
+          }).then(() => {
+            alert(`Ride cancel ho gayi. Policy anusaar ₹${penalty} penalty darj ho gayi hai.`);
+          }).catch(err => {
+            alert("Error: " + err.message);
+          });
+        }
+      }
     }
 
     checkAuth();
   </script>
 </body>
 </html>
+
+  
