@@ -9,7 +9,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen relative overflow-x-hidden">
 
-  <!-- TOP HEADER -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 py-3 flex items-center justify-between shadow-sm">
     <div class="flex items-center gap-2">
       <div class="bg-blue-600 text-white p-2 rounded-xl flex items-center justify-center">
@@ -22,10 +21,8 @@
     </button>
   </header>
 
-  <!-- MAIN CONTAINER -->
   <main class="max-w-md mx-auto pb-24">
 
-    <!-- BOOKING SECTION -->
     <div id="bookingSection">
       <div class="bg-blue-700 text-white px-5 pt-7 pb-12 rounded-b-[2rem] text-center shadow-md">
         <span class="inline-flex items-center gap-1.5 bg-blue-600/70 border border-blue-400/40 text-blue-100 text-xs px-3 py-1 rounded-full font-medium mb-3">
@@ -38,7 +35,6 @@
       </div>
 
       <div class="px-4 -mt-7">
-        <!-- TABS -->
         <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-1.5 flex justify-between gap-1 mb-4 text-xs font-semibold text-slate-500">
           <button class="flex-1 py-2 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center gap-1.5 border border-blue-100">
             <i class="fa-solid fa-car"></i> Cabs
@@ -54,9 +50,13 @@
           </button>
         </div>
 
-        <!-- TRIP TYPE SELECTOR -->
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
-          <p class="text-[11px] font-bold tracking-wider text-slate-400 uppercase mb-2">Trip Type</p>
+          <div class="flex justify-between items-center mb-2">
+            <p class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Trip Type</p>
+            <button type="button" onclick="resetBookingForm()" class="text-[11px] text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-rotate-right"></i> Reset Form
+            </button>
+          </div>
           <div class="grid grid-cols-2 gap-2 mb-4">
             <button type="button" onclick="selectTripType('One Way', this)" class="trip-type-btn py-2 text-xs font-semibold rounded-xl bg-blue-600 text-white">One Way</button>
             <button type="button" onclick="selectTripType('Round Trip', this)" class="trip-type-btn py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600">Round Trip</button>
@@ -64,7 +64,6 @@
             <button type="button" onclick="selectTripType('Airport Transfer', this)" class="trip-type-btn py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600">Airport Transfer</button>
           </div>
 
-          <!-- INPUTS -->
           <div class="space-y-3">
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">From</label>
@@ -104,7 +103,6 @@
           </div>
         </div>
 
-        <!-- PASSENGER DETAILS -->
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
           <div class="flex items-center gap-2 mb-3">
             <i class="fa-regular fa-user text-blue-600"></i>
@@ -126,14 +124,12 @@
           </div>
         </div>
 
-        <!-- VEHICLE CATEGORY -->
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
           <div class="flex items-center gap-2 mb-3">
             <i class="fa-solid fa-car-side text-blue-600"></i>
             <h3 class="text-sm font-bold text-slate-800">Vehicle Category</h3>
           </div>
           <div class="space-y-2">
-            <!-- Hatchback -->
             <label class="flex items-center justify-between p-3 border-2 border-blue-600 bg-blue-50/50 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('Hatchback', 1200, this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" checked class="text-blue-600" />
@@ -145,7 +141,6 @@
               <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">4 seats</span>
             </label>
 
-            <!-- Sedan -->
             <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('Sedan', 1600, this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" class="text-blue-600" />
@@ -157,7 +152,6 @@
               <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">4 seats</span>
             </label>
 
-            <!-- MUV -->
             <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('MUV', 2200, this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" class="text-blue-600" />
@@ -169,7 +163,6 @@
               <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">6 seats</span>
             </label>
 
-            <!-- SUV -->
             <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('SUV', 2800, this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" class="text-blue-600" />
@@ -182,7 +175,6 @@
             </label>
           </div>
 
-          <!-- PARTIAL PAYMENT SUMMARY BADGE -->
           <div class="mt-4 bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
             <p class="font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-circle-check text-amber-600"></i> Zero Advance Booking
@@ -192,7 +184,6 @@
             </p>
           </div>
 
-          <!-- T&C LINK -->
           <div class="mt-3 text-center text-xs text-slate-500">
             By clicking confirm, you agree to our 
             <button type="button" onclick="openModal('termsModal')" class="text-blue-600 underline font-semibold">Terms & Conditions</button>
@@ -205,30 +196,58 @@
       </div>
     </div>
 
-    <!-- CONFIRMATION RECEIPT -->
     <div id="receiptSection" class="hidden px-4 pt-4">
       <button onclick="backToBooking()" class="text-xs font-semibold text-blue-600 flex items-center gap-1 mb-3">
         <i class="fa-solid fa-arrow-left"></i> Book Another Trip
       </button>
 
-      <div class="bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4">
+      <div id="receiptHeaderBox" class="bg-amber-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-car text-lg"></i>
             <span class="font-bold tracking-tight">maketripzy</span>
           </div>
-          <span id="bookingIdBadge" class="bg-blue-500/80 text-white text-xs font-mono font-bold px-2.5 py-1 rounded-md">MTZ-4931</span>
+          <span id="bookingIdBadge" class="bg-black/20 text-white text-xs font-mono font-bold px-2.5 py-1 rounded-md">MTZ-4931</span>
         </div>
         <div class="flex items-center justify-between text-xs">
           <div>
-            <p class="text-blue-200">Status</p>
-            <span class="inline-flex items-center gap-1 font-semibold text-emerald-300">
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Confirmed
+            <p class="text-amber-100">Booking Status</p>
+            <span id="receiptStatusBadge" class="inline-flex items-center gap-1.5 font-bold text-white text-xs mt-0.5">
+              <span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmation Pending from Partner
             </span>
           </div>
           <div class="text-right">
-            <p class="text-blue-200">Booked On</p>
+            <p class="text-amber-100">Booked On</p>
             <p id="receiptBookingDate" class="font-semibold"></p>
+          </div>
+        </div>
+      </div>
+
+      <div id="driverStatusCard" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
+        <div id="driverPendingState" class="text-center py-2">
+          <i class="fa-solid fa-hourglass-half text-amber-500 text-2xl mb-1.5 animate-pulse"></i>
+          <p class="text-xs font-bold text-slate-800">Confirmation Pending from Partner</p>
+          <p class="text-[11px] text-slate-500 mt-0.5">Cab partner ko booking request assign ki ja rahi hai. Partner confirm karte hi driver details yahan unlock hongi.</p>
+        </div>
+
+        <div id="driverConfirmedState" class="hidden space-y-2.5 text-xs">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <span class="font-bold text-emerald-700 flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check text-emerald-600"></i> Partner Confirmed & Assigned
+            </span>
+            <span class="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-md border border-emerald-200">Ready</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-slate-400 text-[10px]">Driver Partner</p>
+              <p id="assignedDriverName" class="font-bold text-slate-800 text-sm">Rajesh Verma</p>
+              <p id="assignedDriverPhone" class="text-slate-500 text-[11px]">+91 98260-XXXXX</p>
+            </div>
+            <div class="text-right">
+              <p class="text-slate-400 text-[10px]">Cab Number</p>
+              <p id="assignedCabNumber" class="font-bold font-mono text-slate-800 text-sm">MP 04 CZ 4589</p>
+              <p id="assignedCabModel" class="text-slate-500 text-[11px]">White Sedan</p>
+            </div>
           </div>
         </div>
       </div>
@@ -267,7 +286,6 @@
         <p class="text-slate-500 pt-1 border-t border-slate-100">Landmark: <span id="receiptCustLandmark"></span></p>
       </div>
 
-      <!-- FARE BREAKDOWN -->
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
         <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare & Payment Breakdown</h4>
         <div class="flex justify-between text-slate-600">
@@ -297,18 +315,28 @@
             <span id="receiptDropAmount" class="font-bold">₹1200</span>
           </div>
         </div>
-        <p class="text-[10px] text-slate-400 italic text-center">*Tolls, state taxes & parking extra if applicable.</p>
       </div>
 
-      <button onclick="sendToWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
-        <i class="fa-brands fa-whatsapp text-lg"></i> Send Details on WhatsApp
-      </button>
+      <div id="partnerActionBox" class="bg-slate-100 border border-dashed border-slate-300 rounded-2xl p-3.5 text-center mb-3">
+        <p class="text-[11px] font-bold text-slate-600 mb-1">Simulate Partner Acceptance</p>
+        <p class="text-[10px] text-slate-500 mb-2">Partner/Vendor ride confirm karne ke baad booking status upgrade ho jayega.</p>
+        <button onclick="partnerConfirmRide()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 mx-auto shadow-sm">
+          <i class="fa-solid fa-check"></i> Partner: Accept & Confirm Ride
+        </button>
+      </div>
+
+      <div class="space-y-2">
+        <button id="whatsappConfirmBtn" onclick="sendToWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
+          <i class="fa-brands fa-whatsapp text-lg"></i> Send Booking to Dispatch (WhatsApp)
+        </button>
+        <button id="cancelBookingBtn" onclick="cancelCurrentBooking()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-3 rounded-xl text-xs border border-rose-200 flex items-center justify-center gap-1.5 transition">
+          <i class="fa-solid fa-ban"></i> Cancel This Booking
+        </button>
+      </div>
     </div>
   </main>
-    <!-- SLIDE-OVER HAMBURGER DRAWER -->
-  <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+    <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden transition-opacity"></div>
   <aside id="sideDrawer" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
-    <!-- Clickable Profile Header -->
     <div onclick="openModal('authModal')" class="p-5 border-b border-slate-200 flex items-center justify-between bg-blue-600 text-white cursor-pointer active:bg-blue-700">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg">
@@ -324,7 +352,6 @@
       </button>
     </div>
 
-    <!-- Navigation Links -->
     <div class="p-4 space-y-2 flex-1 overflow-y-auto text-sm font-medium text-slate-700">
       <button onclick="openModal('historyModal')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left">
         <i class="fa-solid fa-clock-rotate-left text-blue-600 w-5"></i>
@@ -349,11 +376,10 @@
     </div>
 
     <div class="p-4 border-t border-slate-100 text-center text-xs text-slate-400">
-      MakeTripzy Cab Services v1.2
+      MakeTripzy Cab Services v1.4
     </div>
   </aside>
 
-  <!-- MODAL: CUSTOMER LOGIN / PROFILE -->
   <div id="authModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -379,7 +405,6 @@
     </div>
   </div>
 
-  <!-- MODAL: MY BOOKINGS HISTORY -->
   <div id="historyModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center">
@@ -387,10 +412,14 @@
         <button onclick="closeModal('historyModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div id="historyListContainer" class="p-4 overflow-y-auto space-y-3 flex-1 text-xs"></div>
+      <div class="p-3 border-t border-slate-100 bg-slate-50">
+        <button onclick="clearAllHistory()" class="w-full text-rose-600 hover:text-rose-700 font-semibold text-xs py-1.5 flex items-center justify-center gap-1.5">
+          <i class="fa-regular fa-trash-can"></i> Clear All History
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- MODAL: TERMS & CONDITIONS -->
   <div id="termsModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center">
@@ -398,17 +427,16 @@
         <button onclick="closeModal('termsModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-600 leading-relaxed flex-1">
-        <p class="font-bold text-slate-800">1. Partial Payment Terms</p>
-        <p>Advance booking is ₹0. Customer must pay 20% of total fare directly to the driver at trip origin (start point), and remaining 80% upon arrival at dropoff.</p>
-        <p class="font-bold text-slate-800">2. Tolls, Taxes & Parking</p>
-        <p>All highway tolls, state border permit taxes, and parking fees are strictly NOT included in estimated fare. They must be paid as actuals during journey.</p>
-        <p class="font-bold text-slate-800">3. Night Driving Allowance</p>
-        <p>A driver night allowance of ₹250 applies if travel extends between 10:00 PM and 06:00 AM.</p>
+        <p class="font-bold text-slate-800">1. Partner Confirmation</p>
+        <p>Ride is confirmed only after partner acceptance. If no partner confirms within 30 minutes, full assistance is provided by dispatch.</p>
+        <p class="font-bold text-slate-800">2. Partial Payment Terms</p>
+        <p>Advance booking is ₹0. Customer must pay 20% directly to the driver at trip origin, and 80% upon arrival at dropoff.</p>
+        <p class="font-bold text-slate-800">3. Tolls & Parking</p>
+        <p>Tolls, state taxes, and parking are payable directly as actuals during the journey.</p>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: ABOUT US -->
   <div id="aboutModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center">
@@ -416,17 +444,16 @@
         <button onclick="closeModal('aboutModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-600 leading-relaxed flex-1">
-        <p>MakeTripzy is India's premier outstation taxi booking platform delivering safe, dependable, and affordable rides with verified drivers.</p>
+        <p>MakeTripzy connects verified cab partners across India with travelers for seamless outstation rides.</p>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: DRIVER PARTNER -->
   <div id="driverPartnerModal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden text-center p-5">
       <i class="fa-solid fa-car-tunnel text-4xl text-blue-600 mb-2"></i>
       <h3 class="font-bold text-slate-800 text-sm mb-1">Attach Your Taxi</h3>
-      <p class="text-xs text-slate-500 mb-4 leading-relaxed">Earn guaranteed outstation bookings with zero commission on your first 10 trips.</p>
+      <p class="text-xs text-slate-500 mb-4 leading-relaxed">Join MakeTripzy as a partner driver. Receive direct outstation bookings.</p>
       <a href="https://wa.me/918409504684?text=Hi,%20I%20want%20to%20attach%20my%20cab%20with%20MakeTripzy" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2">
         <i class="fa-brands fa-whatsapp text-base"></i> Join on WhatsApp
       </a>
@@ -434,20 +461,30 @@
     </div>
   </div>
 
-  <!-- FLOATING WHATSAPP -->
   <a href="https://wa.me/918409504684?text=Hi,%20I%20need%20cab%20booking%20support" target="_blank" class="fixed bottom-4 right-4 z-30 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold transition transform active:scale-95">
     <i class="fa-brands fa-whatsapp text-lg"></i>
     <span>WhatsApp Support</span>
   </a>
 
-  <!-- SCRIPTS -->
   <script>
     let selectedTripType = 'One Way';
     let selectedVehicle = 'Hatchback';
     let baseFare = 1200;
     const driverAllowance = 300;
+    let currentBookingId = '';
 
     document.getElementById('pickupDate').valueAsDate = new Date();
+
+    function resetBookingForm() {
+      if (confirm('Kya aap form ka saara data reset karna chahte hain?')) {
+        document.getElementById('pickupLocation').value = '';
+        document.getElementById('dropLocation').value = '';
+        document.getElementById('custLandmark').value = '';
+        document.getElementById('pickupDate').valueAsDate = new Date();
+        document.getElementById('pickupTime').value = '10:00 AM';
+        loadSavedProfile();
+      }
+    }
 
     function toggleDrawer(open) {
       const drawer = document.getElementById('sideDrawer');
@@ -513,17 +550,27 @@
       const total = baseFare + driverAllowance;
       const pickupPay = Math.round(total * 0.20);
       const dropPay = total - pickupPay;
-      const randomId = 'MTZ-' + Math.floor(1000 + Math.random() * 9000);
+      currentBookingId = 'MTZ-' + Math.floor(1000 + Math.random() * 9000);
       const bookedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-      // Save Booking to Local Storage
-      const bookingData = { id: randomId, from, to, date, time, vehicle: selectedVehicle, type: selectedTripType, name, phone, landmark, total, pickupPay, dropPay, bookedDate };
+      // Save Initial State: Pending Partner Confirmation
+      const bookingData = { 
+        id: currentBookingId, 
+        from, to, date, time, 
+        vehicle: selectedVehicle, 
+        type: selectedTripType, 
+        name, phone, landmark, 
+        total, pickupPay, dropPay, 
+        bookedDate, 
+        status: 'Confirmation Pending' 
+      };
+      
       let history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
       history.unshift(bookingData);
       localStorage.setItem('maketripzy_history', JSON.stringify(history));
 
-      // Populate Receipt Screen
-      document.getElementById('bookingIdBadge').innerText = randomId;
+      // Set Receipt Initial State
+      document.getElementById('bookingIdBadge').innerText = currentBookingId;
       document.getElementById('receiptBookingDate').innerText = bookedDate;
       document.getElementById('receiptPickup').innerText = from;
       document.getElementById('receiptDrop').innerText = to;
@@ -538,9 +585,72 @@
       document.getElementById('receiptPickupAmount').innerText = '₹' + pickupPay;
       document.getElementById('receiptDropAmount').innerText = '₹' + dropPay;
 
+      // Pending UI
+      document.getElementById('receiptHeaderBox').className = 'bg-amber-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
+      document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmation Pending from Partner';
+      document.getElementById('driverPendingState').classList.remove('hidden');
+      document.getElementById('driverConfirmedState').classList.add('hidden');
+      document.getElementById('partnerActionBox').classList.remove('hidden');
+      document.getElementById('cancelBookingBtn').classList.remove('hidden');
+
       document.getElementById('bookingSection').classList.add('hidden');
       document.getElementById('receiptSection').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Partner Acceptance Function
+    function partnerConfirmRide() {
+      updateBookingStatus(currentBookingId, 'Confirmed');
+
+      // Update Header & Badge to Confirmed (Green)
+      document.getElementById('receiptHeaderBox').className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
+      document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Booking Confirmed';
+
+      // Switch to Confirmed Driver Details
+      document.getElementById('driverPendingState').classList.add('hidden');
+      document.getElementById('driverConfirmedState').classList.remove('hidden');
+      document.getElementById('partnerActionBox').classList.add('hidden');
+
+      // Assign realistic driver based on vehicle
+      const models = { 'Hatchback': 'Maruti Swift (White)', 'Sedan': 'Dzire Prime (Silver)', 'MUV': 'Ertiga Hybrid (Grey)', 'SUV': 'Innova Crysta (White)' };
+      document.getElementById('assignedCabModel').innerText = models[selectedVehicle] || 'Verified Cab';
+
+      alert('Partner ne booking confirm kar di hai! Booking Status is now Confirmed.');
+    }
+
+    function cancelCurrentBooking() {
+      if (confirm('Kya aap sach me ye booking cancel karna chahte hain?')) {
+        updateBookingStatus(currentBookingId, 'Cancelled');
+        document.getElementById('receiptHeaderBox').className = 'bg-slate-700 text-white rounded-2xl p-5 shadow-sm mb-4';
+        document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled';
+        document.getElementById('driverPendingState').classList.add('hidden');
+        document.getElementById('partnerActionBox').classList.add('hidden');
+        document.getElementById('cancelBookingBtn').classList.add('hidden');
+        alert('Booking successfully cancel ho gayi hai!');
+      }
+    }
+
+    function updateBookingStatus(id, newStatus) {
+      let history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
+      history = history.map(item => {
+        if (item.id === id) item.status = newStatus;
+        return item;
+      });
+      localStorage.setItem('maketripzy_history', JSON.stringify(history));
+    }
+
+    function cancelFromHistory(id) {
+      if (confirm('Kya aap is ride ko cancel karna chahte hain?')) {
+        updateBookingStatus(id, 'Cancelled');
+        renderBookingHistory();
+      }
+    }
+
+    function clearAllHistory() {
+      if (confirm('Kya aap saari booking history delete karna chahte hain?')) {
+        localStorage.removeItem('maketripzy_history');
+        renderBookingHistory();
+      }
     }
 
     function renderBookingHistory() {
@@ -554,13 +664,22 @@
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
           <div class="flex justify-between items-center mb-1">
             <span class="font-bold text-blue-700">${item.id}</span>
-            <span class="text-[10px] text-slate-400">${item.bookedDate}</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
+              item.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-700' :
+              item.status === 'Cancelled' ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-800'
+            }">
+              ${item.status || 'Confirmation Pending'}
+            </span>
           </div>
           <p class="font-semibold text-slate-800">${item.from} → ${item.to}</p>
           <p class="text-[11px] text-slate-500">${item.date} • ${item.vehicle}</p>
           <div class="flex justify-between items-center mt-2 pt-2 border-t border-slate-200">
-            <span class="text-emerald-600 font-bold">Total: ₹${item.total}</span>
-            <span class="text-[10px] text-slate-500">Pickup Pay: ₹${item.pickupPay}</span>
+            <span class="text-slate-800 font-bold">₹${item.total}</span>
+            ${item.status !== 'Cancelled' ? `
+              <button onclick="cancelFromHistory('${item.id}')" class="text-rose-600 hover:text-rose-700 text-[11px] font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-ban"></i> Cancel
+              </button>
+            ` : '<span class="text-[11px] text-slate-400">Cancelled</span>'}
           </div>
         </div>
       `).join('');
@@ -582,22 +701,22 @@
       const dropPay = document.getElementById('receiptDropAmount').innerText;
       const name = document.getElementById('receiptCustName').innerText;
       const phone = document.getElementById('receiptCustPhone').innerText;
+      const status = document.getElementById('receiptStatusBadge').innerText.trim();
 
-      const message = `*MakeTripzy Booking Confirmation* 🚖%0A` +
+      const message = `*MakeTripzy Booking Dispatch* 🚖%0A` +
         `*ID:* ${id}%0A` +
+        `*Status:* ${status}%0A` +
         `*Customer:* ${name} (${phone})%0A` +
         `*Route:* ${from} to ${to}%0A` +
-        `*Date/Time:* ${time}%0A` +
-        `*Vehicle:* ${vehicle}%0A%0A` +
+        `*Schedule:* ${time}%0A` +
+        `*Vehicle:* ${vehicle}%0A` +
         `*Total Fare:* ${total}%0A` +
-        `*Pay at Pickup (20%):* ${pickupPay}%0A` +
-        `*Pay at Drop (80%):* ${dropPay}%0A` +
-        `*Advance:* ₹0`;
+        `*At Pickup (20%):* ${pickupPay}%0A` +
+        `*At Drop (80%):* ${dropPay}`;
 
       window.open(`https://wa.me/918889637244?text=${message}`, '_blank');
     }
 
-    // User Profile Management
     function loadSavedProfile() {
       const user = JSON.parse(localStorage.getItem('maketripzy_user'));
       if (user && user.name) {
@@ -643,3 +762,4 @@
   </script>
 </body>
 </html>
+  
