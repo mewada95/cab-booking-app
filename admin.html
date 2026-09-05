@@ -383,4 +383,183 @@
     }
 
     function saveSingleRoutePrice() {
-      const
+      const from = document.getElementById("routeFromCity").value.trim().toLowerCase();
+      const to = document.getElementById("routeToCity").value.trim().toLowerCase();
+      const hatch = Number(document.getElementById("rateHatch").value);
+      const sedan = Number(document.getElementById("rateSedan").value);
+      const muv = Number(document.getElementById("rateMuv").value);
+      const suv = Number(document.getElementById("rateSuv").value);
+
+      if (!from || !to || !hatch || !sedan || !muv || !suv) {
+        alert("Fill all cities and rate fields!");
+        return;
+      }
+
+      const payload = {
+        [`${from}-${to}`]: { Hatchback: hatch, Sedan: sedan, MUV: muv, SUV: suv }
+      };
+
+      db.collection("pricing_rules").doc("fixed_routes").set(payload, { merge: true })
+        .then(() => {
+          alert(`Route package (${from} ➔ ${to}) live update ho gaya!`);
+          document.getElementById("routeFromCity").value = '';
+          document.getElementById("routeToCity").value = '';
+          document.getElementById("rateHatch").value = '';
+          document.getElementById("rateSedan").value = '';
+          document.getElementById("rateMuv").value = '';
+          document.getElementById("rateSuv").value = '';
+        })
+        .catch(err => alert("Error: " + err.message));
+    }
+
+    function deleteRoutePackage(key) {
+      if (confirm(`Delete override for ${key}?`)) {
+        db.collection("pricing_rules").doc("fixed_routes").update({
+          [key]: firebase.firestore.FieldValue.delete()
+        });
+      }
+    }
+
+    function uploadCsvPricing() {
+      const file = document.getElementById("csvFileInput").files[0];
+      if (!file) return alert("Select a .csv file!");
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const lines = e.target.result.split('\n');
+        const batchPayload = {};
+        let validRows = 0;
+
+        for (let i = 1; i < lines.length; i++) {
+          const row = lines[i].split(',').map(s => s.trim());
+          if (row.length >= 6 && row[0] && row[1]) {
+            batchPayload[`${row[0].toLowerCase()}-${row[1].toLowerCase()}`] = {
+              Hatchback: Number(row[2]) || 0,
+              Sedan: Number(row[3]) || 0,
+              MUV: Number(row[4]) || 0,
+              SUV: Number(row[5]) || 0
+            };
+            validRows++;
+          }
+        }
+
+        if (validRows === 0) return alert("CSV invalid!");
+        db.collection("pricing_rules").doc("fixed_routes").set(batchPayload, { merge: true })
+          .then(() => alert(`${validRows} routes successfully updated!`));
+      };
+      reader.readAsText(file);
+    }
+
+    function downloadSampleCsv() {
+      const csv = "From,To,Hatchback,Sedan,MUV,SUV\nbhopal,indore,2499,2799,3899,5499\nindore,ujjain,1199,1399,1999,2899";
+      const link = document.createElement("a");
+      link.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
+      link.download = "maketripzy_sample_routes.csv";
+      link.click();
+    }
+
+    function listenToAllBookings() {
+      db.collection("bookings").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+        allBookingsCache = [];
+        let totalGmv = 0, totalCommission = 0, totalPenalties = 0;
+
+        snapshot.forEach(doc => {
+          const data = { docId: doc.id, ...doc.data() };
+          allBookingsCache.push(data);
+          const fare = Number(data.grandTotalBill || data.total) || 0;
+          if (data.status !== 'Cancelled') {
+            totalGmv += fare;
+            totalCommission += Math.round(fare * 0.15);
+          }
+          if (data.customerPenalty) totalPenalties += Number(data.customerPenalty);
+          if (data.lastVendorPenalty) totalPenalties += Number(data.lastVendorPenalty);
+        });
+
+        document.getElementById("kpiTotalRides").innerText = allBookingsCache.length;
+        document.getElementById("kpiTotalCommission").innerText = `₹${totalCommission.toLocaleString('en-IN')}`;
+        document.getElementById("kpiTotalVendorPayout").innerText = `₹${(totalGmv - totalCommission).toLocaleString('en-IN')}`;
+        document.getElementById("kpiTotalPenalties").innerText = `₹${totalPenalties.toLocaleString('en-IN')}`;
+
+        document.getElementById("finGrossGmv").innerText = `₹${totalGmv.toLocaleString('en-IN')}`;
+        document.getElementById("finPlatformCommission").innerText = `₹${totalCommission.toLocaleString('en-IN')}`;
+        document.getElementById("finVendorPayable").innerText = `₹${(totalGmv - totalCommission).toLocaleString('en-IN')}`;
+        document.getElementById("finTotalPenalties").innerText = `₹${totalPenalties.toLocaleString('en-IN')}`;
+
+        renderAdminRides(allBookingsCache);
+      });
+    }
+
+    function renderAdminRides(rides) {
+      const container = document.getElementById("adminRidesContainer");
+      if (!container) return;
+      if (rides.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-400">No bookings found.</div>`;
+        return;
+      }
+
+      container.innerHTML = rides.map(b => {
+        const fare = Number(b.grandTotalBill || b.total) || 0;
+        const comm = Math.round(fare * 0.15);
+        const net = fare - comm;
+        return `
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-xs space-y-2.5">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+              <span class="font-bold font-mono text-blue-700">${b.bookingId || b.docId.substring(0,8)}</span>
+              <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] bg-blue-50 text-blue-800">${b.status}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <p class="font-bold text-slate-800">${b.name} (${b.phone})</p>
+                <p class="text-slate-500 mt-0.5">${b.from} ➔ ${b.to}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-slate-700 font-semibold">${b.driverName || 'Unassigned'}</p>
+                <p class="font-mono text-slate-500">${b.cabNumber || '-'}</p>
+              </div>
+            </div>
+            <div class="bg-slate-50 p-2 rounded-xl flex justify-between items-center text-[11px]">
+              <span>Customer: <b>₹${fare}</b></span>
+              <span class="text-emerald-700 font-semibold">15%: <b>₹${comm}</b></span>
+              <span>Payout: <b>₹${net}</b></span>
+              <button onclick="adminDeleteBooking('${b.docId}')" class="text-rose-500 p-1"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterRideList() {
+      const filter = document.getElementById("rideFilterStatus").value;
+      renderAdminRides(filter === "ALL" ? allBookingsCache : allBookingsCache.filter(r => r.status === filter));
+    }
+
+    function adminDeleteBooking(docId) {
+      if (confirm("Delete this booking record?")) {
+        db.collection("bookings").doc(docId).delete();
+      }
+    }
+
+    // DIRECT EVENT LISTENERS FOR RELIABLE CLICK/TOUCH ON MOBILE
+    window.addEventListener("load", () => {
+      const btn = document.getElementById("adminLoginBtn");
+      const pinField = document.getElementById("adminPinInput");
+
+      if (btn) {
+        btn.addEventListener("click", executeLogin);
+        btn.addEventListener("touchend", (e) => {
+          e.preventDefault();
+          executeLogin();
+        });
+      }
+
+      if (pinField) {
+        pinField.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") executeLogin();
+        });
+      }
+
+      checkAdminAuth();
+    });
+  </script>
+</body>
+</html>
