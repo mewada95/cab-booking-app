@@ -807,11 +807,67 @@
           } else {
             alert('Booking bina kisi penalty ke successfully cancel ho gayi hai.');
           }
-        });
-      }
+    // REAL-TIME LISTENER FOR PARTNER UPDATES (WITH SAFE RE-DISPATCH UI)
+    function listenToBooking(docId) {
+      if (unsubscribeBooking) unsubscribeBooking();
+
+      unsubscribeBooking = db.collection("bookings").doc(docId).onSnapshot((doc) => {
+        if (!doc.exists) return;
+        const data = doc.data();
+        currentBookingData = data;
+
+        syncLocalStorage(docId, data);
+
+        if (data.status === 'Confirmed') {
+          document.getElementById('receiptHeaderBox').className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
+          document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Booking Confirmed';
+
+          document.getElementById('driverPendingState').classList.add('hidden');
+          document.getElementById('driverConfirmedState').classList.remove('hidden');
+          document.getElementById('assignedDriverName').innerText = data.driverName || 'Verified Partner';
+          document.getElementById('assignedCabNumber').innerText = data.cabNumber || 'Assigned';
+
+          if (data.driverPhone) {
+            document.getElementById('assignedDriverPhoneContainer').innerHTML = `
+              <a href="tel:${data.driverPhone}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                <i class="fa-solid fa-phone text-[10px]"></i> ${data.driverPhone} (Call Driver)
+              </a>`;
+          } else {
+            document.getElementById('assignedDriverPhoneContainer').innerHTML = `<span class="text-slate-400 text-[11px]">Verified Partner</span>`;
+          }
+        } else if (data.status === 'Confirmation Pending') {
+          // Ride pool me hai ya vendor cancel hone ke baad re-assign ho rahi hai
+          document.getElementById('receiptHeaderBox').className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
+          
+          if (data.reassignedNotice) {
+            document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Booking Confirmed • Re-assigning Driver';
+            document.getElementById('driverPendingState').classList.remove('hidden');
+            document.getElementById('driverConfirmedState').classList.add('hidden');
+            document.getElementById('driverPendingState').innerHTML = `
+              <div class="text-center py-2">
+                <i class="fa-solid fa-arrows-rotate text-blue-600 text-2xl mb-1 animate-spin"></i>
+                <p class="text-xs font-bold text-slate-800">Booking Confirmed</p>
+                <p class="text-[11px] text-blue-600 font-semibold mt-0.5">Assigning nearby alternate cab partner...</p>
+                <p class="text-[10px] text-slate-400 mt-1">Driver and vehicle details sharing soon.</p>
+              </div>
+            `;
+          } else {
+            document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmation Pending';
+            document.getElementById('driverPendingState').classList.remove('hidden');
+            document.getElementById('driverConfirmedState').classList.add('hidden');
+          }
+        } else if (data.status === 'Cancelled') {
+          // Jab customer khud cancel kare
+          document.getElementById('receiptHeaderBox').className = 'bg-slate-700 text-white rounded-2xl p-5 shadow-sm mb-4';
+          document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled by You';
+          document.getElementById('driverPendingState').classList.add('hidden');
+          document.getElementById('driverConfirmedState').classList.add('hidden');
+          document.getElementById('cancelBookingBtn').classList.add('hidden');
+        }
+      });
     }
 
-    // LIVE HISTORY SYNC DIRECTLY FROM FIRESTORE
+    // LIVE HISTORY SYNC
     async function renderBookingHistory() {
       const container = document.getElementById('historyListContainer');
       let history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
@@ -841,7 +897,8 @@
 
       container.innerHTML = liveHistory.map(item => {
         const isConfirmed = item.status === 'Confirmed';
-        const isVendorCancelled = item.status === 'Cancelled by Vendor';
+        const isReassigning = item.status === 'Confirmation Pending' && item.reassignedNotice;
+        const isPending = item.status === 'Confirmation Pending' && !item.reassignedNotice;
         const isCustomerCancelled = item.status === 'Cancelled';
 
         return `
@@ -850,9 +907,10 @@
               <span class="font-bold text-blue-700">${item.bookingId || 'MTZ'}</span>
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
                 isConfirmed ? 'bg-emerald-100 text-emerald-700' :
-                (isCustomerCancelled || isVendorCancelled) ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-800'
+                isReassigning ? 'bg-blue-100 text-blue-700' :
+                isCustomerCancelled ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-800'
               }">
-                ${item.status || 'Confirmation Pending'}
+                ${isReassigning ? 'Re-assigning Driver' : (item.status || 'Pending')}
               </span>
             </div>
             <p class="font-semibold text-slate-800 text-xs">${item.from} → ${item.to}</p>
@@ -864,19 +922,20 @@
                 <p><b>Driver Contact:</b> <a href="tel:${item.driverPhone}" class="text-blue-600 font-bold underline"><i class="fa-solid fa-phone text-[10px]"></i> ${item.driverPhone || 'N/A'}</a></p>
                 <p><b>Cab No:</b> <span class="font-mono font-bold">${item.cabNumber || 'Assigned'}</span></p>
               </div>
-            ` : isVendorCancelled ? `
-              <div class="mt-2 pt-1 border-t border-rose-200 text-[10px] text-rose-700 bg-rose-50 p-2 rounded-lg">
-                <i class="fa-solid fa-triangle-exclamation"></i> Ride cancelled by partner. Penalty recorded.
+            ` : isReassigning ? `
+              <div class="mt-2 pt-1 border-t border-blue-200 text-[10px] text-blue-700 bg-blue-50 p-2 rounded-lg">
+                <i class="fa-solid fa-clock-rotate-left mr-1"></i> Alternate cab partner being assigned. Details sharing soon.
               </div>
             ` : isCustomerCancelled ? `
               <div class="mt-2 pt-1 border-t border-rose-200 text-[10px] text-rose-700 bg-rose-50 p-2 rounded-lg">
-                <i class="fa-solid fa-ban"></i> ${item.customerPenalty ? `Cancelled within 6 hrs (Late Fee: ₹${item.customerPenalty})` : 'Cancelled before 6 hrs (No Penalty)'}
+                <i class="fa-solid fa-ban mr-1"></i> ${item.customerPenalty ? `Cancelled within 6 hrs (Late Fee: ₹${item.customerPenalty})` : 'Cancelled before 6 hrs (No Penalty)'}
               </div>
             ` : ''}
           </div>
         `;
       }).join('');
     }
+
 
     function clearAllHistory() {
       if (confirm('Kya aap saari booking history delete karna chahte hain?')) {
