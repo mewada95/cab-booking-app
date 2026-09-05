@@ -558,35 +558,42 @@
       });
     }
 
-    // VENDOR CANCELLATION (10% Fare, Min ₹300, Max ₹1000)
-    function vendorCancelBooking(docId, totalFare, bookingId) {
-      const tenPercent = Math.round(totalFare * 0.10);
-      const penalty = Math.max(300, Math.min(1000, tenPercent));
+    // VENDOR CANCELLATION LOGIC WITH AUTO RE-DISPATCH
+function vendorCancelBooking(docId, totalFare, bookingId) {
+  const tenPercent = Math.round(totalFare * 0.10);
+  const penalty = Math.max(300, Math.min(1000, tenPercent));
 
-      const confirmMsg = 
-        `⚠️ VENDOR PENALTY WARNING:\n\n` +
-        `MakeTripzy policy ke taht confirmed ride cancel karne par 10% fare (Min ₹300, Max ₹1,000) penalty lagti hai.\n\n` +
-        `Total Fare: ₹${totalFare}\n` +
-        `Vendor Penalty: ₹${penalty}\n\n` +
-        `Kya aap sach me ride cancel karna chahte hain?`;
+  const confirmMsg = 
+    `⚠️ VENDOR PENALTY WARNING:\n\n` +
+    `MakeTripzy policy ke mutabiq confirmed ride cancel karne par 10% fare (Min ₹300, Max ₹1,000) penalty lagti hai.\n\n` +
+    `Total Fare: ₹${totalFare}\n` +
+    `Penalty Due: ₹${penalty}\n\n` +
+    `Kya aap ride release/cancel karna chahte hain? Ye ride turant doosre vendors ke radar par bhej di jayegi.`;
 
-      if (confirm(confirmMsg)) {
-        const reason = prompt("Cancellation reason enter karein:", "Vehicle breakdown / Driver emergency");
-        if (reason) {
-          db.collection("bookings").doc(docId).update({
-            status: "Cancelled by Vendor",
-            cancelledBy: "vendor",
-            penaltyAmount: penalty,
-            cancelReason: reason,
-            cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
-          }).then(() => {
-            alert(`Ride cancel ho gayi. Policy anusaar ₹${penalty} penalty darj ho gayi hai.`);
-          }).catch(err => {
-            alert("Error: " + err.message);
-          });
-        }
-      }
+  if (confirm(confirmMsg)) {
+    const reason = prompt("Cancellation reason enter karein:", "Vehicle breakdown / Driver emergency");
+    if (reason) {
+      // Booking ko Cancel karne ke bajaye wapas open pool me daalna
+      db.collection("bookings").doc(docId).update({
+        status: "Confirmation Pending",
+        reassignedNotice: true,
+        lastCancelledByVendor: currentVendor.phone,
+        lastVendorPenalty: penalty,
+        cancelReason: reason,
+        driverName: '',
+        driverPhone: '',
+        cabNumber: '',
+        cabVariant: '',
+        cabYear: '',
+        releasedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert(`Ride release ho chuki hai aur doosre partners ke radar par live ho gayi hai. ₹${penalty} penalty vendor account par record ho chuki hai.`);
+      }).catch(err => {
+        alert("Error: " + err.message);
+      });
     }
+  }
+}
 
     checkAuth();
   </script>
