@@ -478,6 +478,7 @@
     <span>WhatsApp Support</span>
   </a>
   <!-- SCRIPTS & FIREBASE INTEGRATION -->
+    <!-- SCRIPTS & FIREBASE INTEGRATION -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
@@ -612,12 +613,12 @@
           btn.disabled = false;
           currentDocId = docRef.id;
 
-          // Save to Local History
+          // Save to Local History with DocId
           let history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
           history.unshift({ ...bookingPayload, docId: currentDocId });
           localStorage.setItem('maketripzy_history', JSON.stringify(history));
 
-          // Set Static Receipt Info
+          // Set Receipt Info
           document.getElementById('bookingIdBadge').innerText = bookingId;
           document.getElementById('receiptBookingDate').innerText = bookedDate;
           document.getElementById('receiptPickup').innerText = from;
@@ -637,7 +638,7 @@
           document.getElementById('receiptSection').classList.remove('hidden');
           window.scrollTo({ top: 0, behavior: 'smooth' });
 
-          // Listen Realtime to partner acceptance
+          // Real-time listen
           listenToBooking(currentDocId);
         })
         .catch((error) => {
@@ -655,15 +656,16 @@
         if (!doc.exists) return;
         const data = doc.data();
 
+        // Update local storage so history stays updated
+        syncLocalStorage(docId, data);
+
         if (data.status === 'Confirmed') {
-          // Change Header to Blue/Green Confirmed
           document.getElementById('receiptHeaderBox').className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
           document.getElementById('receiptStatusBadge').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Booking Confirmed';
 
-          // Show Driver & Cab Details
           document.getElementById('driverPendingState').classList.add('hidden');
           document.getElementById('driverConfirmedState').classList.remove('hidden');
-          document.getElementById('assignedDriverName').innerText = data.driverName || 'Verified Driver';
+          document.getElementById('assignedDriverName').innerText = data.driverName || 'Verified Partner';
           document.getElementById('assignedCabNumber').innerText = data.cabNumber || 'Assigned';
         } else if (data.status === 'Cancelled') {
           document.getElementById('receiptHeaderBox').className = 'bg-slate-700 text-white rounded-2xl p-5 shadow-sm mb-4';
@@ -674,7 +676,76 @@
       });
     }
 
-    // REAL-TIME CANCELLATION
+    function syncLocalStorage(docId, data) {
+      let history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
+      history = history.map(item => {
+        if (item.docId === docId || item.bookingId === data.bookingId) {
+          return { ...item, ...data };
+        }
+        return item;
+      });
+      localStorage.setItem('maketripzy_history', JSON.stringify(history));
+    }
+
+    // LIVE HISTORY SYNC DIRECTLY FROM FIREBASE
+    async function renderBookingHistory() {
+      const container = document.getElementById('historyListContainer');
+      let history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
+
+      if (history.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-slate-400">No bookings yet!</div>`;
+        return;
+      }
+
+      container.innerHTML = `<div class="text-center py-4 text-slate-400"><i class="fa-solid fa-spinner fa-spin text-base mr-1 text-blue-600"></i> Checking live partner status...</div>`;
+
+      // Sync each ride with Firebase cloud
+      const liveHistory = await Promise.all(history.map(async (item) => {
+        if (item.docId) {
+          try {
+            const docSnap = await db.collection("bookings").doc(item.docId).get();
+            if (docSnap.exists) {
+              return { ...item, ...docSnap.data() };
+            }
+          } catch (e) {
+            console.error("Sync error:", e);
+          }
+        }
+        return item;
+      }));
+
+      // Save latest status in phone storage
+      localStorage.setItem('maketripzy_history', JSON.stringify(liveHistory));
+
+      container.innerHTML = liveHistory.map(item => {
+        const isConfirmed = item.status === 'Confirmed';
+        const isCancelled = item.status === 'Cancelled';
+
+        return `
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-1.5">
+            <div class="flex justify-between items-center mb-1">
+              <span class="font-bold text-blue-700">${item.bookingId || 'MTZ'}</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                isConfirmed ? 'bg-emerald-100 text-emerald-700' :
+                isCancelled ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-800'
+              }">
+                ${item.status || 'Confirmation Pending'}
+              </span>
+            </div>
+            <p class="font-semibold text-slate-800 text-xs">${item.from} → ${item.to}</p>
+            <p class="text-[11px] text-slate-500">${item.date || ''} • ${item.vehicle}</p>
+
+            ${isConfirmed ? `
+              <div class="mt-2 pt-2 border-t border-slate-200 text-[11px] text-emerald-800 bg-emerald-50/70 p-2 rounded-lg">
+                <p><b>Driver:</b> ${item.driverName || 'Assigned Driver'}</p>
+                <p><b>Cab No:</b> ${item.cabNumber || 'Assigned'}</p>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
     function cancelCurrentBooking() {
       if (confirm('Kya aap sach me ye booking cancel karna chahte hain?')) {
         if (currentDocId) {
@@ -682,34 +753,10 @@
             status: 'Cancelled',
             cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
           }).then(() => {
-            alert('Booking cancel kar di gayi hai. Partner radar par cancellation alert update ho gaya hai.');
+            alert('Booking cancel kar di gayi hai.');
           });
         }
       }
-    }
-
-    function renderBookingHistory() {
-      const container = document.getElementById('historyListContainer');
-      const history = JSON.parse(localStorage.getItem('maketripzy_history') || '[]');
-      if (history.length === 0) {
-        container.innerHTML = `<div class="text-center py-6 text-slate-400">No bookings yet!</div>`;
-        return;
-      }
-      container.innerHTML = history.map(item => `
-        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
-          <div class="flex justify-between items-center mb-1">
-            <span class="font-bold text-blue-700">${item.bookingId || item.id}</span>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
-              item.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-700' :
-              item.status === 'Cancelled' ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-800'
-            }">
-              ${item.status || 'Confirmation Pending'}
-            </span>
-          </div>
-          <p class="font-semibold text-slate-800">${item.from} → ${item.to}</p>
-          <p class="text-[11px] text-slate-500">${item.date} • ${item.vehicle}</p>
-        </div>
-      `).join('');
     }
 
     function clearAllHistory() {
@@ -748,7 +795,7 @@
         `*At Pickup (20%):* ${pickupPay}%0A` +
         `*At Drop (80%):* ${dropPay}`;
 
-      window.open(`https://wa.me/918889637244?text=${message}`, '_blank');
+      window.open(`https://wa.me/918409504684?text=${message}`, '_blank');
     }
 
     function loadSavedProfile() {
@@ -796,3 +843,4 @@
   </script>
 </body>
 </html>
+
