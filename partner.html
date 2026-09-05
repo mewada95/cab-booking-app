@@ -70,7 +70,7 @@
       </button>
     </div>
   </div>
-    <!-- MAIN CONTAINER -->
+  <!-- MAIN CONTAINER -->
   <main class="max-w-md mx-auto p-4 pb-24">
 
     <!-- VIEW 1: LIVE RADAR (Bookings) -->
@@ -211,7 +211,9 @@
       measurementId: "G-ZBZZHGGTQX"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
 
     let currentVendor = null;
@@ -364,7 +366,7 @@
       }
     }
 
-    // LIVE RADAR FIRESTORE LISTENER WITH CONTACT MASKING & 10% / ₹300-₹1000 PENALTY
+    // LIVE RADAR FIRESTORE LISTENER
     db.collection("bookings")
       .orderBy("createdAt", "desc")
       .onSnapshot((snapshot) => {
@@ -392,19 +394,18 @@
           const commission15 = Math.round(totalFare * 0.15);
           const vendorNetEarning = totalFare - commission15;
 
-          // PENALTY CALCULATION: 10% Fare (Min ₹300, Max ₹1000)
+          // PENALTY: 10% Fare (Min ₹300, Max ₹1000)
           const tenPercent = Math.round(totalFare * 0.10);
           const vendorPenalty = Math.max(300, Math.min(1000, tenPercent));
 
           const isPending = b.status === "Confirmation Pending";
           const isConfirmed = b.status === "Confirmed";
           const isCustomerCancelled = b.status === "Cancelled";
-          const isVendorCancelled = b.status === "Cancelled by Vendor";
 
           const maskedPhone = b.phone ? b.phone.substring(0, 2) + "******" + b.phone.substring(b.phone.length - 2) : "**********";
 
           html += `
-            <div class="bg-white rounded-2xl p-4 shadow-sm border ${isCustomerCancelled || isVendorCancelled ? 'border-rose-300 bg-rose-50/40' : isConfirmed ? 'border-emerald-300' : 'border-amber-300'} text-xs space-y-3">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border ${isCustomerCancelled ? 'border-rose-300 bg-rose-50/40' : isConfirmed ? 'border-emerald-300' : 'border-amber-300'} text-xs space-y-3">
               <div class="flex justify-between items-center pb-2 border-b border-slate-100">
                 <div>
                   <span class="font-bold font-mono text-slate-800 text-sm">${b.bookingId || docId.substring(0,8)}</span>
@@ -412,9 +413,9 @@
                 </div>
                 <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
                   isConfirmed ? 'bg-emerald-100 text-emerald-800' :
-                  (isCustomerCancelled || isVendorCancelled) ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
+                  isCustomerCancelled ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
                 }">
-                  ${b.status}
+                  ${isPending && b.reassignedNotice ? 'Re-assigning Alternate Partner' : b.status}
                 </span>
               </div>
 
@@ -478,11 +479,6 @@
                   <button onclick="vendorCancelBooking('${docId}', ${totalFare}, '${b.bookingId}')" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-2 rounded-xl border border-rose-200 text-xs flex items-center justify-center gap-1.5 transition">
                     <i class="fa-solid fa-triangle-exclamation"></i> Cancel This Ride (Penalty: ₹${vendorPenalty})
                   </button>
-                </div>
-              ` : isVendorCancelled ? `
-                <div class="p-2.5 bg-rose-100 border border-rose-200 rounded-xl text-[11px] text-rose-800 space-y-0.5">
-                  <p class="font-bold flex items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> Ride Cancelled by Vendor</p>
-                  <p class="text-rose-700">Penalty Incurred: <b>₹${b.penaltyAmount || vendorPenalty}</b> (Due)</p>
                 </div>
               ` : `
                 <div class="p-2.5 bg-rose-100 border border-rose-200 rounded-xl text-[11px] text-rose-800 space-y-0.5">
@@ -549,6 +545,7 @@
         cabNumber: cab.reg,
         cabVariant: cab.variant,
         cabYear: cab.year,
+        reassignedNotice: false,
         acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
         closeAssignModal();
@@ -558,46 +555,43 @@
       });
     }
 
-    // VENDOR CANCELLATION LOGIC WITH AUTO RE-DISPATCH
-function vendorCancelBooking(docId, totalFare, bookingId) {
-  const tenPercent = Math.round(totalFare * 0.10);
-  const penalty = Math.max(300, Math.min(1000, tenPercent));
+    // VENDOR CANCELLATION (10% Fare, Min ₹300, Max ₹1000) WITH AUTO RE-DISPATCH
+    function vendorCancelBooking(docId, totalFare, bookingId) {
+      const tenPercent = Math.round(totalFare * 0.10);
+      const penalty = Math.max(300, Math.min(1000, tenPercent));
 
-  const confirmMsg = 
-    `⚠️ VENDOR PENALTY WARNING:\n\n` +
-    `MakeTripzy policy ke mutabiq confirmed ride cancel karne par 10% fare (Min ₹300, Max ₹1,000) penalty lagti hai.\n\n` +
-    `Total Fare: ₹${totalFare}\n` +
-    `Penalty Due: ₹${penalty}\n\n` +
-    `Kya aap ride release/cancel karna chahte hain? Ye ride turant doosre vendors ke radar par bhej di jayegi.`;
+      const confirmMsg = 
+        `⚠️ VENDOR PENALTY WARNING:\n\n` +
+        `MakeTripzy policy anusaar confirmed ride cancel karne par 10% fare (Min ₹300, Max ₹1,000) penalty lagti hai.\n\n` +
+        `Total Fare: ₹${totalFare}\n` +
+        `Penalty Due: ₹${penalty}\n\n` +
+        `Kya aap ride release karna chahte hain? Ye ride turant alternate partner ke radar par bhej di jayegi.`;
 
-  if (confirm(confirmMsg)) {
-    const reason = prompt("Cancellation reason enter karein:", "Vehicle breakdown / Driver emergency");
-    if (reason) {
-      // Booking ko Cancel karne ke bajaye wapas open pool me daalna
-      db.collection("bookings").doc(docId).update({
-        status: "Confirmation Pending",
-        reassignedNotice: true,
-        lastCancelledByVendor: currentVendor.phone,
-        lastVendorPenalty: penalty,
-        cancelReason: reason,
-        driverName: '',
-        driverPhone: '',
-        cabNumber: '',
-        cabVariant: '',
-        cabYear: '',
-        releasedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert(`Ride release ho chuki hai aur doosre partners ke radar par live ho gayi hai. ₹${penalty} penalty vendor account par record ho chuki hai.`);
-      }).catch(err => {
-        alert("Error: " + err.message);
-      });
+      if (confirm(confirmMsg)) {
+        const reason = prompt("Cancellation reason enter karein:", "Vehicle breakdown / Driver emergency");
+        if (reason) {
+          db.collection("bookings").doc(docId).update({
+            status: "Confirmation Pending",
+            reassignedNotice: true,
+            lastCancelledByVendor: currentVendor ? currentVendor.phone : 'vendor',
+            lastVendorPenalty: penalty,
+            cancelReason: reason,
+            driverName: '',
+            driverPhone: '',
+            cabNumber: '',
+            cabVariant: '',
+            cabYear: '',
+            releasedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }).then(() => {
+            alert(`Ride release kar di gayi hai aur baaki partners ke radar par live ho chuki hai. ₹${penalty} penalty vendor account par record ho gayi hai.`);
+          }).catch(err => {
+            alert("Error: " + err.message);
+          });
+        }
+      }
     }
-  }
-}
 
     checkAuth();
   </script>
 </body>
 </html>
-
-  
