@@ -584,7 +584,7 @@
       <div class="flex justify-between items-center border-b border-slate-100 pb-2">
         <div>
           <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-            <i class="fa-solid fa-shield-halved text-blue-600"></i> Partner KYC Audit
+            <i class="fa-solid fa-shield-halved text-blue-600"></i> Partner Profile & Details
           </h3>
           <p class="text-[10px] text-slate-500" id="kycModalVendorUid">Vendor UID: -</p>
         </div>
@@ -594,7 +594,7 @@
       </div>
 
       <div id="partnerDetailsBody" class="space-y-3">
-        <p class="text-slate-400 text-center py-4">Fetching vendor file...</p>
+        <p class="text-slate-400 text-center py-4">Fetching vendor details...</p>
       </div>
     </div>
   </div>
@@ -825,7 +825,7 @@
                     ${assignedVendor?.agencyName || assignedVendor?.name || 'Partner Dossier'}
                   </button>
                   <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${isVendorKycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                    ${isVendorKycVerified ? 'KYC ✓' : 'No KYC'}
+                    ${isVendorKycVerified ? 'Verified ✓' : 'Profile'}
                   </span>
                 </div>
               ` : `
@@ -833,7 +833,7 @@
               `}
               ${b.driverName ? `
                 <p class="font-bold text-emerald-800 mt-0.5">${b.driverName} (${b.driverPhone || '-'})</p>
-                <p class="text-[10px] font-mono font-bold text-slate-700">${b.cabNumber || ''}</p>
+                <p class="text-[10px] font-mono font-bold text-slate-700">${b.cabNumber || ''} ${b.cabSegment ? '(' + b.cabSegment + ')' : ''}</p>
               ` : ''}
             </td>
             <td class="p-3.5">
@@ -940,13 +940,17 @@
         if (!doc.exists) { body.innerHTML = `<p>Not found</p>`; return; }
         const v = doc.data();
         body.innerHTML = `
-          <div class="space-y-2">
-            <p><b>Agency:</b> ${v.agencyName || v.name}</p>
-            <p><b>Email:</b> ${v.email}</p>
-            <p><b>KYC Status:</b> ${v.kycVerified ? 'Verified ✓' : 'Pending ⏳'}</p>
-            ${v.selfieUrl ? `<img src="${v.selfieUrl}" class="w-24 h-24 object-cover rounded-xl mx-auto border" />` : ''}
-            <div class="grid grid-cols-2 gap-2 pt-2">
-              <button onclick="setPartnerKycStatus('${vendorId}', true)" class="bg-emerald-600 text-white py-2 rounded-xl font-bold">Approve KYC</button>
+          <div class="space-y-2 text-xs">
+            <p><b>Agency Name:</b> ${v.agencyName || v.name || '-'}</p>
+            <p><b>Owner Name:</b> ${v.name || '-'}</p>
+            <p><b>Mobile Number:</b> <a href="tel:${v.phone}" class="text-blue-600 font-bold">${v.phone || '-'}</a></p>
+            <p><b>City:</b> ${v.city || '-'}</p>
+            <p><b>Email:</b> ${v.email || '-'}</p>
+            <p><b>Address:</b> ${v.address || '-'}</p>
+            <p><b>Status:</b> <span class="px-2 py-0.5 rounded font-bold ${v.kycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${v.kycVerified ? 'Verified ✓' : 'Pending'}</span></p>
+            ${v.selfieUrl ? `<div class="pt-2 text-center"><p class="font-bold text-slate-500 mb-1">Partner Selfie:</p><img src="${v.selfieUrl}" class="w-24 h-24 object-cover rounded-xl mx-auto border shadow-sm" /></div>` : ''}
+            <div class="grid grid-cols-2 gap-2 pt-3">
+              <button onclick="setPartnerKycStatus('${vendorId}', true)" class="bg-emerald-600 text-white py-2 rounded-xl font-bold">Approve Profile</button>
               <button onclick="promptBlockVendor('${vendorId}', '${(v.agencyName || v.name || '').replace(/'/g, "\\'")}')" class="bg-rose-600 text-white py-2 rounded-xl font-bold">Block Partner</button>
             </div>
           </div>
@@ -956,7 +960,7 @@
 
     function setPartnerKycStatus(vendorId, isApproved) {
       db.collection("vendors").doc(vendorId).update({ kycVerified: isApproved }).then(() => {
-        alert("KYC status updated!"); closeModal('partnerDetailsModal'); fetchRegisteredPartners();
+        alert("Partner status updated!"); closeModal('partnerDetailsModal'); fetchRegisteredPartners();
       });
     }
 
@@ -990,19 +994,23 @@
       container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">Loading...</div>`;
 
       db.collection("vendors").get().then(snap => {
-        if (snap.empty) { container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">No partners.</div>`; return; }
+        if (snap.empty) { container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">No partners registered yet.</div>`; return; }
         container.innerHTML = snap.docs.map(doc => {
           const v = { uid: doc.id, ...doc.data() };
           return `
             <div class="bg-slate-50 border rounded-2xl p-4 space-y-2">
-              <h4 class="font-bold text-slate-800">${v.agencyName || v.name || 'Partner'}</h4>
-              <p class="text-[11px] text-blue-600">${v.email}</p>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded ${v.isBlocked ? 'bg-rose-600 text-white' : v.kycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                ${v.isBlocked ? 'Blocked ⛔' : v.kycVerified ? 'Verified ✓' : 'Pending ⏳'}
-              </span>
+              <h4 class="font-bold text-slate-800 text-sm">${v.agencyName || v.name || 'Partner Agency'}</h4>
+              <p class="text-[11px] text-slate-600"><i class="fa-solid fa-phone mr-1"></i> ${v.phone || 'No Phone'}</p>
+              <p class="text-[11px] text-blue-600"><i class="fa-solid fa-city mr-1"></i> ${v.city || 'City not specified'}</p>
+              <p class="text-[11px] text-slate-500">${v.email || '-'}</p>
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${v.isBlocked ? 'bg-rose-600 text-white' : v.kycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${v.isBlocked ? 'Blocked ⛔' : v.kycVerified ? 'Verified ✓' : 'Profile Pending'}
+                </span>
+              </div>
               <div class="grid grid-cols-2 gap-1 pt-2">
-                <button onclick="inspectPartnerProfile('${v.uid}')" class="bg-white border text-xs py-1 rounded-lg">Audit</button>
-                ${v.isBlocked ? `<button onclick="unblockVendorDirectly('${v.uid}')" class="bg-emerald-600 text-white text-xs py-1 rounded-lg">Unblock</button>` : `<button onclick="promptBlockVendor('${v.uid}', '${(v.agencyName || v.name || '').replace(/'/g, "\\'")}')" class="bg-rose-50 border text-rose-700 text-xs py-1 rounded-lg">Block</button>`}
+                <button onclick="inspectPartnerProfile('${v.uid}')" class="bg-white border text-xs py-1.5 rounded-lg font-semibold hover:bg-slate-100">View Details</button>
+                ${v.isBlocked ? `<button onclick="unblockVendorDirectly('${v.uid}')" class="bg-emerald-600 text-white text-xs py-1.5 rounded-lg font-semibold">Unblock</button>` : `<button onclick="promptBlockVendor('${v.uid}', '${(v.agencyName || v.name || '').replace(/'/g, "\\'")}')" class="bg-rose-50 border text-rose-700 text-xs py-1.5 rounded-lg font-semibold">Block</button>`}
               </div>
             </div>
           `;
@@ -1019,7 +1027,7 @@
         
         container.innerHTML = unique.map(f => `
           <div class="bg-slate-50 border rounded-2xl p-4 space-y-1">
-            <p class="font-mono font-bold text-slate-900">${f.cabNumber}</p>
+            <p class="font-mono font-bold text-slate-900">${f.cabNumber} ${f.cabSegment ? '(' + f.cabSegment + ')' : ''}</p>
             <p class="font-bold text-slate-800 text-xs">${f.driverName || 'Driver'} (${f.driverPhone || 'N/A'})</p>
           </div>
         `).join('');
