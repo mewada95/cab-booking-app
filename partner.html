@@ -44,12 +44,12 @@
       <div class="flex items-start gap-2.5">
         <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base mt-0.5"></i>
         <div class="flex-1">
-          <p class="text-xs font-bold text-amber-900">Partner Profile & KYC Incomplete</p>
-          <p class="text-[11px] text-amber-700 mt-0.5">TDS compliance aur auto-dispatch unlock karne ke liye apna Aadhaar, PAN aur Camera Selfie verify karein.</p>
+          <p class="text-xs font-bold text-amber-900">Partner Profile & Verification Pending</p>
+          <p class="text-[11px] text-amber-700 mt-0.5">Apna basic profile aur live selfie update karein.</p>
         </div>
       </div>
       <button onclick="openKycModal()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded-xl text-xs shadow-sm transition flex items-center justify-center gap-1.5">
-        <i class="fa-solid fa-camera"></i> Complete Partner Verification
+        <i class="fa-solid fa-camera"></i> Complete Profile Verification
       </button>
     </div>
 
@@ -157,7 +157,7 @@
     </div>
   </div>
 
-  <!-- PARTNER KYC & PROFILE MODAL (MANDATORY FIELDS + EDITABLE NAME, MOBILE, CITY) -->
+  <!-- PARTNER PROFILE MODAL (OPTIONAL AADHAAR/PAN) -->
   <div id="kycModal" class="fixed inset-0 bg-slate-900/80 z-[85] hidden items-center justify-center p-3">
     <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -165,7 +165,7 @@
           <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
             <i class="fa-solid fa-shield-halved text-emerald-600"></i> Partner Profile & Verification
           </h3>
-          <p class="text-[10px] text-slate-500">Aadhaar, PAN (TDS), live selfie compulsory</p>
+          <p class="text-[10px] text-slate-500">Live selfie & basic details (Aadhaar/PAN optional)</p>
         </div>
         <div class="flex items-center gap-2">
           <button type="button" onclick="skipKycForNow()" class="text-[11px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-xl transition">
@@ -209,11 +209,11 @@
           </div>
         </div>
 
-        <!-- 2. EDITABLE EDITABLE PROFILE FIELDS (NAME, MOBILE, CITY) -->
+        <!-- 2. PERSONAL, MOBILE & CITY DETAILS (MANDATORY) -->
         <div class="space-y-3">
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Full Legal / Agency Name *</label>
-            <input id="kycFullName" type="text" placeholder="Aadhaar / PAN ke anusar naam" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+            <input id="kycFullName" type="text" placeholder="Travel Agency / Driver Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
           </div>
 
           <div>
@@ -228,57 +228,32 @@
 
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Permanent Residential / Office Address *</label>
-            <textarea id="kycAddress" rows="2" placeholder="House/Flat No, Street, City, State, PIN Code" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500"></textarea>
+            <textarea id="kycAddress" rows="2" placeholder="House/Flat No, Street, State, PIN Code" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500"></textarea>
           </div>
         </div>
 
-        <!-- 3. AADHAAR CARD -->
+        <!-- 3. AADHAAR CARD (OPTIONAL) -->
         <div class="space-y-2 pt-1 border-t border-slate-100">
-          <div class="flex justify-between items-center">
-            <label class="block font-semibold text-slate-700">12-Digit Aadhaar Card Number *</label>
-            <span id="aadhaarAutoStatus" class="text-[10px] font-bold text-slate-400">Unverified</span>
-          </div>
-          <div class="relative">
-            <input id="kycAadhaarNum" type="tel" maxlength="12" oninput="autoValidateAadhaar(this.value)" placeholder="12 digit Aadhaar Number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-blue-500" />
-            <i id="aadhaarValidIcon" class="fa-solid fa-circle-check text-emerald-500 absolute right-3 top-2.5 hidden"></i>
-          </div>
+          <label class="block font-semibold text-slate-700">Aadhaar Card Number (Optional)</label>
+          <input id="kycAadhaarNum" type="tel" maxlength="12" placeholder="12 digit Aadhaar Number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold" />
           <div>
-            <label class="block text-[11px] text-slate-500 mb-1">Aadhaar Card Front Photo *</label>
-            <input id="kycAadhaarFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+            <label class="block text-[11px] text-slate-500 mb-1">Aadhaar Photo (Optional)</label>
+            <input id="kycAadhaarFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700" />
           </div>
         </div>
 
-        <!-- 4. PAN CARD FOR TDS COMPLIANCE -->
+        <!-- 4. PAN CARD (OPTIONAL) -->
         <div class="space-y-2 pt-1 border-t border-slate-100">
-          <div class="flex justify-between items-center">
-            <label class="block font-semibold text-slate-700">PAN Card (For 1% TDS Compliance) *</label>
-            <span id="panAutoStatus" class="text-[10px] font-bold text-slate-400">Format Check</span>
-          </div>
-          <div class="relative">
-            <input id="kycPanNum" type="text" maxlength="10" oninput="autoValidatePan(this.value)" placeholder="ABCDE1234F" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold uppercase focus:outline-none focus:border-blue-500" />
-            <i id="panValidIcon" class="fa-solid fa-circle-check text-emerald-500 absolute right-3 top-2.5 hidden"></i>
-          </div>
+          <label class="block font-semibold text-slate-700">PAN Card Number (Optional)</label>
+          <input id="kycPanNum" type="text" maxlength="10" placeholder="ABCDE1234F" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold uppercase" />
           <div>
-            <label class="block text-[11px] text-slate-500 mb-1">PAN Card Photo *</label>
-            <input id="kycPanFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-          </div>
-        </div>
-
-        <!-- 5. DRIVING LICENSE (OPTIONAL) -->
-        <div class="space-y-2 pt-1 border-t border-slate-100 bg-slate-50 p-3 rounded-2xl border border-slate-200">
-          <div class="flex justify-between items-center">
-            <label class="block font-semibold text-slate-700">Commercial Driving License (Optional)</label>
-            <span class="text-[9px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-bold">If Available</span>
-          </div>
-          <input id="kycDlNum" type="text" placeholder="DL Number" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs uppercase font-mono focus:outline-none focus:border-blue-500" />
-          <div>
-            <label class="block text-[11px] text-slate-500 mb-1">DL Photo (Optional)</label>
-            <input id="kycDlFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-200 file:text-slate-700" />
+            <label class="block text-[11px] text-slate-500 mb-1">PAN Photo (Optional)</label>
+            <input id="kycPanFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700" />
           </div>
         </div>
 
         <button type="button" id="submitKycBtn" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
-          <i class="fa-solid fa-cloud-arrow-up"></i> Auto-Verify & Submit KYC
+          <i class="fa-solid fa-cloud-arrow-up"></i> Save Partner Profile
         </button>
       </div>
     </div>
@@ -404,7 +379,7 @@
 
     function skipKycForNow() {
       closeModal('kycModal');
-      alert("Aapne KYC verification baad ke liye skip kar diya hai. Aap dashboard access kar sakte hain.");
+      alert("Aapne profile verification baad ke liye skip kar diya hai.");
     }
 
     function switchVendorTab(tab) {
@@ -426,7 +401,6 @@
       }
     }
 
-    // AUTH STATE LISTENER & KYC RETRIEVAL
     auth.onAuthStateChanged((user) => {
       currentVendor = user;
       const label = document.getElementById('partnerAuthLabel');
@@ -459,16 +433,15 @@
           const isVerified = currentVendorProfile.kycVerified === true;
 
           if (isVerified) {
-            if (kycText) kycText.innerText = "KYC Verified";
+            if (kycText) kycText.innerText = "Profile Verified";
             if (kycBtn) kycBtn.className = "text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-xl flex items-center gap-1 font-semibold";
             if (alertBanner) alertBanner.classList.add('hidden');
           } else {
-            if (kycText) kycText.innerText = "KYC Pending";
+            if (kycText) kycText.innerText = "Profile Pending";
             if (kycBtn) kycBtn.className = "text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded-xl flex items-center gap-1 font-semibold";
             if (alertBanner) alertBanner.classList.remove('hidden');
           }
 
-          // Pre-fill editable profile fields
           if (currentVendorProfile.agencyName && document.getElementById('kycFullName')) {
             document.getElementById('kycFullName').value = currentVendorProfile.agencyName;
           } else if (currentVendorProfile.name && document.getElementById('kycFullName')) {
@@ -483,23 +456,14 @@
           if (currentVendorProfile.address && document.getElementById('kycAddress')) {
             document.getElementById('kycAddress').value = currentVendorProfile.address;
           }
-
-          if (currentVendorProfile.aadhaar) {
-            document.getElementById('kycAadhaarNum').value = currentVendorProfile.aadhaar;
-            autoValidateAadhaar(currentVendorProfile.aadhaar);
-          }
-          if (currentVendorProfile.pan) {
-            document.getElementById('kycPanNum').value = currentVendorProfile.pan;
-            autoValidatePan(currentVendorProfile.pan);
-          }
-          if (currentVendorProfile.dlNumber) document.getElementById('kycDlNum').value = currentVendorProfile.dlNumber;
+          if (currentVendorProfile.aadhaar) document.getElementById('kycAadhaarNum').value = currentVendorProfile.aadhaar;
+          if (currentVendorProfile.pan) document.getElementById('kycPanNum').value = currentVendorProfile.pan;
         } else {
           if (alertBanner) alertBanner.classList.remove('hidden');
         }
       });
     }
 
-    // CAMERA CAPTURE ENGINE
     async function startLiveCamera() {
       const video = document.getElementById('webcamVideo');
       const placeholder = document.getElementById('cameraPlaceholder');
@@ -515,11 +479,10 @@
         video.classList.remove('hidden');
         placeholder.classList.add('hidden');
         capturedImg.classList.add('hidden');
-        
         snapBtn.disabled = false;
         snapBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm";
       } catch (err) {
-        alert("Camera permission denied ya camera available nahi hai: " + err.message);
+        alert("Camera permission error: " + err.message);
       }
     }
 
@@ -530,7 +493,6 @@
       const statusTag = document.getElementById('selfieStatusTag');
 
       if (!videoStream) return;
-
       canvas.width = video.videoWidth || 640;
       canvas.height = video.videoHeight || 480;
       const ctx = canvas.getContext('2d');
@@ -540,10 +502,8 @@
       capturedImg.src = capturedSelfieBase64;
       capturedImg.classList.remove('hidden');
       video.classList.add('hidden');
-
       statusTag.innerText = "Captured ✓";
       statusTag.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800";
-
       stopLiveCamera();
     }
 
@@ -551,48 +511,6 @@
       if (videoStream) {
         videoStream.getTracks().forEach(track => track.stop());
         videoStream = null;
-      }
-      const snapBtn = document.getElementById('snapCamBtn');
-      if (snapBtn) {
-        snapBtn.disabled = true;
-        snapBtn.className = "bg-slate-200 text-slate-400 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1 cursor-not-allowed";
-      }
-    }
-
-    function autoValidatePan(val) {
-      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-      const upper = val.toUpperCase().trim();
-      const status = document.getElementById('panAutoStatus');
-      const icon = document.getElementById('panValidIcon');
-
-      if (panRegex.test(upper)) {
-        status.innerText = "Valid Format ✓";
-        status.className = "text-[10px] font-bold text-emerald-600";
-        icon.classList.remove('hidden');
-        return true;
-      } else {
-        status.innerText = "10 Char Alpha-Num Required";
-        status.className = "text-[10px] font-bold text-rose-500";
-        icon.classList.add('hidden');
-        return false;
-      }
-    }
-
-    function autoValidateAadhaar(val) {
-      const clean = val.replace(/\D/g, '');
-      const status = document.getElementById('aadhaarAutoStatus');
-      const icon = document.getElementById('aadhaarValidIcon');
-
-      if (clean.length === 12 && !/^[01]/.test(clean)) {
-        status.innerText = "12-Digit Verified ✓";
-        status.className = "text-[10px] font-bold text-emerald-600";
-        icon.classList.remove('hidden');
-        return true;
-      } else {
-        status.innerText = "12 Digits Required";
-        status.className = "text-[10px] font-bold text-rose-500";
-        icon.classList.add('hidden');
-        return false;
       }
     }
 
@@ -605,39 +523,27 @@
       const address = document.getElementById('kycAddress').value.trim();
       const aadhaarNum = document.getElementById('kycAadhaarNum').value.trim();
       const panNum = document.getElementById('kycPanNum').value.trim().toUpperCase();
-      const dlNum = document.getElementById('kycDlNum').value.trim();
 
       const aadhaarFile = document.getElementById('kycAadhaarFile').files[0];
       const panFile = document.getElementById('kycPanFile').files[0];
-      const dlFile = document.getElementById('kycDlFile').files[0];
 
       if (!name || phone.length < 10 || !city || !address) {
         return alert("Full Name, 10-digit Mobile Number, City aur Address bharna anivarya hai!");
       }
-      if (!capturedSelfieBase64 && (!currentVendorProfile || !currentVendorProfile.selfieUrl)) {
-        return alert("Live Camera Selfie capture karna mandatory hai!");
-      }
-      if (!autoValidateAadhaar(aadhaarNum)) {
-        return alert("Kripya 12-digit valid Aadhaar Number enter karein!");
-      }
-      if (!autoValidatePan(panNum)) {
-        return alert("Kripya valid 10-digit PAN Number enter karein!");
-      }
 
       const btn = document.getElementById('submitKycBtn');
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Uploading & Verifying...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving Profile...`;
       btn.disabled = true;
 
       try {
         let selfieUrl = currentVendorProfile?.selfieUrl || '';
         let aadhaarUrl = currentVendorProfile?.aadhaarUrl || '';
         let panUrl = currentVendorProfile?.panUrl || '';
-        let dlUrl = currentVendorProfile?.dlUrl || '';
 
         if (capturedSelfieBase64) {
           const selfieRef = storage.ref(`partners/${currentVendor.uid}/selfie_${Date.now()}.jpg`);
-          const selfieSnapshot = await selfieRef.putString(capturedSelfieBase64, 'data_url');
-          selfieUrl = await selfieSnapshot.ref.getDownloadURL();
+          const snap = await selfieRef.putString(capturedSelfieBase64, 'data_url');
+          selfieUrl = await snap.ref.getDownloadURL();
         }
 
         if (aadhaarFile) {
@@ -652,47 +558,35 @@
           panUrl = await pSnap.ref.getDownloadURL();
         }
 
-        if (dlFile) {
-          const dRef = storage.ref(`partners/${currentVendor.uid}/dl_${Date.now()}_${dlFile.name}`);
-          const dSnap = await dRef.put(dlFile);
-          dlUrl = await dSnap.ref.getDownloadURL();
-        }
-
-        const isAutoVerified = Boolean(name && phone && city && address && aadhaarNum.length === 12 && panNum.length === 10 && selfieUrl);
-
         await db.collection("vendors").doc(currentVendor.uid).set({
           name: name,
           agencyName: name,
           phone: phone,
           city: city,
           address: address,
-          aadhaar: aadhaarNum,
+          aadhaar: aadhaarNum || '',
           aadhaarUrl: aadhaarUrl,
-          pan: panNum,
+          pan: panNum || '',
           panUrl: panUrl,
-          dlNumber: dlNum || 'Not Provided',
-          dlUrl: dlUrl || '',
           selfieUrl: selfieUrl,
-          kycVerified: isAutoVerified,
-          kycStatus: isAutoVerified ? 'Auto-Approved' : 'Under Review',
+          kycVerified: true,
+          kycStatus: 'Approved',
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
-        btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Verification Completed`;
+        btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Profile Saved`;
         btn.disabled = false;
         closeModal('kycModal');
-        alert("🎉 Partner Profile & KYC successfully verified and saved!");
+        alert("🎉 Partner profile successfully saved and synced to Admin panel.");
       } catch (err) {
-        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Auto-Verify & Submit KYC`;
+        btn.innerHTML = `Save Partner Profile`;
         btn.disabled = false;
-        alert("Upload Error: " + err.message);
+        alert("Error: " + err.message);
       }
     }
 
     function vendorLoginWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-
       auth.signInWithPopup(provider)
         .then((res) => {
           const u = res.user;
@@ -706,7 +600,7 @@
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
           closeModal('vendorAuthModal');
-          alert("Partner Login Successful! Data synced to Admin panel.");
+          alert("Login Successful! Data synced to Admin panel.");
         })
         .catch(err => alert("Login Error: " + err.message));
     }
@@ -750,7 +644,7 @@
             }, { merge: true });
             closeModal('vendorAuthModal');
           })
-          .catch(err => alert("Login Error: " + err.message));
+          .catch(err => alert("Error: " + err.message));
       }
     }
 
@@ -978,12 +872,6 @@
       if (!currentVendor) {
         alert("Ride accept karne ke liye Vendor/Partner login anivarya hai!");
         openVendorAuthModal();
-        return;
-      }
-
-      if (currentVendorProfile && currentVendorProfile.kycVerified !== true) {
-        alert("⚠️ KYC Incomplete!\n\nRides accept karne se pehle apna Aadhaar, PAN aur Camera Selfie verify karein.");
-        openKycModal();
         return;
       }
 
