@@ -71,12 +71,12 @@
           <div id="localPackageWrapper" class="hidden mb-3 space-y-1.5 bg-blue-50/50 p-3 rounded-xl border border-blue-200">
             <label class="block text-xs font-bold text-blue-900" id="packageLabelTitle">Select Package *</label>
             <select id="localPackageSelect" onchange="handlePackageChange()" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none">
-              </select>
+            </select>
           </div>
 
           <div class="space-y-3">
             <div class="relative">
-              <label class="block text-xs font-medium text-slate-600 mb-1">From (Pickup City/Locality)</label>
+              <label class="block text-xs font-medium text-slate-600 mb-1" id="pickupLabelText">From (Pickup City/Locality)</label>
               <div class="relative flex items-center">
                 <i class="fa-solid fa-location-dot absolute left-3 text-slate-400 text-sm"></i>
                 <input id="pickupLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'pickup')" placeholder="e.g. Indore, Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
@@ -155,7 +155,7 @@
                   <p class="text-sm font-bold text-slate-800">Hatchback</p>
                   <p class="text-[11px] text-slate-500">WagonR, Swift • 4 seats</p>
                   <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
-                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 56 KM</span>
+                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹11/KM</span>
                   </div>
                 </div>
@@ -172,7 +172,7 @@
                   <p class="text-sm font-bold text-slate-800">Sedan</p>
                   <p class="text-[11px] text-slate-500">Dzire, Etios, Aura • 4 seats</p>
                   <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
-                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 56 KM</span>
+                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹12/KM</span>
                   </div>
                 </div>
@@ -189,7 +189,7 @@
                   <p class="text-sm font-bold text-slate-800">Ertiga (MUV)</p>
                   <p class="text-[11px] text-slate-500">Maruti Ertiga • 6 seats</p>
                   <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
-                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 56 KM</span>
+                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹14/KM</span>
                   </div>
                 </div>
@@ -206,7 +206,7 @@
                   <p class="text-sm font-bold text-slate-800">Innova Crysta</p>
                   <p class="text-[11px] text-slate-500">Toyota Crysta • 6–7 seats</p>
                   <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
-                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 56 KM</span>
+                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹20/KM</span>
                   </div>
                 </div>
@@ -360,20 +360,12 @@
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
         <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare Breakdown</h4>
         <div class="flex justify-between text-slate-600">
-          <span id="receiptFareLabel">Vehicle Fare</span>
-          <span id="receiptBaseFare" class="font-semibold">₹0</span>
-        </div>
-        <div class="flex justify-between text-slate-600">
-          <span>Driver Allowance</span>
-          <span class="font-semibold">₹300</span>
+          <span id="receiptFareLabel">Vehicle Fare (Inc. Driver Allowance)</span>
+          <span id="receiptTotalFare" class="font-bold text-sm text-slate-900">₹0</span>
         </div>
         <div id="receiptCarrierRow" class="hidden flex justify-between text-slate-600">
           <span>Roof Luggage Carrier</span>
           <span id="receiptCarrierFee" class="font-semibold">+₹300</span>
-        </div>
-        <div class="flex justify-between border-t border-slate-100 pt-2 text-sm font-bold text-slate-900">
-          <span>Total Fare</span>
-          <span id="receiptTotalFare">₹0</span>
         </div>
 
         <div class="bg-blue-50/70 rounded-xl p-3 border border-blue-100 space-y-1.5 mt-2">
@@ -512,12 +504,7 @@
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
-
       <div id="historyListContainer" class="p-4 overflow-y-auto space-y-3 flex-1 text-xs"></div>
-
-      <div class="p-3 border-t border-slate-100 bg-slate-50 text-center">
-        <p class="text-[11px] text-slate-400">All bookings are permanently recorded & secured.</p>
-      </div>
     </div>
   </div>
 
@@ -533,12 +520,6 @@
         <p class="font-bold text-slate-800">1. Cancellation Policy</p>
         <p>• Pickup time se 6 ghante pehle cancellation bilkul <b>FREE (₹0 Penalty)</b> hai.</p>
         <p>• Pickup time ke 6 ghante ke andar cancel karne par <b>10% (Min ₹300, Max ₹1,000)</b> late fee penalty record hoti hai.</p>
-        <p class="font-bold text-slate-800">2. Scheduled Timing Rule</p>
-        <p>Ride ko kam se kam 1 ghanta aage schedule karna compulsory hai. Current ya expired time ki booking allow nahi hai.</p>
-        <p class="font-bold text-slate-800">3. Extra Distance Policy</p>
-        <p>Included route KM se zyada gaadi chalne par vehicle category ke anusar per KM extra charges applicable honge.</p>
-        <p class="font-bold text-slate-800">4. Toll & State Taxes</p>
-        <p>Fastag Toll, State Border Tax aur Parking charges base fare me shamil nahi hain. Yeh raste me passenger ko directly pay karne hote hain.</p>
       </div>
     </div>
   </div>
@@ -557,11 +538,6 @@
     </div>
   </div>
 
-  <a href="https://wa.me/918889637244?text=Hi,%20I%20need%20cab%20booking%20support" target="_blank" class="fixed bottom-4 right-4 z-30 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold transition transform active:scale-95">
-    <i class="fa-brands fa-whatsapp text-lg"></i>
-    <span>WhatsApp Support</span>
-  </a>
-
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
@@ -573,9 +549,7 @@
       measurementId: "G-ZBZZHGGTQX"
     };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
 
@@ -592,8 +566,8 @@
 
     let selectedTripType = 'One Way';
     let selectedVehicle = 'Hatchback';
-    let baseFare = 0; // Point 2: Initial default fare 0
-    let currentDisplayKm = 56;
+    let baseFare = 0;
+    let currentDisplayKm = 0;
     const driverAllowance = 300;
     let currentDocId = '';
     let currentBookingData = null;
@@ -608,116 +582,69 @@
     let adminFixedRoutes = {};
     let adminLocalRentals = {};
 
-    // REAL-TIME LISTENER FOR CSV FIXED ROUTES & LOCAL RENTALS
     db.collection("pricing_rules").doc("fixed_routes").onSnapshot((doc) => {
-      if (doc.exists) {
-        adminFixedRoutes = doc.data() || {};
-        updateDynamicVehicleFares(calculatedDistanceKm);
-      }
+      if (doc.exists) { adminFixedRoutes = doc.data() || {}; updateDynamicVehicleFares(calculatedDistanceKm); }
     });
 
     db.collection("pricing_rules").doc("local_rentals").onSnapshot((doc) => {
-      if (doc.exists) {
-        adminLocalRentals = doc.data() || {};
-      }
+      if (doc.exists) { adminLocalRentals = doc.data() || {}; }
     });
 
     function toggleDrawer(open) {
       const drawer = document.getElementById('sideDrawer');
       const overlay = document.getElementById('drawerOverlay');
       if (!drawer || !overlay) return;
-
       if (open) {
-        overlay.classList.remove('hidden');
-        overlay.style.display = 'block';
-        drawer.style.transform = 'translateX(0%)';
+        overlay.classList.remove('hidden'); overlay.style.display = 'block'; drawer.style.transform = 'translateX(0%)';
       } else {
         drawer.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-          overlay.classList.add('hidden');
-          overlay.style.display = 'none';
-        }, 300);
+        setTimeout(() => { overlay.classList.add('hidden'); overlay.style.display = 'none'; }, 300);
       }
     }
 
     function openModal(id) {
       toggleDrawer(false);
       const modal = document.getElementById(id);
-      if (modal) {
-        modal.classList.remove('hidden');
-        modal.style.display = 'flex';
-      }
-      if (id === 'historyModal') {
-        renderBookingHistory();
-      }
+      if (modal) { modal.classList.remove('hidden'); modal.style.display = 'flex'; }
+      if (id === 'historyModal') renderBookingHistory();
     }
 
     function closeModal(id) {
       const modal = document.getElementById(id);
-      if (modal) {
-        modal.classList.add('hidden');
-        modal.style.display = 'none';
-      }
+      if (modal) { modal.classList.add('hidden'); modal.style.display = 'none'; }
     }
 
     function initializeSchedulingRestrictions() {
       const datePicker = document.getElementById('pickupDate');
       const timePicker = document.getElementById('pickupTime');
-
       const now = new Date();
       const defaultTime = new Date(now.getTime() + (75 * 60 * 1000));
       const rem = defaultTime.getMinutes() % 5;
       if (rem !== 0) defaultTime.setMinutes(defaultTime.getMinutes() + (5 - rem));
 
-      const yyyy = defaultTime.getFullYear();
-      const mm = String(defaultTime.getMonth() + 1).padStart(2, '0');
-      const dd = String(defaultTime.getDate()).padStart(2, '0');
-      const minDate = `${yyyy}-${mm}-${dd}`;
-
       if (datePicker) {
         datePicker.min = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        if (!datePicker.value || datePicker.value < datePicker.min) {
-          datePicker.value = minDate;
-        }
+        if (!datePicker.value) datePicker.value = datePicker.min;
       }
-
       if (timePicker && !timePicker.value) {
-        const hh = String(defaultTime.getHours()).padStart(2, '0');
-        const min = String(defaultTime.getMinutes()).padStart(2, '0');
-        timePicker.value = `${hh}:${min}`;
+        timePicker.value = `${String(defaultTime.getHours()).padStart(2, '0')}:${String(defaultTime.getMinutes()).padStart(2, '0')}`;
       }
-
-      validateScheduleTiming();
     }
 
     function validateScheduleTiming() {
       const dateInput = document.getElementById('pickupDate');
       const timeInput = document.getElementById('pickupTime');
       if (!dateInput || !timeInput) return true;
-
-      const selectedDate = dateInput.value;
-      const selectedTime = timeInput.value;
-      if (!selectedDate || !selectedTime) return false;
-
-      const [hours, minutes] = selectedTime.split(':').map(Number);
-      const scheduleDateTime = new Date(`${selectedDate}T00:00:00`);
+      const [hours, minutes] = timeInput.value.split(':').map(Number);
+      const scheduleDateTime = new Date(`${dateInput.value}T00:00:00`);
       scheduleDateTime.setHours(hours, minutes, 0, 0);
-
-      const now = new Date();
-      const minAllowed = new Date(now.getTime() + (60 * 60 * 1000));
-
-      if (scheduleDateTime < minAllowed) {
-        return false;
-      }
-      return true;
+      return scheduleDateTime >= new Date(Date.now() + (60 * 60 * 1000));
     }
 
     function formatDisplayTime(timeStr24) {
       if (!timeStr24) return '';
       const [h, m] = timeStr24.split(':').map(Number);
-      const modifier = h >= 12 ? 'PM' : 'AM';
-      const displayH = h % 12 || 12;
-      return `${String(displayH).padStart(2, '0')}:${String(m).padStart(2, '0')} ${modifier}`;
+      return `${String(h % 12 || 12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
     }
 
     function toggleCarrierAddon(checked) {
@@ -726,68 +653,29 @@
     }
 
     function loginWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-
-      auth.signInWithPopup(provider)
-        .then((result) => {
-          const u = result.user;
-          db.collection("customers").doc(u.uid).set({
-            name: u.displayName || '',
-            email: u.email || '',
-            photo: u.photoURL || '',
-            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge: true });
-
-          closeModal('authModal');
-          toggleDrawer(false);
-          alert("Login Successful! Welcome " + (u.displayName || u.email));
-        })
-        .catch((error) => {
-          if (error.code === 'auth/popup-blocked') {
-            auth.signInWithRedirect(provider);
-          } else {
-            alert("Google Sign-In Error: " + error.message);
-          }
-        });
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then((result) => {
+        const u = result.user;
+        db.collection("customers").doc(u.uid).set({
+          name: u.displayName || '', email: u.email || '', photo: u.photoURL || '',
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        closeModal('authModal'); toggleDrawer(false);
+      }).catch(err => alert("Error: " + err.message));
     }
 
     auth.onAuthStateChanged((user) => {
       currentUser = user;
       const indicator = document.getElementById('authIndicatorBadge');
-      const drawerTitle = document.getElementById('drawerUserTitle');
-      const drawerSub = document.getElementById('drawerUserSub');
-      const logoutBtn = document.getElementById('logoutBtn');
-
       if (user) {
-        if (indicator) {
-          indicator.className = "text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md";
-          indicator.innerText = "Verified Customer";
-        }
-        if (drawerTitle) drawerTitle.innerText = user.displayName || user.email.split('@')[0];
-        if (drawerSub) drawerSub.innerText = user.email;
-        if (logoutBtn) logoutBtn.classList.remove('hidden');
-
-        if (document.getElementById('custName') && !document.getElementById('custName').value) {
-          document.getElementById('custName').value = user.displayName || '';
-        }
-
-        db.collection("customers").doc(user.uid).get().then(doc => {
-          if (doc.exists) {
-            const data = doc.data();
-            if (data.phone && document.getElementById('custPhone')) {
-              document.getElementById('custPhone').value = data.phone;
-            }
-          }
-        });
+        if (indicator) { indicator.className = "text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md"; indicator.innerText = "Verified Customer"; }
+        document.getElementById('drawerUserTitle').innerText = user.displayName || user.email.split('@')[0];
+        document.getElementById('drawerUserSub').innerText = user.email;
+        document.getElementById('logoutBtn').classList.remove('hidden');
+        if (document.getElementById('custName') && !document.getElementById('custName').value) document.getElementById('custName').value = user.displayName || '';
       } else {
-        if (indicator) {
-          indicator.className = "text-[10px] text-rose-500 font-bold bg-rose-50 px-2 py-0.5 rounded-md";
-          indicator.innerText = "Login Required";
-        }
-        if (drawerTitle) drawerTitle.innerText = "Login / Sign In";
-        if (drawerSub) drawerSub.innerText = "Tap to login with Google or Email";
-        if (logoutBtn) logoutBtn.classList.add('hidden');
+        if (indicator) { indicator.className = "text-[10px] text-rose-500 font-bold bg-rose-50 px-2 py-0.5 rounded-md"; indicator.innerText = "Login Required"; }
+        document.getElementById('drawerUserTitle').innerText = "Login / Sign In";
+        document.getElementById('logoutBtn').classList.add('hidden');
       }
     });
 
@@ -797,91 +685,71 @@
       const name = document.getElementById('loginName').value.trim();
       const phone = document.getElementById('loginPhone').value.trim();
 
-      if (!email || pass.length < 6) {
-        alert("Valid email aur minimum 6 characters ka password daalein!");
-        return;
-      }
+      if (!email || pass.length < 6) return alert("Valid email aur 6-digit password daalein!");
+      if (isSignUp && (!name || phone.length < 10)) return alert("Full Name aur Phone number mandatory hai!");
 
       if (isSignUp) {
-        if (!name || phone.length < 10) {
-          alert("Account create karne ke liye Full Name aur 10-digit Phone number compulsory hai!");
-          return;
-        }
-        auth.createUserWithEmailAndPassword(email, pass)
-          .then((cred) => {
-            return db.collection("customers").doc(cred.user.uid).set({
-              name: name,
-              phone: phone,
-              email: email,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-          })
-          .then(() => {
-            alert("Account successfully created!");
-            closeModal('authModal');
-          })
-          .catch(err => alert("Sign Up Error: " + err.message));
+        auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
+          return db.collection("customers").doc(cred.user.uid).set({ name, phone, email });
+        }).then(() => { closeModal('authModal'); alert("Account created!"); }).catch(err => alert("Error: " + err.message));
       } else {
-        auth.signInWithEmailAndPassword(email, pass)
-          .then(() => {
-            closeModal('authModal');
-          })
-          .catch(err => alert("Login Error: " + err.message));
+        auth.signInWithEmailAndPassword(email, pass).then(() => closeModal('authModal')).catch(err => alert("Error: " + err.message));
       }
     }
 
-    function logoutCustomer() {
-      if (confirm("Log out of your customer account?")) {
-        auth.signOut().then(() => {
-          location.reload();
-        });
-      }
-    }
+    function logoutCustomer() { auth.signOut().then(() => location.reload()); }
 
     function handleAddressSearch(query, type) {
       clearTimeout(searchDebounceTimer);
       const listContainer = document.getElementById(type === 'pickup' ? 'pickupSuggestions' : 'dropSuggestions');
 
-      if (!query || query.trim().length < 2) {
-        listContainer.classList.add('hidden');
-        listContainer.innerHTML = '';
-        return;
+      if (selectedTripType === 'Airport Transfer') {
+        const pkg = document.getElementById('localPackageSelect').value;
+        if (type === 'pickup' && pkg === 'airport_drop') {
+          listContainer.innerHTML = `<div onclick="selectAirportLocation('pickup', 'Raja Bhoj Airport, Bhopal', 'bhopal')" class="p-2.5 hover:bg-blue-50 border-b cursor-pointer font-bold text-blue-900"><i class="fa-solid fa-plane mr-1"></i> Raja Bhoj Airport, Bhopal</div>`;
+          listContainer.classList.remove('hidden'); return;
+        }
+        if (type === 'drop' && pkg === 'airport_pickup') {
+          listContainer.innerHTML = `<div onclick="selectAirportLocation('drop', 'Raja Bhoj Airport, Bhopal', 'bhopal')" class="p-2.5 hover:bg-blue-50 border-b cursor-pointer font-bold text-blue-900"><i class="fa-solid fa-plane mr-1"></i> Raja Bhoj Airport, Bhopal</div>`;
+          listContainer.classList.remove('hidden'); return;
+        }
       }
 
-      searchDebounceTimer = setTimeout(() => {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=6&addressdetails=1`;
+      if (!query || query.trim().length < 2) { listContainer.classList.add('hidden'); listContainer.innerHTML = ''; return; }
 
-        fetch(url, { headers: { 'Accept-Language': 'en' } })
+      searchDebounceTimer = setTimeout(() => {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=6&addressdetails=1`, { headers: { 'Accept-Language': 'en' } })
           .then(res => res.json())
           .then(data => {
-            if (!data || data.length === 0) {
-              listContainer.innerHTML = `<div class="p-2.5 text-slate-400 text-center">No location found</div>`;
-              listContainer.classList.remove('hidden');
-              return;
-            }
-
+            if (!data || data.length === 0) { listContainer.classList.add('hidden'); return; }
             listContainer.innerHTML = data.map(item => {
-              const displayName = item.display_name;
-              const shortName = item.name || displayName.split(',')[0];
-              const subDetails = displayName.split(',').slice(1, 4).join(',');
-              const city = item.address?.city || item.address?.town || item.address?.state_district || shortName;
-
+              const shortName = item.name || item.display_name.split(',')[0];
+              const subDetails = item.display_name.split(',').slice(1, 4).join(',');
+              const city = item.address?.city || item.address?.town || shortName;
               return `
-                <div onclick="selectLocation('${type}', '${item.lat}', '${item.lon}', '${shortName.replace(/'/g, "\\'")}, ${subDetails.replace(/'/g, "\\'")}', '${city.replace(/'/g, "\\'")}')" class="p-2.5 hover:bg-blue-50 border-b border-slate-100 last:border-none cursor-pointer flex items-start gap-2">
+                <div onclick="selectLocation('${type}', '${item.lat}', '${item.lon}', '${shortName.replace(/'/g, "\\'")}, ${subDetails.replace(/'/g, "\\'")}', '${city.replace(/'/g, "\\'")}')" class="p-2.5 hover:bg-blue-50 border-b cursor-pointer flex items-start gap-2">
                   <i class="fa-solid fa-location-dot text-blue-500 text-xs mt-0.5"></i>
-                  <div>
-                    <p class="font-bold text-slate-800">${shortName}</p>
-                    <p class="text-[10px] text-slate-400 line-clamp-1">${subDetails}</p>
-                  </div>
-                </div>
-              `;
+                  <div><p class="font-bold text-slate-800">${shortName}</p><p class="text-[10px] text-slate-400">${subDetails}</p></div>
+                </div>`;
             }).join('');
             listContainer.classList.remove('hidden');
-          })
-          .catch(() => {
-            listContainer.classList.add('hidden');
           });
       }, 300);
+    }
+
+    function selectAirportLocation(type, name, city) {
+      if (type === 'pickup') {
+        document.getElementById('pickupLocation').value = name;
+        pickupCoords = { lat: 23.2875, lon: 77.3375 };
+        pickupCityName = city.trim().toLowerCase();
+        document.getElementById('pickupSuggestions').classList.add('hidden');
+      } else {
+        document.getElementById('dropLocation').value = name;
+        dropCoords = { lat: 23.2875, lon: 77.3375 };
+        dropCityName = city.trim().toLowerCase();
+        document.getElementById('dropSuggestions').classList.add('hidden');
+      }
+      updateDynamicVehicleFares(calculatedDistanceKm);
     }
 
     function selectLocation(type, lat, lon, fullAddress, city) {
@@ -897,363 +765,170 @@
         document.getElementById('dropSuggestions').classList.add('hidden');
       }
 
-      // Point 5: Airport Transfer two-way city matching validation
-      if (selectedTripType === 'Airport Transfer') {
-        if (pickupCityName && dropCityName && pickupCityName !== dropCityName) {
-          alert("⚠️ Airport Transfer rule: Pickup aur Drop dono hi airport situated same city ke andar hone chahiye!");
-        }
+      if (selectedTripType === 'Airport Transfer' && pickupCityName && dropCityName && pickupCityName !== dropCityName) {
+        alert("⚠️ Airport Transfer rule: Pickup aur Drop same city ke andar hone chahiye!");
       }
 
-      if (pickupCoords && dropCoords && selectedTripType !== 'Local Rental') {
-        calculateRoadDrivingDistance();
-      } else {
-        updateDynamicVehicleFares(calculatedDistanceKm);
-      }
+      if (pickupCoords && dropCoords && selectedTripType !== 'Local Rental') calculateRoadDrivingDistance();
+      else updateDynamicVehicleFares(calculatedDistanceKm);
     }
 
     function calculateRoadDrivingDistance() {
       const badgeBox = document.getElementById('distanceBadgeBox');
       const badgeText = document.getElementById('distanceBadgeText');
-      if (badgeBox && badgeText) {
-        badgeBox.classList.remove('hidden');
-        badgeText.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Calculating road route...`;
-      }
+      if (badgeBox && badgeText) { badgeBox.classList.remove('hidden'); badgeText.innerHTML = `Calculating route...`; }
 
-      const url = `https://router.project-osrm.org/route/v1/driving/${pickupCoords.lon},${pickupCoords.lat};${dropCoords.lon},${dropCoords.lat}?overview=false`;
-
-      fetch(url)
+      fetch(`https://router.project-osrm.org/route/v1/driving/${pickupCoords.lon},${pickupCoords.lat};${dropCoords.lon},${dropCoords.lat}?overview=false`)
         .then(res => res.json())
         .then(data => {
-          if (data.code === "Ok" && data.routes && data.routes.length > 0) {
+          if (data.code === "Ok" && data.routes?.[0]) {
             calculatedDistanceKm = Math.round(data.routes[0].distance / 1000);
             updateDynamicVehicleFares(calculatedDistanceKm);
           }
-        })
-        .catch(err => console.error(err));
+        });
     }
 
-    // CALCULATE FARE WITH CSV FIXED PACKAGE PRIORITY & LOCAL/AIRPORT MAPPING
     function calculateSegmentFare(vehicleType, oneWayDistanceKm, tripType) {
       const pkgSelect = document.getElementById('localPackageSelect');
       const selectedPkg = pkgSelect ? pkgSelect.value : '';
 
-      // Point 3 & 4: Local Rentals & Airport Transfer CSV / Database Package matching
       if (tripType === 'Local Rental' && selectedPkg) {
-        const cityKey = pickupCityName || 'bhopal';
-        const cityData = adminLocalRentals[cityKey] || adminLocalRentals['bhopal'] || {};
+        const cityData = adminLocalRentals[pickupCityName || 'bhopal'] || adminLocalRentals['bhopal'] || {};
         const cabPkg = cityData[vehicleType] || cityData['Sedan'];
-
-        if (cabPkg) {
-          return {
-            fare: Number(cabPkg.baseFare) || 1800,
-            isCsvPackage: true,
-            displayKm: `${cabPkg.includedKm} KM / ${cabPkg.includedHours} Hrs`,
-            extraInfo: `Extra: ₹${cabPkg.extraKm}/KM & ₹${cabPkg.extraHr}/Hr`
-          };
-        }
-        // Fallback default packages if not in DB
-        if (selectedPkg === '4h/40km') return { fare: 1800, isCsvPackage: true, displayKm: '40 KM / 4 Hrs', extraInfo: 'Extra: ₹15/KM & ₹150/Hr' };
-        if (selectedPkg === '8h/80km') return { fare: 3200, isCsvPackage: true, displayKm: '80 KM / 8 Hrs', extraInfo: 'Extra: ₹15/KM & ₹150/Hr' };
+        if (cabPkg) return { fare: Number(cabPkg.baseFare) || 1800, isCsvPackage: true, displayKm: `${cabPkg.includedKm} KM / ${cabPkg.includedHours} Hrs` };
+        return { fare: selectedPkg === '4h/40km' ? 1800 : 3200, isCsvPackage: true, displayKm: selectedPkg };
       }
 
       if (tripType === 'Airport Transfer') {
-        const cityKey = pickupCityName || 'bhopal';
-        const cityData = adminLocalRentals[cityKey] || adminLocalRentals['bhopal'] || {};
+        const cityData = adminLocalRentals[pickupCityName || 'bhopal'] || adminLocalRentals['bhopal'] || {};
         const cabPkg = cityData[vehicleType] || cityData['Sedan'];
-        const airportBase = cabPkg ? Math.round(Number(cabPkg.baseFare) * 0.9) : 1600;
-
-        return {
-          fare: airportBase,
-          isCsvPackage: true,
-          displayKm: 'Airport Transfer Package',
-          extraInfo: 'Fixed Airport Route Rate'
-        };
+        return { fare: cabPkg ? Math.round(Number(cabPkg.baseFare) * 0.9) : 1600, isCsvPackage: true, displayKm: 'Airport Transfer Package' };
       }
 
-      // Point 2: One-way without source/destination returns 0 (No default rates shown)
-      if (tripType === 'One Way' && (!pickupCityName || !dropCityName)) {
-        return { fare: 0, isCsvPackage: false, displayKm: '56 KM' };
-      }
+      if (tripType === 'One Way' && (!pickupCityName || !dropCityName)) return { fare: 0, isCsvPackage: false, displayKm: '0 KM' };
 
       if (pickupCityName && dropCityName && tripType === 'One Way') {
-        const forwardKey = `${pickupCityName}-${dropCityName}`;
-        const reverseKey = `${dropCityName}-${pickupCityName}`;
-        const fixedPackage = adminFixedRoutes[forwardKey] || adminFixedRoutes[reverseKey];
-
-        if (fixedPackage && fixedPackage[vehicleType]) {
-          return { 
-            fare: Number(fixedPackage[vehicleType]), 
-            isCsvPackage: true, 
-            displayKm: `${oneWayDistanceKm || 56} KM` 
-          };
-        }
+        const fixedPackage = adminFixedRoutes[`${pickupCityName}-${dropCityName}`] || adminFixedRoutes[`${dropCityName}-${pickupCityName}`];
+        if (fixedPackage?.[vehicleType]) return { fare: Number(fixedPackage[vehicleType]), isCsvPackage: true, displayKm: `${oneWayDistanceKm || 56} KM` };
       }
 
       const config = CAB_CONFIG[vehicleType] || CAB_CONFIG['Sedan'];
-      const realDist = Number(oneWayDistanceKm) || 56;
+      const realDist = Number(oneWayDistanceKm) || 0;
+      if (realDist <= 0) return { fare: 0, isCsvPackage: false, displayKm: '0 KM' };
 
-      if (tripType === 'One Way') {
-        const billableSlab = Math.max(100, realDist);
-        const fare = Math.round(billableSlab * config.baseRate * config.oneWayMultiplier);
-        return { fare: fare, isCsvPackage: false, displayKm: `${realDist} KM` };
-      } else if (tripType === 'Round Trip') {
-        const totalRoundKm = realDist * 2;
-        const billableSlab = Math.max(300, totalRoundKm);
-        const fare = Math.round(billableSlab * config.baseRate);
-        return { fare: fare, isCsvPackage: false, displayKm: `${totalRoundKm} KM` };
-      } else {
-        const billableSlab = Math.max(100, realDist);
-        return { fare: Math.round(billableSlab * config.baseRate), isCsvPackage: false, displayKm: `${realDist} KM` };
-      }
+      if (tripType === 'One Way') return { fare: Math.round(Math.max(50, realDist) * config.baseRate * config.oneWayMultiplier), isCsvPackage: false, displayKm: `${realDist} KM` };
+      if (tripType === 'Round Trip') return { fare: Math.round(Math.max(100, realDist * 2) * config.baseRate), isCsvPackage: false, displayKm: `${realDist * 2} KM` };
+      return { fare: Math.round(Math.max(50, realDist) * config.baseRate), isCsvPackage: false, displayKm: `${realDist} KM` };
     }
 
     function updateDynamicVehicleFares(distanceKm) {
-      const dist = distanceKm || calculatedDistanceKm || 56;
-
+      const dist = distanceKm || calculatedDistanceKm || 0;
       const hRes = calculateSegmentFare('Hatchback', dist, selectedTripType);
       const sRes = calculateSegmentFare('Sedan', dist, selectedTripType);
       const mRes = calculateSegmentFare('MUV', dist, selectedTripType);
       const uRes = calculateSegmentFare('SUV', dist, selectedTripType);
 
-      document.getElementById('priceTagHatchback').innerText = `₹${hRes.fare.toLocaleString('en-IN')}`;
-      document.getElementById('priceTagSedan').innerText = `₹${sRes.fare.toLocaleString('en-IN')}`;
-      document.getElementById('priceTagMUV').innerText = `₹${mRes.fare.toLocaleString('en-IN')}`;
-      document.getElementById('priceTagSUV').innerText = `₹${uRes.fare.toLocaleString('en-IN')}`;
+      document.getElementById('priceTagHatchback').innerText = hRes.fare > 0 ? `₹${(hRes.fare + driverAllowance).toLocaleString('en-IN')}` : '₹0';
+      document.getElementById('priceTagSedan').innerText = sRes.fare > 0 ? `₹${(sRes.fare + driverAllowance).toLocaleString('en-IN')}` : '₹0';
+      document.getElementById('priceTagMUV').innerText = mRes.fare > 0 ? `₹${(mRes.fare + driverAllowance).toLocaleString('en-IN')}` : '₹0';
+      document.getElementById('priceTagSUV').innerText = uRes.fare > 0 ? `₹${(uRes.fare + driverAllowance).toLocaleString('en-IN')}` : '₹0';
 
       const cur = calculateSegmentFare(selectedVehicle, dist, selectedTripType);
-      baseFare = cur.fare;
+      baseFare = cur.fare > 0 ? cur.fare + driverAllowance : 0; 
       currentDisplayKm = cur.displayKm;
 
-      if (cur.isCsvPackage) {
-        document.getElementById('rateModeBadge').innerText = "CSV Package Active";
-      } else {
-        document.getElementById('rateModeBadge').innerText = "All Exclusive Fare";
-      }
-
-      document.querySelectorAll('.inc-km-tag').forEach(el => {
-        el.innerText = `Included: ${currentDisplayKm}`;
-      });
-
-      const badgeText = document.getElementById('distanceBadgeText');
-      const badgeBox = document.getElementById('distanceBadgeBox');
-      if (badgeText && badgeBox) {
-        if (selectedTripType === 'Local Rental' || selectedTripType === 'Airport Transfer') {
-          badgeBox.classList.add('hidden');
-        } else if (calculatedDistanceKm > 0) {
-          badgeBox.classList.remove('hidden');
-          if (selectedTripType === 'Round Trip') {
-            badgeText.innerText = `Route: Approx ${calculatedDistanceKm * 2} KM Round Trip`;
-          } else {
-            badgeText.innerText = `Route: Approx ${calculatedDistanceKm} KM Direct Road`;
-          }
-        }
-      }
+      document.getElementById('rateModeBadge').innerText = cur.isCsvPackage ? "CSV Package Active" : "All Exclusive Fare";
+      document.querySelectorAll('.inc-km-tag').forEach(el => el.innerText = `Included: ${currentDisplayKm}`);
     }
 
     function selectTripType(type, element) {
       selectedTripType = type;
-      document.querySelectorAll('.trip-type-btn').forEach(btn => {
-        btn.classList.remove('bg-blue-600', 'text-white');
-        btn.classList.add('bg-slate-100', 'text-slate-600');
-      });
-      element.classList.remove('bg-slate-100', 'text-slate-600');
-      element.classList.add('bg-blue-600', 'text-white');
+      document.querySelectorAll('.trip-type-btn').forEach(btn => btn.className = "trip-type-btn py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600");
+      element.className = "trip-type-btn py-2 text-xs font-semibold rounded-xl bg-blue-600 text-white";
 
       const wrapper = document.getElementById('localPackageWrapper');
       const selectBox = document.getElementById('localPackageSelect');
-      const labelTitle = document.getElementById('packageLabelTitle');
       const dropContainer = document.getElementById('dropLocationContainer');
       const dropInput = document.getElementById('dropLocation');
-      const termsBanner = document.getElementById('localRentalTermsBanner');
+      const pickupLabel = document.getElementById('pickupLabelText');
 
-      // Point 3 & 4 & 6: Drop optional for local, package formatting, and airport rules
       if (type === 'Local Rental') {
         wrapper.classList.remove('hidden');
-        labelTitle.innerText = "Select Local Rental Package *";
-        selectBox.innerHTML = `
-          <option value="4h/40km">Local 4 Hours / 40 KM</option>
-          <option value="8h/80km">Local 8 Hours / 80 KM</option>
-        `;
-        dropContainer.style.display = 'none'; // Point 6: Drop not compulsory for local
-        dropInput.value = 'Local City Rental';
-        dropCoords = { lat: 0, lon: 0 };
-        dropCityName = pickupCityName;
-        if (termsBanner) termsBanner.classList.remove('hidden');
+        selectBox.innerHTML = `<option value="4h/40km">Local 4 Hours / 40 KM</option><option value="8h/80km">Local 8 Hours / 80 KM</option>`;
+        dropContainer.style.display = 'none'; dropInput.value = 'Local Rental'; dropCoords = { lat: 0, lon: 0 }; dropCityName = pickupCityName;
+        pickupLabel.innerText = "City / Locality *";
       } else if (type === 'Airport Transfer') {
         wrapper.classList.remove('hidden');
-        labelTitle.innerText = "Select Airport Transfer Type *";
-        selectBox.innerHTML = `
-          <option value="airport_pickup">Airport ➔ City Transfer</option>
-          <option value="airport_drop">City ➔ Airport Transfer</option>
-        `;
-        dropContainer.style.display = 'block'; // Airport needs city matching
-        dropInput.value = '';
-        dropCoords = null;
-        dropCityName = '';
-        if (termsBanner) termsBanner.classList.add('hidden');
+        selectBox.innerHTML = `<option value="airport_pickup">Airport ➔ City Transfer</option><option value="airport_drop">City ➔ Airport Transfer</option>`;
+        dropContainer.style.display = 'block'; dropInput.value = ''; dropCoords = null; dropCityName = '';
+        pickupLabel.innerText = "Pickup Location (Select Airport or City) *";
       } else {
-        wrapper.classList.add('hidden');
-        dropContainer.style.display = 'block';
-        dropInput.value = '';
-        dropCoords = null;
-        dropCityName = '';
-        if (termsBanner) termsBanner.classList.add('hidden');
+        wrapper.classList.add('hidden'); dropContainer.style.display = 'block'; dropInput.value = ''; dropCoords = null; dropCityName = '';
+        pickupLabel.innerText = "From (Pickup City/Locality)";
       }
-
       updateDynamicVehicleFares(calculatedDistanceKm);
     }
 
-    function handlePackageChange() {
-      updateDynamicVehicleFares(calculatedDistanceKm);
-    }
+    function handlePackageChange() { updateDynamicVehicleFares(calculatedDistanceKm); }
 
     function selectVehicle(name, element) {
       selectedVehicle = name;
-      const res = calculateSegmentFare(name, calculatedDistanceKm || 56, selectedTripType);
-      baseFare = res.fare;
-      currentDisplayKm = res.displayKm;
-
-      document.querySelectorAll('.vehicle-card').forEach(card => {
-        card.classList.remove('border-2', 'border-blue-600', 'bg-blue-50/50');
-        card.classList.add('border', 'border-slate-200');
-      });
-      element.classList.remove('border', 'border-slate-200');
-      element.classList.add('border-2', 'border-blue-600', 'bg-blue-50/50');
-      const radio = element.querySelector('input[type="radio"]');
-      if (radio) radio.checked = true;
+      const res = calculateSegmentFare(name, calculatedDistanceKm || 0, selectedTripType);
+      baseFare = res.fare > 0 ? res.fare + driverAllowance : 0;
+      document.querySelectorAll('.vehicle-card').forEach(c => c.className = "flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card");
+      element.className = "flex items-center justify-between p-3 border-2 border-blue-600 bg-blue-50/50 rounded-xl cursor-pointer vehicle-card";
+      element.querySelector('input').checked = true;
     }
 
     function resetBookingForm() {
       if (confirm('Reset form?')) {
         document.getElementById('pickupLocation').value = '';
         document.getElementById('dropLocation').value = '';
-        document.getElementById('custLandmark').value = '';
-        document.getElementById('carrierRequiredCheck').checked = false;
-        isCarrierRequired = false;
-        document.getElementById('distanceBadgeBox').classList.add('hidden');
-        pickupCoords = null;
-        dropCoords = null;
-        pickupCityName = '';
-        dropCityName = '';
-        calculatedDistanceKm = 0;
-        initializeSchedulingRestrictions();
-        updateDynamicVehicleFares(56);
+        pickupCoords = null; dropCoords = null; calculatedDistanceKm = 0;
+        updateDynamicVehicleFares(0);
       }
     }
 
     function handleBooking() {
-      if (!currentUser) {
-        alert("🔒 Booking ke liye Customer Login anivarya hai! Kripya Google ya Email se Login karein.");
-        openModal('authModal');
-        return;
-      }
-
-      if (!validateScheduleTiming()) {
-        alert("⚠️ Invalid Pickup Time!\n\nKam se kam 1 ghante baad ka samay chunein.");
-        return;
-      }
+      if (!currentUser) { alert("🔒 Login anivarya hai!"); openModal('authModal'); return; }
+      if (!validateScheduleTiming()) return alert("⚠️ Kam se kam 1 ghanta aage ka samay chunein.");
 
       const from = document.getElementById('pickupLocation').value.trim();
       const to = document.getElementById('dropLocation').value.trim();
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
-      const landmark = document.getElementById('custLandmark').value.trim();
       const date = document.getElementById('pickupDate').value;
       const rawTime = document.getElementById('pickupTime').value;
-      const displayTime = formatDisplayTime(rawTime);
 
-      if (!from) {
-        alert('Kripya Pickup location select karein!');
-        return;
-      }
-      if (selectedTripType !== 'Local Rental' && !to) {
-        alert('Kripya Drop location select karein!');
-        return;
-      }
-      if (!name || phone.length < 10) {
-        alert('Valid passenger name aur 10-digit mobile number bharein!');
-        return;
-      }
-      if (baseFare <= 0) {
-        alert('Kripya valid source aur destination select karein taaki fare calculate ho sake.');
-        return;
+      if (!from || (selectedTripType !== 'Local Rental' && !to) || !name || phone.length < 10 || baseFare <= 0) {
+        return alert("Kripya sabhi mandatory fields thik se bharein aur valid fare select karein!");
       }
 
       const carrierFee = isCarrierRequired ? carrierChargeAmount : 0;
-      const total = baseFare + driverAllowance + carrierFee;
-      const pickupPay = Math.round(total * 0.45);
-      const dropPay = total - pickupPay;
-      const bookingId = 'MTZ-' + Math.floor(1000 + Math.random() * 9000);
-      const bookedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      const extraKmRate = (CAB_CONFIG[selectedVehicle] || CAB_CONFIG['Sedan']).extraKmRate;
-
+      const total = baseFare + carrierFee;
       const bookingPayload = {
-        userId: currentUser.uid,
-        userEmail: currentUser.email || '',
-        bookingId: bookingId,
-        from: from,
-        to: to,
-        estimatedDistanceKm: calculatedDistanceKm || 56,
-        includedKm: currentDisplayKm,
-        extraKmRate: extraKmRate,
-        date: date,
-        time: displayTime,
-        rawTime: rawTime,
-        vehicle: selectedVehicle,
-        type: selectedTripType,
-        name: name,
-        phone: phone,
-        landmark: landmark || 'Direct Pickup',
-        carrierRequired: isCarrierRequired,
-        carrierCharge: carrierFee,
-        baseFare: baseFare,
-        driverAllowance: driverAllowance,
-        total: total,
-        pickupPay: pickupPay,
-        dropPay: dropPay,
-        bookedDate: bookedDate,
-        status: 'Confirmation Pending',
-        reassignedNotice: false,
-        driverName: '',
-        driverPhone: '',
-        cabNumber: '',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        userId: currentUser.uid, bookingId: 'MTZ-' + Math.floor(1000 + Math.random() * 9000),
+        from, to, estimatedDistanceKm: calculatedDistanceKm || 56, includedKm: currentDisplayKm,
+        date, time: formatDisplayTime(rawTime), vehicle: selectedVehicle, type: selectedTripType,
+        name, phone, landmark: document.getElementById('custLandmark').value.trim() || 'Direct',
+        carrierRequired: isCarrierRequired, carrierCharge: carrierFee, baseFare: baseFare - driverAllowance,
+        driverAllowance: driverAllowance, total, pickupPay: Math.round(total * 0.45), dropPay: total - Math.round(total * 0.45),
+        bookedDate: new Date().toLocaleDateString(), status: 'Confirmation Pending',
+        driverName: '', driverPhone: '', cabNumber: '', createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      const btn = document.getElementById('bookSubmitBtn');
-      btn.innerText = 'Creating Booking...';
-      btn.disabled = true;
-
-      db.collection("bookings").add(bookingPayload)
-        .then((docRef) => {
-          btn.innerText = 'Confirm Booking';
-          btn.disabled = false;
-          currentDocId = docRef.id;
-          currentBookingData = bookingPayload;
-
-          displayReceiptView(bookingPayload, docRef.id);
-          listenToBooking(docRef.id);
-        })
-        .catch((error) => {
-          btn.innerText = 'Confirm Booking';
-          btn.disabled = false;
-          alert('Booking error: ' + error.message);
-        });
+      db.collection("bookings").add(bookingPayload).then((docRef) => {
+        currentDocId = docRef.id; currentBookingData = bookingPayload;
+        displayReceiptView(bookingPayload, docRef.id);
+        listenToBooking(docRef.id);
+      }).catch(err => alert("Error: " + err.message));
     }
 
     function viewBookingFromHistory(docId) {
       closeModal('historyModal');
       db.collection("bookings").doc(docId).get().then(doc => {
-        if (doc.exists) {
-          const data = doc.data();
-          currentDocId = docId;
-          currentBookingData = data;
-          displayReceiptView(data, docId);
-          listenToBooking(docId);
-        } else {
-          alert("Booking details not found!");
-        }
-      }).catch(err => alert("Error: " + err.message));
+        if (doc.exists) { currentDocId = docId; currentBookingData = doc.data(); displayReceiptView(doc.data(), docId); listenToBooking(docId); }
+      });
     }
 
     function displayReceiptView(data, docId) {
@@ -1266,21 +941,15 @@
       document.getElementById('receiptVehicle').innerText = data.vehicle;
       document.getElementById('receiptCustName').innerText = data.name;
       document.getElementById('receiptCustPhone').innerText = data.phone;
-      document.getElementById('receiptCustLandmark').innerText = data.landmark || 'Direct Pickup';
-      document.getElementById('receiptFareLabel').innerText = `Vehicle Fare (${data.includedKm})`;
-      document.getElementById('receiptBaseFare').innerText = '₹' + data.baseFare.toLocaleString('en-IN');
+      document.getElementById('receiptCustLandmark').innerText = data.landmark;
       document.getElementById('receiptTotalFare').innerText = '₹' + data.total.toLocaleString('en-IN');
       document.getElementById('receiptPickupAmount').innerText = '₹' + data.pickupPay.toLocaleString('en-IN');
       document.getElementById('receiptDropAmount').innerText = '₹' + data.dropPay.toLocaleString('en-IN');
 
       const carrierRow = document.getElementById('receiptCarrierRow');
       if (carrierRow) {
-        if (data.carrierRequired) {
-          carrierRow.classList.remove('hidden');
-          document.getElementById('receiptCarrierFee').innerText = `+₹${data.carrierCharge || 300}`;
-        } else {
-          carrierRow.classList.add('hidden');
-        }
+        if (data.carrierRequired) { carrierRow.classList.remove('hidden'); document.getElementById('receiptCarrierFee').innerText = `+₹${data.carrierCharge || 300}`; }
+        else { carrierRow.classList.add('hidden'); }
       }
 
       document.getElementById('bookingSection').classList.add('hidden');
@@ -1290,7 +959,6 @@
 
     function listenToBooking(docId) {
       if (unsubscribeBooking) unsubscribeBooking();
-
       unsubscribeBooking = db.collection("bookings").doc(docId).onSnapshot((doc) => {
         if (!doc.exists) return;
         const data = doc.data();
@@ -1304,30 +972,25 @@
 
         if (data.status === 'Confirmed') {
           if (headerBox) headerBox.className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
-          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Booking Confirmed';
-
+          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Partner Confirmed & Assigned';
           if (pendingState) pendingState.classList.add('hidden');
           if (confirmedState) confirmedState.classList.remove('hidden');
-          if (document.getElementById('assignedDriverName')) document.getElementById('assignedDriverName').innerText = data.driverName || 'Verified Partner';
-          if (document.getElementById('assignedCabNumber')) document.getElementById('assignedCabNumber').innerText = data.cabNumber || 'Assigned';
-
-          const phoneBox = document.getElementById('assignedDriverPhoneContainer');
-          if (phoneBox) {
-            if (data.driverPhone) {
-              phoneBox.innerHTML = `
-                <a href="tel:${data.driverPhone}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
-                  <i class="fa-solid fa-phone text-[10px]"></i> ${data.driverPhone} (Call Driver)
-                </a>`;
-            } else {
-              phoneBox.innerHTML = `<span class="text-slate-400 text-[11px]">Verified Partner</span>`;
-            }
+          document.getElementById('assignedDriverName').innerText = data.driverName || 'Verified Partner';
+          document.getElementById('assignedCabNumber').innerText = data.cabNumber || 'Assigned';
+          if (data.driverPhone) {
+            document.getElementById('assignedDriverPhoneContainer').innerHTML = `<a href="tel:${data.driverPhone}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200"><i class="fa-solid fa-phone text-[10px]"></i> ${data.driverPhone}</a>`;
           }
-        } else if (data.status === 'Confirmation Pending') {
-          if (headerBox) headerBox.className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
-          if (confirmedState) confirmedState.classList.add('hidden');
-          if (pendingState) pendingState.classList.remove('hidden');
-
-          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmation Pending';
+        } else if (data.status === 'Trip Started') {
+          if (headerBox) headerBox.className = 'bg-emerald-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
+          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> 🚗 Trip In Progress (Garage Out Done)';
+          if (pendingState) pendingState.classList.add('hidden');
+          if (confirmedState) confirmedState.classList.remove('hidden');
+          if (cancelBtn) cancelBtn.classList.add('hidden');
+        } else if (data.status === 'Trip Completed') {
+          if (headerBox) headerBox.className = 'bg-purple-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
+          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-white"></span> ✨ Trip Successfully Completed';
+          if (pendingState) pendingState.classList.add('hidden');
+          if (cancelBtn) cancelBtn.classList.add('hidden');
         } else if (data.status === 'Cancelled') {
           if (headerBox) headerBox.className = 'bg-slate-700 text-white rounded-2xl p-5 shadow-sm mb-4';
           if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled';
@@ -1340,48 +1003,29 @@
 
     function cancelCurrentBooking() {
       if (!currentDocId || !currentBookingData) return;
-      const totalFare = Number(currentBookingData.total) || 1500;
-      const calculatedPenalty = Math.max(300, Math.min(1000, Math.round(totalFare * 0.10)));
-
       if (confirm(`Cancellation policy anusaar cancel karein?`)) {
         db.collection("bookings").doc(currentDocId).update({
-          status: 'Cancelled',
-          cancelledBy: 'customer',
-          customerPenalty: calculatedPenalty,
+          status: 'Cancelled', cancelledBy: 'customer',
+          customerPenalty: Math.max(300, Math.min(1000, Math.round(Number(currentBookingData.total) * 0.10))),
           cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => alert('Booking cancelled successfully.'));
+        }).then(() => alert('Booking cancelled.'));
       }
     }
 
     function renderBookingHistory() {
       const container = document.getElementById('historyListContainer');
-      if (!currentUser) {
-        container.innerHTML = `<div class="text-center py-6"><p class="text-slate-600 font-bold mb-2">Login to view bookings</p><button onclick="openModal('authModal')" class="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold">Sign In</button></div>`;
-        return;
-      }
-
-      container.innerHTML = `<div class="text-center py-4 text-slate-400">Fetching bookings...</div>`;
-
+      if (!currentUser) { container.innerHTML = `<div class="text-center py-6"><button onclick="openModal('authModal')" class="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold">Sign In</button></div>`; return; }
       db.collection("bookings").orderBy("createdAt", "desc").limit(25).get().then((snapshot) => {
         const docs = snapshot.docs.filter(doc => doc.data().userId === currentUser.uid);
-
-        if (docs.length === 0) {
-          container.innerHTML = `<div class="text-center py-6 text-slate-400">Aapki koi booking nahi mili.</div>`;
-          return;
-        }
-
+        if (docs.length === 0) { container.innerHTML = `<div class="text-center py-6 text-slate-400">No bookings found.</div>`; return; }
         container.innerHTML = docs.map(doc => {
           const item = doc.data();
           return `
-            <div onclick="viewBookingFromHistory('${doc.id}')" class="bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-2xl p-3 text-xs space-y-1.5 cursor-pointer">
-              <div class="flex justify-between font-bold text-blue-700">
-                <span>${item.bookingId}</span>
-                <span>₹${item.total}</span>
-              </div>
+            <div onclick="viewBookingFromHistory('${doc.id}')" class="bg-slate-50 hover:bg-blue-50 border rounded-2xl p-3 text-xs space-y-1.5 cursor-pointer">
+              <div class="flex justify-between font-bold text-blue-700"><span>${item.bookingId}</span><span>₹${item.total}</span></div>
               <p class="text-slate-800">${item.from} ➔ ${item.to}</p>
               <p class="text-[10px] text-slate-400">${item.date} • ${item.status}</p>
-            </div>
-          `;
+            </div>`;
         }).join('');
       });
     }
@@ -1405,7 +1049,7 @@
       document.getElementById('drawerOverlay').addEventListener('click', () => toggleDrawer(false));
       document.getElementById('drawerProfileTrigger').addEventListener('click', () => openModal('authModal'));
       initializeSchedulingRestrictions();
-      updateDynamicVehicleFares(56);
+      updateDynamicVehicleFares(0);
     });
   </script>
 </body>
