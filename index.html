@@ -628,7 +628,7 @@
     let searchDebounceTimer = null;
     let adminFixedRoutes = {};
 
-    // REAL-TIME LISTENER FOR CSV UPLOADED FIXED ROUTES
+    // REAL-TIME LISTENER FOR CSV FIXED ROUTES
     db.collection("pricing_rules").doc("fixed_routes").onSnapshot((doc) => {
       if (doc.exists) {
         adminFixedRoutes = doc.data() || {};
