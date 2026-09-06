@@ -95,7 +95,7 @@
             <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
               <i class="fa-solid fa-file-csv text-emerald-600 text-base"></i> Segmented CSV Export Engine
             </h2>
-            <p class="text-xs text-slate-500">Trip category aur peak-hours ke hisab se separated CSV download karein</p>
+            <p class="text-xs text-slate-500">Trip category aur date ke hisab se separated CSV download karein</p>
           </div>
           
           <div class="flex items-center gap-2 text-xs">
@@ -114,7 +114,7 @@
               <option value="Round Trip">Round Trips Only</option>
               <option value="Airport Transfer - Pickup">Airport ➔ City Transfers</option>
               <option value="Airport Transfer - Drop">City ➔ Airport Transfers</option>
-              <option value="Local Rental">Local City Rentals (8h/80km)</option>
+              <option value="Local Rental">Local City Rentals</option>
             </select>
           </div>
 
@@ -167,8 +167,6 @@
           </button>
           <button onclick="downloadSpecificSegment('One Way')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200">One-Way CSV</button>
           <button onclick="downloadSpecificSegment('Round Trip')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200">Round-Trip CSV</button>
-          <button onclick="downloadSpecificSegment('Airport Transfer - Pickup')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200">Airport➔City CSV</button>
-          <button onclick="downloadSpecificSegment('Airport Transfer - Drop')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200">City➔Airport CSV</button>
           <button onclick="downloadSpecificSegment('Local Rental')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200">Local Rental CSV</button>
         </div>
       </div>
@@ -261,69 +259,54 @@
           </div>
         </div>
 
-        <!-- DYNAMIC FIXED ROUTE OVERRIDES -->
+        <!-- DYNAMIC PRICING & SEPARATE CSV UPLOADS -->
         <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100">
             <div>
               <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                <i class="fa-solid fa-route text-emerald-600"></i> Route Fixed Price Overrides
+                <i class="fa-solid fa-route text-emerald-600"></i> Route & Local Pricing CSV Upload
               </h3>
-              <p class="text-[10px] text-slate-500">Manual ya Bulk CSV upload se fixed pricing set karein</p>
+              <p class="text-[10px] text-slate-500">Outstation aur Local Rentals ke liye alag-alag CSV upload karein</p>
             </div>
             <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">Super Admin Only</span>
           </div>
 
+          <!-- 1. OUTSTATION CSV UPLOAD -->
           <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-2xl space-y-2 text-xs">
             <div class="flex justify-between items-center">
               <span class="font-bold text-emerald-900 flex items-center gap-1.5">
-                <i class="fa-solid fa-file-arrow-up text-emerald-600"></i> Bulk CSV Upload Routes
+                <i class="fa-solid fa-file-arrow-up text-emerald-600"></i> Outstation Routes CSV
               </span>
-              <button onclick="downloadSampleRoutesCsv()" class="text-[10px] bg-white border border-emerald-300 text-emerald-700 font-bold px-2 py-1 rounded-lg hover:bg-emerald-100 transition">
-                <i class="fa-solid fa-file-arrow-down"></i> Sample Template
+              <button onclick="downloadSampleOutstationCsv()" class="text-[10px] bg-white border border-emerald-300 text-emerald-700 font-bold px-2 py-1 rounded-lg hover:bg-emerald-100 transition">
+                <i class="fa-solid fa-file-arrow-down"></i> Outstation Sample
               </button>
             </div>
-            <p class="text-[10px] text-emerald-800">CSV me <code>fromCity, toCity, hatchback, sedan, muv, suv</code> columns hone chahiye.</p>
+            <p class="text-[10px] text-emerald-800">Format: <code>FARE ID, FARE NAME, CAB TYPE, SOURCE CITY, DESTINATION CITY, BASE FARE, INCLUDED KM, EXTRA KM CHARGE</code></p>
             <div class="flex items-center gap-2">
-              <input id="routesCsvFileInput" type="file" accept=".csv" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer" />
-              <button onclick="uploadFixedRoutesCsv()" id="uploadRoutesCsvBtn" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm">
-                Upload CSV
+              <input id="outstationCsvInput" type="file" accept=".csv" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-xl file:border-0 file:bg-emerald-600 file:text-white cursor-pointer" />
+              <button onclick="uploadOutstationCsv()" id="uploadOutstationBtn" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm">
+                Upload Outstation
               </button>
             </div>
           </div>
 
-          <div class="space-y-2.5 text-xs pt-1">
-            <p class="font-bold text-slate-700 text-[11px]">Ya Single Route Manually Add Karein:</p>
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block font-semibold text-slate-600 mb-1">From City</label>
-                <input id="fixedFromCity" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
-              </div>
-              <div>
-                <label class="block font-semibold text-slate-600 mb-1">To City</label>
-                <input id="fixedToCity" type="text" placeholder="e.g. Indore" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
-              </div>
+          <!-- 2. LOCAL RENTALS CSV UPLOAD -->
+          <div class="bg-blue-50/70 border border-blue-200 p-3 rounded-2xl space-y-2 text-xs">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-blue-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-file-arrow-up text-blue-600"></i> Local City Rentals CSV
+              </span>
+              <button onclick="downloadSampleLocalCsv()" class="text-[10px] bg-white border border-blue-300 text-blue-700 font-bold px-2 py-1 rounded-lg hover:bg-blue-100 transition">
+                <i class="fa-solid fa-file-arrow-down"></i> Local Sample
+              </button>
             </div>
-            <div class="grid grid-cols-4 gap-2">
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-600 mb-1">Hatchback</label>
-                <input id="fixedHatch" type="number" placeholder="₹1800" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-600 mb-1">Sedan</label>
-                <input id="fixedSedan" type="number" placeholder="₹2000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-600 mb-1">MUV</label>
-                <input id="fixedMuv" type="number" placeholder="₹2600" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-600 mb-1">SUV</label>
-                <input id="fixedSuv" type="number" placeholder="₹4000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
-              </div>
+            <p class="text-[10px] text-blue-800">Format: <code>FARE ID, FARE NAME, CAB TYPE, CITY, BASE FARE, INCLUDED KM, INCLUDED HOURS, EXTRA KM CHARGE, EXTRA HOURS CHARGE</code></p>
+            <div class="flex items-center gap-2">
+              <input id="localCsvInput" type="file" accept=".csv" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-xl file:border-0 file:bg-blue-600 file:text-white cursor-pointer" />
+              <button onclick="uploadLocalCsv()" id="uploadLocalBtn" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm">
+                Upload Local
+              </button>
             </div>
-            <button onclick="saveFixedPricingRoute()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
-              Save Single Route Rule
-            </button>
           </div>
         </div>
       </div>
@@ -1050,8 +1033,6 @@
 
       db.collection("broadcast_announcements").add({
         target: document.getElementById('broadcastTarget').value,
-        type: document.getElementById('broadcastType').value,
-        coupon: document.getElementById('broadcastCoupon').value.trim().toUpperCase(),
         title, message, isActive: true, createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => { alert("Published!"); loadActiveBroadcasts(); });
     }
@@ -1072,8 +1053,38 @@
       if (val === 'CUSTOM') row.classList.remove('hidden'); else row.classList.add('hidden');
     }
 
+    // WORKING CSV EXPORT ENGINE
     function downloadSpecificSegment(s) { document.getElementById('exportTripSegment').value = s; downloadSegmentedCsv(); }
-    function downloadSegmentedCsv() { alert("CSV Export Triggered!"); }
+    
+    function downloadSegmentedCsv() {
+      const segment = document.getElementById('exportTripSegment').value;
+      const statusFilter = document.getElementById('exportStatus').value;
+
+      let list = [...allMasterBookings];
+      if (segment !== "ALL") {
+        if (segment === "Airport Transfer") {
+          list = list.filter(b => b.type && b.type.includes("Airport Transfer"));
+        } else {
+          list = list.filter(b => b.type === segment);
+        }
+      }
+      if (statusFilter !== "ALL") list = list.filter(b => b.status === statusFilter);
+
+      if (list.length === 0) return alert("No bookings match the export filter.");
+
+      const headers = ["Booking ID", "Date", "Customer Name", "Phone", "From", "To", "Vehicle", "Trip Type", "Total Fare", "Status"];
+      const rows = list.map(b => [
+        `"${b.bookingId || ''}"`, `"${b.date || ''}"`, `"${(b.name || '').replace(/"/g, '""')}"`,
+        `"${b.phone || ''}"`, `"${(b.from || '').replace(/"/g, '""')}"`, `"${(b.to || '').replace(/"/g, '""')}"`,
+        `"${b.vehicle || ''}"`, `"${b.type || ''}"`, b.total || 0, `"${b.status || ''}"`
+      ].join(','));
+
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csvContent));
+      link.setAttribute("download", `MakeTripzy_Bookings_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
 
     function addStaffMember() {
       const email = document.getElementById('staffEmailInput').value.trim().toLowerCase();
@@ -1090,85 +1101,146 @@
       });
     }
 
-    // BULK CSV UPLOAD FOR FIXED ROUTES (UPDATED WITH YOUR MULTI-COLUMN FORMAT SUPPORT)
-    function downloadSampleRoutesCsv() {
+    // 1. OUTSTATION CSV SAMPLE & UPLOAD ENGINE
+    function downloadSampleOutstationCsv() {
       const sample = "FARE ID,FARE NAME,CAB TYPE,SOURCE CITY,DESTINATION CITY,BASE FARE,INCLUDED KM,EXTRA KM CHARGE\n0001,BHOPAL TO INDORE ONE WAY,HATCHBACK,BHOPAL,INDORE,1800,196,11\n0002,BHOPAL TO INDORE ONE WAY,SEDAN,BHOPAL,INDORE,2400,196,12\n0003,BHOPAL TO INDORE ONE WAY,SUV,BHOPAL,INDORE,4000,196,20";
       const link = document.createElement("a");
       link.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(sample));
-      link.setAttribute("download", "MakeTripzy_Fixed_Routes_Sample.csv");
+      link.setAttribute("download", "MakeTripzy_Outstation_Sample.csv");
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
-    function uploadFixedRoutesCsv() {
-      const file = document.getElementById('routesCsvFileInput').files[0];
-      if (!file) return alert("Kripya CSV file select karein!");
+    function uploadOutstationCsv() {
+      const file = document.getElementById('outstationCsvInput').files[0];
+      if (!file) return alert("Kripya Outstation CSV file select karein!");
 
       const reader = new FileReader();
-      const btn = document.getElementById('uploadRoutesCsvBtn');
+      const btn = document.getElementById('uploadOutstationBtn');
       btn.innerText = "Parsing...";
       btn.disabled = true;
 
       reader.onload = function(e) {
         const lines = e.target.result.split(/\r\n|\n/).filter(l => l.trim().length > 0);
         if (lines.length < 2) {
-          btn.innerText = "Upload CSV"; btn.disabled = false;
+          btn.innerText = "Upload Outstation"; btn.disabled = false;
           return alert("CSV file invalid hai!");
         }
 
-        // We map grouped routes: from-to -> { Hatchback: price, Sedan: price, ... }
         const routePackages = {};
         let count = 0;
 
         for (let i = 1; i < lines.length; i++) {
           const p = lines[i].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-          // Format expected: FARE ID, FARE NAME, CAB TYPE, SOURCE CITY, DESTINATION CITY, BASE FARE, INCLUDED KM, EXTRA KM CHARGE
           if (p.length >= 6) {
-            const cabType = p[2].toUpperCase(); // HATCHBACK, SEDAN, MUV, SUV
-            const from = p[3].toLowerCase();
-            const to = p[4].toLowerCase();
+            const cabType = (p[2] || '').toUpperCase();
+            const from = (p[3] || '').toLowerCase();
+            const to = (p[4] || '').toLowerCase();
             const baseFare = Number(p[5]);
 
-            if (from && to && cabType && !isNaN(baseFare)) {
+            if (from && to && cabType && !isNaN(baseFare) && baseFare > 0) {
               const routeKey = `${from}-${to}`;
-              if (!routePackages[routeKey]) {
-                routePackages[routeKey] = {};
-              }
-              // Normalize cab type key to standard casing
-              let normalizedCab = 'Sedan';
-              if (cabType.includes('HATCH')) normalizedCab = 'Hatchback';
-              else if (cabType.includes('SEDAN')) normalizedCab = 'Sedan';
-              else if (cabType.includes('MUV') || cabType.includes('ERTIGA')) normalizedCab = 'MUV';
-              else if (cabType.includes('SUV') || cabType.includes('INNOVA')) normalizedCab = 'SUV';
+              if (!routePackages[routeKey]) routePackages[routeKey] = {};
+              
+              let normCab = 'Sedan';
+              if (cabType.includes('HATCH')) normCab = 'Hatchback';
+              else if (cabType.includes('SEDAN')) normCab = 'Sedan';
+              else if (cabType.includes('MUV') || cabType.includes('ERTIGA')) normCab = 'MUV';
+              else if (cabType.includes('SUV') || cabType.includes('INNOVA')) normCab = 'SUV';
 
-              routePackages[routeKey][normalizedCab] = baseFare;
+              routePackages[routeKey][normCab] = baseFare;
               count++;
             }
           }
         }
 
         if (count === 0) {
-          btn.innerText = "Upload CSV"; btn.disabled = false;
-          return alert("CSV format read nahi ho paya. Sample template download karke check karein.");
+          btn.innerText = "Upload Outstation"; btn.disabled = false;
+          return alert("Outstation CSV format read nahi ho paya.");
         }
 
         db.collection("pricing_rules").doc("fixed_routes").set(routePackages, { merge: true }).then(() => {
-          btn.innerText = "Upload CSV"; btn.disabled = false;
-          document.getElementById('routesCsvFileInput').value = '';
-          alert(`🎉 Success! ${count} route package records uploaded successfully.`);
+          btn.innerText = "Upload Outstation"; btn.disabled = false;
+          document.getElementById('outstationCsvInput').value = '';
+          alert(`🎉 Success! ${count} outstation route records uploaded successfully.`);
         }).catch(err => {
-          btn.innerText = "Upload CSV"; btn.disabled = false;
-          alert("Save error: " + err.message);
+          btn.innerText = "Upload Outstation"; btn.disabled = false;
+          alert("Error: " + err.message);
         });
       };
       reader.readAsText(file);
     }
 
-    function saveFixedPricingRoute() {
-      const from = document.getElementById('fixedFromCity').value.trim().toLowerCase();
-      const to = document.getElementById('fixedToCity').value.trim().toLowerCase();
-      db.collection("pricing_rules").doc("fixed_routes").set({
-        [`${from}-${to}`]: { Hatchback: Number(document.getElementById('fixedHatch').value), Sedan: Number(document.getElementById('fixedSedan').value), MUV: Number(document.getElementById('fixedMuv').value), SUV: Number(document.getElementById('fixedSuv').value) }
-      }, { merge: true }).then(() => alert("Saved!"));
+    // 2. LOCAL RENTAL CSV SAMPLE & UPLOAD ENGINE
+    function downloadSampleLocalCsv() {
+      const sample = "FARE ID,FARE NAME,CAB TYPE,CITY,BASE FARE,INCLUDED KM,INCLUDED HOURS,EXTRA KM CHARGE,EXTRA HOURS CHARGE\n1001,BHOPAL LOCAL 4H/40KM,SEDAN,BHOPAL,1800,40,4,15,150\n1002,BHOPAL LOCAL 8H/80KM,SUV,BHOPAL,3500,80,8,20,250";
+      const link = document.createElement("a");
+      link.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(sample));
+      link.setAttribute("download", "MakeTripzy_LocalRental_Sample.csv");
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    function uploadLocalCsv() {
+      const file = document.getElementById('localCsvInput').files[0];
+      if (!file) return alert("Kripya Local Rental CSV file select karein!");
+
+      const reader = new FileReader();
+      const btn = document.getElementById('uploadLocalBtn');
+      btn.innerText = "Parsing...";
+      btn.disabled = true;
+
+      reader.onload = function(e) {
+        const lines = e.target.result.split(/\r\n|\n/).filter(l => l.trim().length > 0);
+        if (lines.length < 2) {
+          btn.innerText = "Upload Local"; btn.disabled = false;
+          return alert("CSV file invalid hai!");
+        }
+
+        const localPackages = {};
+        let count = 0;
+
+        for (let i = 1; i < lines.length; i++) {
+          const p = lines[i].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+          if (p.length >= 9) {
+            const cabType = (p[2] || '').toUpperCase();
+            const city = (p[3] || '').toLowerCase();
+            const baseFare = Number(p[4]);
+
+            if (city && cabType && !isNaN(baseFare) && baseFare > 0) {
+              if (!localPackages[city]) localPackages[city] = {};
+              
+              let normCab = 'Sedan';
+              if (cabType.includes('HATCH')) normCab = 'Hatchback';
+              else if (cabType.includes('SEDAN')) normCab = 'Sedan';
+              else if (cabType.includes('MUV') || cabType.includes('ERTIGA')) normCab = 'MUV';
+              else if (cabType.includes('SUV') || cabType.includes('INNOVA')) normCab = 'SUV';
+
+              localPackages[city][normCab] = {
+                baseFare: baseFare,
+                includedKm: p[5] || '40',
+                includedHours: p[6] || '4',
+                extraKm: p[7] || '15',
+                extraHr: p[8] || '150'
+              };
+              count++;
+            }
+          }
+        }
+
+        if (count === 0) {
+          btn.innerText = "Upload Local"; btn.disabled = false;
+          return alert("Local Rental CSV format read nahi ho paya.");
+        }
+
+        db.collection("pricing_rules").doc("local_rentals").set(localPackages, { merge: true }).then(() => {
+          btn.innerText = "Upload Local"; btn.disabled = false;
+          document.getElementById('localCsvInput').value = '';
+          alert(`🎉 Success! ${count} local rental records uploaded successfully.`);
+        }).catch(err => {
+          btn.innerText = "Upload Local"; btn.disabled = false;
+          alert("Error: " + err.message);
+        });
+      };
+      reader.readAsText(file);
     }
   </script>
 </body>
