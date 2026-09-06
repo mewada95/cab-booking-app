@@ -3,241 +3,319 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MakeTripzy - Central Admin Panel</title>
+  <title>MakeTripzy - Master Operations & Staff Console</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- Firebase Compat SDKs -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen">
 
-  <!-- ADMIN PASSCODE GATE -->
-  <div id="adminAuthScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4">
-      <div class="text-center space-y-1">
-        <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center mx-auto text-xl font-bold shadow-md">
-          <i class="fa-solid fa-lock"></i>
-        </div>
-        <h2 class="text-lg font-bold text-slate-900 pt-2">MakeTripzy Admin Control</h2>
-        <p class="text-xs text-slate-500">Enter master PIN to manage pricing and fleet</p>
-      </div>
-
-      <div class="space-y-3 pt-2">
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Master Security PIN</label>
-          <input id="adminPinInput" type="password" maxlength="6" placeholder="Enter 4 or 6-digit PIN" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-center tracking-widest text-lg font-bold focus:outline-none focus:border-blue-600" />
-        </div>
-        <p class="text-[11px] text-slate-400 text-center">Default PIN: <span class="font-mono font-bold text-blue-600">8889</span></p>
-        <button id="adminLoginBtn" onclick="handleAdminLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-md transition active:scale-95">
-          Access Admin Dashboard
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOP HEADER -->
-  <header class="bg-slate-900 text-white px-4 py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-md">
-    <div class="flex items-center gap-2.5">
-      <div class="bg-blue-600 text-white p-1.5 rounded-xl flex items-center justify-center font-bold">
-        <i class="fa-solid fa-gauge-high text-sm"></i>
+  <!-- TOP ADMIN BAR -->
+  <header class="bg-slate-900 text-white px-6 py-3.5 sticky top-0 z-40 flex items-center justify-between shadow-md">
+    <div class="flex items-center gap-3">
+      <div class="bg-blue-600 text-white p-2 rounded-xl flex items-center justify-center font-bold">
+        <i class="fa-solid fa-headset text-base"></i>
       </div>
       <div>
-        <h1 class="text-sm font-bold tracking-wide">MakeTripzy Admin</h1>
-        <p class="text-[10px] text-slate-400">Pricing Engine & Platform Command</p>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base font-bold tracking-tight">MakeTripzy Admin Control</h1>
+          <span id="roleBadge" class="text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider bg-slate-800 text-slate-400">Authenticating...</span>
+        </div>
+        <p class="text-[11px] text-slate-400">Master Operations, Dispatch & Financial Audits</p>
       </div>
     </div>
-    <div class="flex items-center gap-2">
-      <a href="index.html" target="_blank" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
-        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Customer App
-      </a>
-      <button onclick="adminLogout()" class="text-xs bg-slate-800 hover:bg-rose-600/20 text-rose-400 p-2 rounded-lg border border-slate-700 transition" title="Logout">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+    
+    <div class="flex items-center gap-3">
+      <span id="adminUserEmail" class="text-xs text-slate-300 hidden md:inline"></span>
+      <button onclick="handleAdminLogout()" class="text-xs bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/40 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
       </button>
     </div>
   </header>
 
-  <!-- NAVIGATION TABS -->
-  <div class="bg-white border-b border-slate-200 sticky top-[57px] z-20 shadow-sm">
-    <div class="max-w-4xl mx-auto flex text-xs font-bold text-center">
-      <button onclick="switchAdminTab('pricing')" id="tabPricingBtn" class="flex-1 py-3 text-blue-600 border-b-2 border-blue-600 flex items-center justify-center gap-1.5">
-        <i class="fa-solid fa-tags"></i> Route Pricing & CSV
-      </button>
-      <button onclick="switchAdminTab('rides')" id="tabRidesBtn" class="flex-1 py-3 text-slate-500 border-b-2 border-transparent flex items-center justify-center gap-1.5">
-        <i class="fa-solid fa-car"></i> Live Rides & Dispatch
-      </button>
-      <button onclick="switchAdminTab('finance')" id="tabFinanceBtn" class="flex-1 py-3 text-slate-500 border-b-2 border-transparent flex items-center justify-center gap-1.5">
-        <i class="fa-solid fa-chart-line"></i> Revenue & Penalties
-      </button>
-    </div>
-  </div>
-
   <!-- MAIN CONTAINER -->
-  <main class="max-w-4xl mx-auto p-4 pb-24 space-y-5">
+  <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
 
     <!-- KPI STATS STRIP -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-[10px] uppercase font-bold text-slate-400">Total Rides Booked</p>
-        <p id="kpiTotalRides" class="text-xl font-black text-slate-900 mt-0.5">0</p>
-        <span class="text-[10px] text-blue-600 font-semibold">Real-time Sync</span>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-[10px] uppercase font-bold text-slate-400">Total Bookings</p>
+        <p id="kpiTotalBookings" class="text-2xl font-black text-slate-900 mt-1">0</p>
+        <span class="text-[10px] text-blue-600 font-semibold">Lifetime volume</span>
       </div>
-      <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-[10px] uppercase font-bold text-slate-400">15% MakeTripzy Fee</p>
-        <p id="kpiTotalCommission" class="text-xl font-black text-emerald-600 mt-0.5">₹0</p>
-        <span class="text-[10px] text-emerald-600 font-semibold">Platform Earnings</span>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-[10px] uppercase font-bold text-slate-400">Confirmation Pending</p>
+        <p id="kpiPending" class="text-2xl font-black text-amber-500 mt-1">0</p>
+        <span class="text-[10px] text-amber-600 font-semibold">Open in pool</span>
       </div>
-      <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-[10px] uppercase font-bold text-slate-400">Vendor Net Payout</p>
-        <p id="kpiTotalVendorPayout" class="text-xl font-black text-slate-800 mt-0.5">₹0</p>
-        <span class="text-[10px] text-slate-500 font-semibold">Net Payouts</span>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-[10px] uppercase font-bold text-slate-400">Active / Confirmed</p>
+        <p id="kpiConfirmed" class="text-2xl font-black text-emerald-600 mt-1">0</p>
+        <span class="text-[10px] text-emerald-600 font-semibold">Fleet locked</span>
       </div>
-      <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-[10px] uppercase font-bold text-slate-400">Cancellation Fees</p>
-        <p id="kpiTotalPenalties" class="text-xl font-black text-rose-600 mt-0.5">₹0</p>
-        <span class="text-[10px] text-rose-600 font-semibold">Total Recoveries</span>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-[10px] uppercase font-bold text-slate-400">Gross Business</p>
+        <p id="kpiGrossVolume" class="text-2xl font-black text-slate-900 mt-1">₹0</p>
+        <span class="text-[10px] text-slate-500 font-semibold">Customer GMV</span>
+      </div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm col-span-2 md:col-span-1">
+        <p class="text-[10px] uppercase font-bold text-slate-400">Platform Cut (15%)</p>
+        <p id="kpiPlatformCut" class="text-2xl font-black text-indigo-600 mt-1">₹0</p>
+        <span class="text-[10px] text-indigo-600 font-semibold">Net margin</span>
       </div>
     </div>
 
-    <!-- TAB 1: PRICING ENGINE & CSV IMPORT -->
-    <div id="viewPricing" class="space-y-4">
+    <!-- MODULAR CSV EXPORT & FILTER HUB -->
+    <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div>
+          <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-file-csv text-emerald-600 text-base"></i> Segmented CSV Export Engine
+          </h2>
+          <p class="text-xs text-slate-500">Trip category aur peak-hours ke hisab se separated CSV download karein</p>
+        </div>
+        
+        <div class="flex items-center gap-2 text-xs">
+          <span class="text-slate-400 text-[11px] font-medium">Auto-Peak Detection:</span>
+          <span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-lg font-bold text-[10px]">Morning: 07:00-11:00 AM</span>
+          <span class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-lg font-bold text-[10px]">Evening: 05:00-09:00 PM</span>
+        </div>
+      </div>
 
-      <!-- ADD / UPDATE SINGLE ROUTE FORM -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-          <div>
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-              <i class="fa-solid fa-plus text-blue-600"></i> Set Fixed Route Rate Package
-            </h3>
-            <p class="text-[11px] text-slate-400">Customer app par standard KM engine bypass hokar direct yahi package show hoga.</p>
-          </div>
-          <span class="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md">Live Push</span>
+      <!-- Filter Controls Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Trip Segment</label>
+          <select id="exportTripSegment" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
+            <option value="ALL">All Segments (Master Report)</option>
+            <option value="One Way">One Way Trips Only</option>
+            <option value="Round Trip">Round Trips Only</option>
+            <option value="Airport Transfer - Pickup">Airport ➔ City Transfers</option>
+            <option value="Airport Transfer - Drop">City ➔ Airport Transfers</option>
+            <option value="Local Rental">Local City Rentals (8h/80km)</option>
+          </select>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">From City</label>
-            <input id="routeFromCity" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-semibold" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">To City</label>
-            <input id="routeToCity" type="text" placeholder="e.g. Indore" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-semibold" />
-          </div>
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Date Range</label>
+          <select id="exportDateRange" onchange="toggleCustomDateInputs(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
+            <option value="ALL">Lifetime (All Dates)</option>
+            <option value="TODAY">Today Only</option>
+            <option value="LAST_7_DAYS">Last 7 Days</option>
+            <option value="THIS_MONTH">This Month</option>
+            <option value="CUSTOM">Custom Date Range</option>
+          </select>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Hatchback (₹)</label>
-            <input id="rateHatch" type="number" placeholder="2499" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-mono font-bold" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Sedan (₹)</label>
-            <input id="rateSedan" type="number" placeholder="2799" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-mono font-bold" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Ertiga / MUV (₹)</label>
-            <input id="rateMuv" type="number" placeholder="3899" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-mono font-bold" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Crysta / SUV (₹)</label>
-            <input id="rateSuv" type="number" placeholder="5499" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-600 font-mono font-bold" />
-          </div>
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Peak Time Window</label>
+          <select id="exportPeakWindow" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
+            <option value="ALL">All Times (Regular & Peak)</option>
+            <option value="PEAK_ONLY">Peak Hours Only (07-11 AM & 05-09 PM)</option>
+            <option value="NON_PEAK">Off-Peak Hours Only</option>
+          </select>
         </div>
 
-        <button onclick="saveSingleRoutePrice()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition">
-          <i class="fa-solid fa-cloud-arrow-up"></i> Save & Live Sync Route
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Booking Status</label>
+          <select id="exportStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
+            <option value="ALL">All Statuses</option>
+            <option value="Confirmation Pending">Pending Pool</option>
+            <option value="Confirmed">Confirmed / Active</option>
+            <option value="Trip Completed">Completed Trips</option>
+            <option value="Cancelled">Cancelled Only</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Custom Date Row (Hidden by default) -->
+      <div id="customDateRow" class="hidden grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">From Date</label>
+          <input id="customStartDate" type="date" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs" />
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">To Date</label>
+          <input id="customEndDate" type="date" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs" />
+        </div>
+      </div>
+
+      <!-- CSV ACTION BUTTONS STRIP -->
+      <div class="flex flex-wrap gap-2 pt-2">
+        <button onclick="downloadSegmentedCsv()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition active:scale-95">
+          <i class="fa-solid fa-download"></i> Download Filtered CSV
+        </button>
+
+        <button onclick="downloadSpecificSegment('One Way')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200 flex items-center gap-1">
+          One-Way CSV
+        </button>
+        <button onclick="downloadSpecificSegment('Round Trip')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200 flex items-center gap-1">
+          Round-Trip CSV
+        </button>
+        <button onclick="downloadSpecificSegment('Airport Transfer - Pickup')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200 flex items-center gap-1">
+          Airport➔City CSV
+        </button>
+        <button onclick="downloadSpecificSegment('Airport Transfer - Drop')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200 flex items-center gap-1">
+          City➔Airport CSV
+        </button>
+        <button onclick="downloadSpecificSegment('Local Rental')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200 flex items-center gap-1">
+          Local Rental CSV
         </button>
       </div>
+    </div>
 
-      <!-- BULK CSV IMPORT / EXPORT -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-        <div class="flex justify-between items-center">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-            <i class="fa-solid fa-file-excel text-emerald-600"></i> Bulk Update Routes via CSV / Excel
-          </h3>
-          <button onclick="downloadSampleCsv()" class="text-[11px] text-blue-600 hover:text-blue-700 font-semibold underline flex items-center gap-1">
-            <i class="fa-solid fa-download"></i> Sample CSV
-          </button>
+    <!-- DISPATCH & RECENT BOOKINGS LIVE TABLE -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-2">
+        <div>
+          <h3 class="text-sm font-bold text-slate-800">Live Fleet Dispatch Console</h3>
+          <p class="text-[11px] text-slate-500">Real-time sync of all customer rides, driver assignments and settlements</p>
         </div>
-        <p class="text-[11px] text-slate-500">Excel me banayi CSV file upload karke saikdo routes ke rates ek baar me update karein.</p>
-        
-        <div class="flex flex-col sm:flex-row gap-2 pt-1">
-          <input type="file" id="csvFileInput" accept=".csv" class="flex-1 text-xs file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-slate-200 rounded-xl p-1 bg-slate-50" />
-          <button onclick="uploadCsvPricing()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm">
-            <i class="fa-solid fa-upload"></i> Import & Override
+        <div class="flex items-center gap-2">
+          <input id="tableSearchInput" oninput="filterTableLocally(this.value)" type="text" placeholder="Search booking, phone, city..." class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500 font-medium" />
+          <button onclick="fetchLiveBookings()" class="text-blue-600 hover:text-blue-700 p-2 text-xs font-bold">
+            <i class="fa-solid fa-rotate-right"></i>
           </button>
         </div>
       </div>
 
-      <!-- ACTIVE FIXED ROUTES LIST -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-        <div class="flex justify-between items-center">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-            <i class="fa-solid fa-list-check text-blue-600"></i> Active Override Packages
-          </h3>
-          <span id="activeRoutesCount" class="text-[11px] bg-slate-100 font-bold px-2 py-0.5 rounded-md text-slate-600">0 Routes</span>
-        </div>
-
-        <div id="activeRoutesContainer" class="space-y-2 max-h-80 overflow-y-auto text-xs">
-          <div class="text-center py-6 text-slate-400">Loading active routes...</div>
-        </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-50 text-slate-400 font-bold border-b border-slate-200 text-[10px] uppercase tracking-wider">
+              <th class="p-3.5">ID / Date</th>
+              <th class="p-3.5">Customer</th>
+              <th class="p-3.5">Route & Segment</th>
+              <th class="p-3.5">Distance & Fuel</th>
+              <th class="p-3.5">Fare & Split</th>
+              <th class="p-3.5">Driver & Cab</th>
+              <th class="p-3.5">Status</th>
+              <th class="p-3.5 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsTableBody" class="divide-y divide-slate-100 font-medium">
+            <tr>
+              <td colspan="8" class="text-center py-10 text-slate-400">
+                <i class="fa-solid fa-spinner fa-spin text-xl mb-2 text-blue-500"></i>
+                <p>Loading central dispatch table...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- TAB 2: LIVE RIDES MONITOR -->
-    <div id="viewRides" class="hidden space-y-3">
-      <div class="flex justify-between items-center">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Central Ride Dispatch Log</h3>
-        <select id="rideFilterStatus" onchange="filterRideList()" class="text-xs bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold focus:outline-none">
-          <option value="ALL">All Statuses</option>
-          <option value="Confirmation Pending">Pending Partner</option>
-          <option value="Confirmed">Confirmed / Assigned</option>
-          <option value="Trip Started">On-Going Trip</option>
-          <option value="Trip Completed">Completed</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
-      </div>
+    <!-- SUPER ADMIN ONLY: STAFF MANAGEMENT & PRICING RULES -->
+    <div id="superAdminSettingsSection" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- STAFF OPERATOR MANAGEMENT -->
+      <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+          <div>
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-user-gear text-blue-600"></i> Staff Admin Management
+            </h3>
+            <p class="text-[10px] text-slate-500">Add dispatchers and operational operators</p>
+          </div>
+          <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">Super Admin Only</span>
+        </div>
 
-      <div id="adminRidesContainer" class="space-y-3">
-        <div class="text-center py-12 text-slate-400 text-xs">
-          <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-slate-300"></i>
-          <p>Loading bookings from Firestore...</p>
+        <div class="space-y-2.5 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Staff Google Email Address</label>
+            <input id="staffEmailInput" type="email" placeholder="staff@gmail.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Assign Operational Role</label>
+            <select id="staffRoleSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+              <option value="staff">Staff Admin (Dispatch & View-Only Reports)</option>
+              <option value="superadmin">Super Admin (Full Financial & Pricing Control)</option>
+            </select>
+          </div>
+          <button onclick="addStaffMember()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
+            Grant Role Access
+          </button>
+        </div>
+
+        <div class="pt-2">
+          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Active Authorized Staff</p>
+          <div id="staffListContainer" class="space-y-1.5 text-xs max-h-40 overflow-y-auto"></div>
         </div>
       </div>
-    </div>
 
-    <!-- TAB 3: FINANCIAL AUDIT -->
-    <div id="viewFinance" class="hidden space-y-4">
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800">Platform Financial Audit (15% Net Cut)</h3>
-        <p class="text-xs text-slate-500 leading-relaxed">
-          Har booking par 15% platform commission cut rehta hai. Fuel allowance (20%) pickup par milti hai aur 80% vendor settlement drop par hoti hai.
-        </p>
+      <!-- DYNAMIC FIXED ROUTE OVERRIDES -->
+      <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+          <div>
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-route text-emerald-600"></i> Route Fixed Price Overrides
+            </h3>
+            <p class="text-[10px] text-slate-500">Specific corridors ke liye manual fixed packages</p>
+          </div>
+          <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">Super Admin Only</span>
+        </div>
 
-        <div class="border-t border-slate-100 pt-3 space-y-2 text-xs">
-          <div class="flex justify-between py-1 border-b border-slate-50">
-            <span class="text-slate-600">Total Gross GMV (Customer Fare):</span>
-            <span id="finGrossGmv" class="font-bold text-slate-900">₹0</span>
+        <div class="space-y-2.5 text-xs">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">From City</label>
+              <input id="fixedFromCity" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">To City</label>
+              <input id="fixedToCity" type="text" placeholder="e.g. Indore" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
+            </div>
           </div>
-          <div class="flex justify-between py-1 border-b border-slate-50">
-            <span class="text-emerald-700 font-semibold">Platform Fee Collected (15%):</span>
-            <span id="finPlatformCommission" class="font-bold text-emerald-700">₹0</span>
+          <div class="grid grid-cols-4 gap-2">
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-600 mb-1">Hatchback</label>
+              <input id="fixedHatch" type="number" placeholder="₹1800" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-600 mb-1">Sedan</label>
+              <input id="fixedSedan" type="number" placeholder="₹2000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-600 mb-1">MUV</label>
+              <input id="fixedMuv" type="number" placeholder="₹2600" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-600 mb-1">SUV</label>
+              <input id="fixedSuv" type="number" placeholder="₹4000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
+            </div>
           </div>
-          <div class="flex justify-between py-1 border-b border-slate-50">
-            <span class="text-slate-600">Total Vendor Net Payable:</span>
-            <span id="finVendorPayable" class="font-bold text-slate-900">₹0</span>
-          </div>
-          <div class="flex justify-between py-1 border-b border-slate-50">
-            <span class="text-rose-600 font-semibold">Total Cancellation Penalty Recoveries:</span>
-            <span id="finTotalPenalties" class="font-bold text-rose-600">₹0</span>
-          </div>
+          <button onclick="saveFixedPricingRoute()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
+            Save Route Package Rule
+          </button>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- JAVASCRIPT & DATABASE CONTROLLER -->
+  <!-- AUTH / 1-CLICK GOOGLE LOGIN OVERLAY -->
+  <div id="adminAuthModal" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 text-center">
+      <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 shadow-md">
+        <i class="fa-solid fa-user-shield"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-900">MakeTripzy Admin Portal</h3>
+      <p class="text-xs text-slate-500">Super Admin & Authorized Staff Only</p>
+
+      <div class="pt-2">
+        <button onclick="loginAdminWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-3 px-4 rounded-xl border border-slate-300 flex items-center justify-center gap-2 shadow-sm transition active:scale-95 text-xs">
+          <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          Continue with Google
+        </button>
+      </div>
+      <p class="text-[10px] text-slate-400">Apne authorized Google email account se login karein.</p>
+    </div>
+  </div>
+
+  <!-- SCRIPT CONTROLLER -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
@@ -253,313 +331,451 @@
       firebase.initializeApp(firebaseConfig);
     }
     const db = firebase.firestore();
+    const auth = firebase.auth();
 
-    const MASTER_ADMIN_PIN = "8889";
-    let allBookingsCache = [];
-    let currentFixedRoutesCache = {};
+    let currentAdminUser = null;
+    let currentUserRole = null; // 'superadmin' | 'staff'
+    let allMasterBookings = [];
 
-    function checkAdminAuth() {
-      const isAuth = localStorage.getItem("maketripzy_admin_auth");
-      const authScreen = document.getElementById("adminAuthScreen");
-      if (isAuth === "true") {
-        if (authScreen) {
-          authScreen.classList.add("hidden");
-          authScreen.style.display = "none";
-        }
-        initDashboard();
+    // HARDCODED SUPER ADMIN EMAILS
+    const HARDCODED_SUPER_ADMINS = [
+      "mewadajay95@gmail.com",
+      "admin@maketripzy.com"
+    ];
+
+    function toggleCustomDateInputs(val) {
+      const row = document.getElementById('customDateRow');
+      if (val === 'CUSTOM') {
+        row.classList.remove('hidden');
+        row.classList.add('grid');
       } else {
-        if (authScreen) {
-          authScreen.classList.remove("hidden");
-          authScreen.style.display = "flex";
-        }
+        row.classList.add('hidden');
+        row.classList.remove('grid');
       }
     }
 
-    function handleAdminLogin() {
-      const input = document.getElementById("adminPinInput");
-      const pin = input ? input.value.trim() : "";
-      
-      if (pin === MASTER_ADMIN_PIN) {
-        localStorage.setItem("maketripzy_admin_auth", "true");
-        const authScreen = document.getElementById("adminAuthScreen");
-        if (authScreen) {
-          authScreen.classList.add("hidden");
-          authScreen.style.display = "none";
-        }
-        initDashboard();
-      } else {
-        alert("Invalid PIN! Correct Master PIN is 8889");
-      }
-    }
+    // 1-CLICK GOOGLE SIGN-IN FOR ADMIN / STAFF
+    function loginAdminWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
 
-    function adminLogout() {
-      if (confirm("Kya aap Admin panel se logout karna chahte hain?")) {
-        localStorage.removeItem("maketripzy_admin_auth");
-        location.reload();
-      }
-    }
-
-    function switchAdminTab(tab) {
-      const vPricing = document.getElementById('viewPricing');
-      const vRides = document.getElementById('viewRides');
-      const vFinance = document.getElementById('viewFinance');
-
-      if (vPricing) vPricing.classList.add('hidden');
-      if (vRides) vRides.classList.add('hidden');
-      if (vFinance) vFinance.classList.add('hidden');
-
-      document.getElementById('tabPricingBtn').className = "flex-1 py-3 text-slate-500 border-b-2 border-transparent flex items-center justify-center gap-1.5";
-      document.getElementById('tabRidesBtn').className = "flex-1 py-3 text-slate-500 border-b-2 border-transparent flex items-center justify-center gap-1.5";
-      document.getElementById('tabFinanceBtn').className = "flex-1 py-3 text-slate-500 border-b-2 border-transparent flex items-center justify-center gap-1.5";
-
-      if (tab === 'pricing') {
-        if (vPricing) vPricing.classList.remove('hidden');
-        document.getElementById('tabPricingBtn').className = "flex-1 py-3 text-blue-600 border-b-2 border-blue-600 flex items-center justify-center gap-1.5";
-      } else if (tab === 'rides') {
-        if (vRides) vRides.classList.remove('hidden');
-        document.getElementById('tabRidesBtn').className = "flex-1 py-3 text-blue-600 border-b-2 border-blue-600 flex items-center justify-center gap-1.5";
-      } else {
-        if (vFinance) vFinance.classList.remove('hidden');
-        document.getElementById('tabFinanceBtn').className = "flex-1 py-3 text-blue-600 border-b-2 border-blue-600 flex items-center justify-center gap-1.5";
-      }
-    }
-
-    function initDashboard() {
-      listenToPricingRules();
-      listenToAllBookings();
-    }
-
-    function listenToPricingRules() {
-      db.collection("pricing_rules").doc("fixed_routes").onSnapshot((doc) => {
-        currentFixedRoutesCache = doc.exists ? (doc.data() || {}) : {};
-        renderActiveRoutes(currentFixedRoutesCache);
-      }, (err) => {
-        console.error("Pricing rules fetch error:", err);
-      });
-    }
-
-    function renderActiveRoutes(routes) {
-      const container = document.getElementById("activeRoutesContainer");
-      const countBadge = document.getElementById("activeRoutesCount");
-      if (!container || !countBadge) return;
-
-      const keys = Object.keys(routes);
-      countBadge.innerText = `${keys.length} Routes Active`;
-
-      if (keys.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-6 text-slate-400">
-            Koi fixed override package set nahi hai. Saare routes dynamic KM engine se chal rahe hain.
-          </div>`;
-        return;
-      }
-
-      container.innerHTML = keys.map(key => {
-        const item = routes[key];
-        const parts = key.split('-');
-        const from = parts[0] || '';
-        const to = parts[1] || '';
-
-        return `
-          <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl flex justify-between items-center">
-            <div>
-              <p class="font-bold text-slate-900 capitalize text-sm">${from} ➔ ${to}</p>
-              <div class="flex flex-wrap gap-2 text-[11px] text-slate-500 mt-1">
-                <span>Hatch: <b>₹${item.Hatchback || 0}</b></span>
-                <span>•</span>
-                <span>Sedan: <b>₹${item.Sedan || 0}</b></span>
-                <span>•</span>
-                <span>MUV: <b>₹${item.MUV || 0}</b></span>
-                <span>•</span>
-                <span>SUV: <b>₹${item.SUV || 0}</b></span>
-              </div>
-            </div>
-            <button onclick="deleteRoutePackage('${key}')" class="text-rose-500 hover:text-rose-700 p-2 rounded-lg hover:bg-rose-50 transition" title="Delete Override">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function saveSingleRoutePrice() {
-      const from = document.getElementById("routeFromCity").value.trim().toLowerCase();
-      const to = document.getElementById("routeToCity").value.trim().toLowerCase();
-      const hatch = Number(document.getElementById("rateHatch").value);
-      const sedan = Number(document.getElementById("rateSedan").value);
-      const muv = Number(document.getElementById("rateMuv").value);
-      const suv = Number(document.getElementById("rateSuv").value);
-
-      if (!from || !to || !hatch || !sedan || !muv || !suv) {
-        alert("Fill all cities and rate fields!");
-        return;
-      }
-
-      const payload = {
-        [`${from}-${to}`]: { Hatchback: hatch, Sedan: sedan, MUV: muv, SUV: suv }
-      };
-
-      db.collection("pricing_rules").doc("fixed_routes").set(payload, { merge: true })
-        .then(() => {
-          alert(`Route package (${from} ➔ ${to}) live update ho gaya!`);
-          document.getElementById("routeFromCity").value = '';
-          document.getElementById("routeToCity").value = '';
-          document.getElementById("rateHatch").value = '';
-          document.getElementById("rateSedan").value = '';
-          document.getElementById("rateMuv").value = '';
-          document.getElementById("rateSuv").value = '';
-        })
-        .catch(err => alert("Error: " + err.message));
-    }
-
-    function deleteRoutePackage(key) {
-      if (confirm(`Delete override for ${key}?`)) {
-        db.collection("pricing_rules").doc("fixed_routes").update({
-          [key]: firebase.firestore.FieldValue.delete()
+      auth.signInWithPopup(provider)
+        .catch(err => {
+          if (err.code === 'auth/popup-blocked') {
+            auth.signInWithRedirect(provider);
+          } else {
+            alert("Login Error: " + err.message);
+          }
         });
-      }
     }
 
-    function uploadCsvPricing() {
-      const file = document.getElementById("csvFileInput").files[0];
-      if (!file) return alert("Select a .csv file!");
+    // AUTH & ROLE VERIFICATION ENGINE
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const userEmail = user.email.toLowerCase();
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const lines = e.target.result.split('\n');
-        const batchPayload = {};
-        let validRows = 0;
-
-        for (let i = 1; i < lines.length; i++) {
-          const row = lines[i].split(',').map(s => s.trim());
-          if (row.length >= 6 && row[0] && row[1]) {
-            batchPayload[`${row[0].toLowerCase()}-${row[1].toLowerCase()}`] = {
-              Hatchback: Number(row[2]) || 0,
-              Sedan: Number(row[3]) || 0,
-              MUV: Number(row[4]) || 0,
-              SUV: Number(row[5]) || 0
-            };
-            validRows++;
+        // 1. Check Super Admin hardcoded list
+        let role = null;
+        if (HARDCODED_SUPER_ADMINS.includes(userEmail)) {
+          role = "superadmin";
+        } else {
+          // 2. Check Staff in Firestore collection
+          try {
+            const roleDoc = await db.collection("staff_roles").doc(userEmail).get();
+            if (roleDoc.exists && roleDoc.data().role) {
+              role = roleDoc.data().role;
+            }
+          } catch (e) {
+            console.warn("Role fetch fallback:", e);
           }
         }
 
-        if (validRows === 0) return alert("CSV invalid!");
-        db.collection("pricing_rules").doc("fixed_routes").set(batchPayload, { merge: true })
-          .then(() => alert(`${validRows} routes successfully updated!`));
-      };
-      reader.readAsText(file);
+        // 3. Unauthorized access check
+        if (!role) {
+          alert(`⛔ Unauthorized Access!\n\nEmail ${user.email} MakeTripzy Admin ya Staff ke roop me registered nahi hai.`);
+          auth.signOut();
+          return;
+        }
+
+        currentAdminUser = user;
+        currentUserRole = role;
+        document.getElementById('adminUserEmail').innerText = user.email;
+
+        const roleBadge = document.getElementById('roleBadge');
+        const superSection = document.getElementById('superAdminSettingsSection');
+
+        if (role === "superadmin") {
+          roleBadge.innerText = "SUPER ADMIN";
+          roleBadge.className = "text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/40";
+          if (superSection) superSection.classList.remove('hidden');
+          loadStaffList();
+        } else {
+          roleBadge.innerText = "STAFF ADMIN (OPERATOR)";
+          roleBadge.className = "text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/40";
+          if (superSection) superSection.classList.add('hidden');
+        }
+
+        document.getElementById('adminAuthModal').classList.add('hidden');
+        fetchLiveBookings();
+      } else {
+        currentAdminUser = null;
+        currentUserRole = null;
+        document.getElementById('adminAuthModal').classList.remove('hidden');
+      }
+    });
+
+    function handleAdminLogout() {
+      auth.signOut().then(() => location.reload());
     }
 
-    function downloadSampleCsv() {
-      const csv = "From,To,Hatchback,Sedan,MUV,SUV\nbhopal,indore,2499,2799,3899,5499\nindore,ujjain,1199,1399,1999,2899";
-      const link = document.createElement("a");
-      link.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
-      link.download = "maketripzy_sample_routes.csv";
-      link.click();
-    }
+    // STAFF MANAGEMENT (SUPER ADMIN ONLY)
+    function addStaffMember() {
+      if (currentUserRole !== "superadmin") return alert("Access denied!");
+      const email = document.getElementById('staffEmailInput').value.trim().toLowerCase();
+      const role = document.getElementById('staffRoleSelect').value;
 
-    function listenToAllBookings() {
-      db.collection("bookings").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
-        allBookingsCache = [];
-        let totalGmv = 0, totalCommission = 0, totalPenalties = 0;
+      if (!email || !email.includes('@')) return alert("Valid Google email daalein!");
 
-        snapshot.forEach(doc => {
-          const data = { docId: doc.id, ...doc.data() };
-          allBookingsCache.push(data);
-          const fare = Number(data.grandTotalBill || data.total) || 0;
-          if (data.status !== 'Cancelled') {
-            totalGmv += fare;
-            totalCommission += Math.round(fare * 0.15);
-          }
-          if (data.customerPenalty) totalPenalties += Number(data.customerPenalty);
-          if (data.lastVendorPenalty) totalPenalties += Number(data.lastVendorPenalty);
-        });
-
-        document.getElementById("kpiTotalRides").innerText = allBookingsCache.length;
-        document.getElementById("kpiTotalCommission").innerText = `₹${totalCommission.toLocaleString('en-IN')}`;
-        document.getElementById("kpiTotalVendorPayout").innerText = `₹${(totalGmv - totalCommission).toLocaleString('en-IN')}`;
-        document.getElementById("kpiTotalPenalties").innerText = `₹${totalPenalties.toLocaleString('en-IN')}`;
-
-        document.getElementById("finGrossGmv").innerText = `₹${totalGmv.toLocaleString('en-IN')}`;
-        document.getElementById("finPlatformCommission").innerText = `₹${totalCommission.toLocaleString('en-IN')}`;
-        document.getElementById("finVendorPayable").innerText = `₹${(totalGmv - totalCommission).toLocaleString('en-IN')}`;
-        document.getElementById("finTotalPenalties").innerText = `₹${totalPenalties.toLocaleString('en-IN')}`;
-
-        renderAdminRides(allBookingsCache);
+      db.collection("staff_roles").doc(email).set({
+        email: email,
+        role: role,
+        addedBy: currentAdminUser.email,
+        assignedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert(`Role '${role}' assigned to ${email}`);
+        document.getElementById('staffEmailInput').value = '';
+        loadStaffList();
       });
     }
 
-    function renderAdminRides(rides) {
-      const container = document.getElementById("adminRidesContainer");
-      if (!container) return;
-      if (rides.length === 0) {
-        container.innerHTML = `<div class="text-center py-8 text-slate-400">No bookings found.</div>`;
-        return;
-      }
+    function loadStaffList() {
+      db.collection("staff_roles").onSnapshot((snap) => {
+        const container = document.getElementById('staffListContainer');
+        if (!container) return;
+        if (snap.empty) {
+          container.innerHTML = `<p class="text-slate-400">No additional staff added.</p>`;
+          return;
+        }
 
-      container.innerHTML = rides.map(b => {
-        const fare = Number(b.grandTotalBill || b.total) || 0;
-        const comm = Math.round(fare * 0.15);
-        const net = fare - comm;
-        return `
-          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-xs space-y-2.5">
-            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-              <span class="font-bold font-mono text-blue-700">${b.bookingId || b.docId.substring(0,8)}</span>
-              <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] bg-blue-50 text-blue-800">${b.status}</span>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
+        container.innerHTML = snap.docs.map(doc => {
+          const s = doc.data();
+          return `
+            <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-200">
               <div>
-                <p class="font-bold text-slate-800">${b.name} (${b.phone})</p>
-                <p class="text-slate-500 mt-0.5">${b.from} ➔ ${b.to}</p>
+                <p class="font-bold text-slate-800">${s.email}</p>
+                <span class="text-[9px] uppercase font-bold text-slate-400">${s.role}</span>
               </div>
-              <div class="text-right">
-                <p class="text-slate-700 font-semibold">${b.driverName || 'Unassigned'}</p>
-                <p class="font-mono text-slate-500">${b.cabNumber || '-'}</p>
+              <button onclick="removeStaffMember('${s.email}')" class="text-rose-600 hover:text-rose-700 text-xs p-1">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          `;
+        }).join('');
+      });
+    }
+
+    function removeStaffMember(email) {
+      if (confirm(`Remove staff access for ${email}?`)) {
+        db.collection("staff_roles").doc(email).delete();
+      }
+    }
+
+    // FETCH LIVE BOOKINGS
+    function fetchLiveBookings() {
+      db.collection("bookings").orderBy("createdAt", "desc").onSnapshot((snap) => {
+        allMasterBookings = [];
+        let pending = 0, confirmed = 0, gross = 0;
+
+        snap.forEach(doc => {
+          const item = { docId: doc.id, ...doc.data() };
+          allMasterBookings.push(item);
+
+          if (item.status === "Confirmation Pending") pending++;
+          if (item.status === "Confirmed" || item.status === "Trip Started" || item.status === "Trip Completed") confirmed++;
+          if (item.status !== "Cancelled") {
+            gross += (Number(item.total) || 0);
+          }
+        });
+
+        document.getElementById('kpiTotalBookings').innerText = allMasterBookings.length;
+        document.getElementById('kpiPending').innerText = pending;
+        document.getElementById('kpiConfirmed').innerText = confirmed;
+        document.getElementById('kpiGrossVolume').innerText = `₹${gross.toLocaleString('en-IN')}`;
+        document.getElementById('kpiPlatformCut').innerText = `₹${Math.round(gross * 0.15).toLocaleString('en-IN')}`;
+
+        renderTable(allMasterBookings);
+      }, (err) => console.error("Dispatch load error:", err));
+    }
+
+    function renderTable(list) {
+      const tbody = document.getElementById('bookingsTableBody');
+      if (!tbody) return;
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">No bookings matched this view.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(b => {
+        const isConfirmed = b.status === "Confirmed";
+        const isPending = b.status === "Confirmation Pending";
+        const isCompleted = b.status === "Trip Completed";
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="p-3.5">
+              <span class="font-bold font-mono text-blue-700">${b.bookingId || 'MTZ'}</span>
+              <p class="text-[10px] text-slate-400 mt-0.5">${b.date || ''} (${b.time || ''})</p>
+            </td>
+            <td class="p-3.5">
+              <p class="font-bold text-slate-800">${b.name || '-'}</p>
+              <a href="tel:${b.phone}" class="text-[11px] text-blue-600 hover:underline">${b.phone || '-'}</a>
+            </td>
+            <td class="p-3.5">
+              <p class="font-semibold text-slate-800 text-xs">${b.from} ➔ ${b.to}</p>
+              <div class="flex items-center gap-1.5 mt-0.5 text-[10px]">
+                <span class="bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-bold">${b.type || 'One Way'}</span>
+                <span class="text-slate-500">${b.vehicle || ''}</span>
               </div>
-            </div>
-            <div class="bg-slate-50 p-2 rounded-xl flex justify-between items-center text-[11px]">
-              <span>Customer: <b>₹${fare}</b></span>
-              <span class="text-emerald-700 font-semibold">15%: <b>₹${comm}</b></span>
-              <span>Payout: <b>₹${net}</b></span>
-              <button onclick="adminDeleteBooking('${b.docId}')" class="text-rose-500 p-1"><i class="fa-solid fa-trash"></i></button>
-            </div>
-          </div>
+            </td>
+            <td class="p-3.5">
+              <p class="font-bold text-slate-700">Inc: ${b.includedKm || b.estimatedDistanceKm || 56} KM</p>
+              <p class="text-[10px] text-slate-400">Extra: ₹${b.extraKmRate || 12}/KM</p>
+            </td>
+            <td class="p-3.5">
+              <span class="font-bold text-slate-900">₹${b.total || 0}</span>
+              <div class="text-[10px] text-slate-500 mt-0.5">
+                <span>Pick(45%): ₹${b.pickupPay || Math.round(b.total * 0.45)}</span>
+              </div>
+            </td>
+            <td class="p-3.5">
+              ${b.driverName ? `
+                <p class="font-bold text-emerald-800">${b.driverName}</p>
+                <p class="text-[10px] font-mono text-slate-600">${b.cabNumber || ''}</p>
+              ` : `
+                <span class="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded font-bold">Unassigned</span>
+              `}
+            </td>
+            <td class="p-3.5">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                isCompleted ? 'bg-purple-100 text-purple-800' :
+                isConfirmed ? 'bg-emerald-100 text-emerald-800' :
+                isPending ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
+              }">
+                ${b.status}
+              </span>
+            </td>
+            <td class="p-3.5 text-right space-x-1">
+              ${currentUserRole === 'superadmin' ? `
+                <button onclick="adminDeleteBooking('${b.docId}')" title="Delete Booking" class="text-slate-400 hover:text-rose-600 p-1">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              ` : ''}
+              <button onclick="inspectBookingDetails('${b.docId}')" title="Inspect Full Object" class="text-slate-400 hover:text-blue-600 p-1">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </td>
+          </tr>
         `;
       }).join('');
     }
 
-    function filterRideList() {
-      const filter = document.getElementById("rideFilterStatus").value;
-      renderAdminRides(filter === "ALL" ? allBookingsCache : allBookingsCache.filter(r => r.status === filter));
+    function filterTableLocally(keyword) {
+      const q = keyword.toLowerCase().trim();
+      if (!q) {
+        renderTable(allMasterBookings);
+        return;
+      }
+      const filtered = allMasterBookings.filter(b => {
+        return (b.bookingId && b.bookingId.toLowerCase().includes(q)) ||
+               (b.name && b.name.toLowerCase().includes(q)) ||
+               (b.phone && b.phone.includes(q)) ||
+               (b.from && b.from.toLowerCase().includes(q)) ||
+               (b.to && b.to.toLowerCase().includes(q));
+      });
+      renderTable(filtered);
     }
 
     function adminDeleteBooking(docId) {
-      if (confirm("Delete this booking record?")) {
+      if (confirm("Super Admin Warning: Kya aap sach me is booking record ko permanently delete karna chahte hain?")) {
         db.collection("bookings").doc(docId).delete();
       }
     }
 
-    // DIRECT EVENT LISTENERS FOR RELIABLE CLICK/TOUCH ON MOBILE
-    window.addEventListener("load", () => {
-      const btn = document.getElementById("adminLoginBtn");
-      const pinField = document.getElementById("adminPinInput");
+    function inspectBookingDetails(docId) {
+      const b = allMasterBookings.find(x => x.docId === docId);
+      if (b) {
+        alert(`Booking Details:\n\nID: ${b.bookingId}\nPassenger: ${b.name} (${b.phone})\nRoute: ${b.from} ➔ ${b.to}\nFare: ₹${b.total}\nIncluded KM: ${b.includedKm || b.estimatedDistanceKm || 56} KM\nCarrier: ${b.carrierRequired ? 'Yes (+₹300)' : 'No'}\nDriver: ${b.driverName || 'None'}`);
+      }
+    }
 
-      if (btn) {
-        btn.addEventListener("click", executeLogin);
-        btn.addEventListener("touchend", (e) => {
-          e.preventDefault();
-          executeLogin();
-        });
+    // PEAK TIME WINDOW DETECTION (07:00-11:00 AM & 05:00-09:00 PM)
+    function isPeakTimeWindow(timeStr, rawTime) {
+      let h = -1;
+      if (rawTime && rawTime.includes(':')) {
+        h = parseInt(rawTime.split(':')[0], 10);
+      } else if (timeStr && timeStr.includes(':')) {
+        const parts = timeStr.split(':');
+        h = parseInt(parts[0], 10);
+        if (timeStr.toUpperCase().includes('PM') && h < 12) h += 12;
+        if (timeStr.toUpperCase().includes('AM') && h === 12) h = 0;
+      }
+      if (h === -1) return false;
+      return (h >= 7 && h <= 11) || (h >= 17 && h <= 21);
+    }
+
+    function downloadSpecificSegment(segmentName) {
+      document.getElementById('exportTripSegment').value = segmentName;
+      downloadSegmentedCsv();
+    }
+
+    function downloadSegmentedCsv() {
+      const segment = document.getElementById('exportTripSegment').value;
+      const dateRange = document.getElementById('exportDateRange').value;
+      const peakWindow = document.getElementById('exportPeakWindow').value;
+      const statusFilter = document.getElementById('exportStatus').value;
+
+      let list = [...allMasterBookings];
+
+      if (segment !== "ALL") {
+        if (segment === "Airport Transfer - Pickup") {
+          list = list.filter(b => b.type === "Airport Transfer" && (b.from.toLowerCase().includes("airport") || b.to.toLowerCase().includes("city")));
+        } else if (segment === "Airport Transfer - Drop") {
+          list = list.filter(b => b.type === "Airport Transfer" && (b.to.toLowerCase().includes("airport")));
+        } else {
+          list = list.filter(b => b.type === segment);
+        }
       }
 
-      if (pinField) {
-        pinField.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") executeLogin();
-        });
+      if (statusFilter !== "ALL") {
+        list = list.filter(b => b.status === statusFilter);
       }
 
-      checkAdminAuth();
-    });
+      if (peakWindow === "PEAK_ONLY") {
+        list = list.filter(b => isPeakTimeWindow(b.time, b.rawTime));
+      } else if (peakWindow === "NON_PEAK") {
+        list = list.filter(b => !isPeakTimeWindow(b.time, b.rawTime));
+      }
+
+      const now = new Date();
+      if (dateRange === "TODAY") {
+        const todayStr = now.toISOString().split('T')[0];
+        list = list.filter(b => b.date === todayStr);
+      } else if (dateRange === "LAST_7_DAYS") {
+        const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+        list = list.filter(b => new Date(b.date) >= sevenDaysAgo);
+      } else if (dateRange === "CUSTOM") {
+        const s = document.getElementById('customStartDate').value;
+        const e = document.getElementById('customEndDate').value;
+        if (s) list = list.filter(b => b.date >= s);
+        if (e) list = list.filter(b => b.date <= e);
+      }
+
+      if (list.length === 0) {
+        alert("Selected filters ke hisaab se koi booking record nahi mila.");
+        return;
+      }
+
+      const headers = [
+        "Booking ID",
+        "Booked Date",
+        "Pickup Date",
+        "Pickup Time",
+        "Peak Window",
+        "Trip Category",
+        "Customer Name",
+        "Customer Phone",
+        "From Location",
+        "To Location",
+        "Included KM",
+        "Vehicle Type",
+        "Carrier Required",
+        "Total Fare (INR)",
+        "Pickup Advance (45%)",
+        "Drop Balance (55%)",
+        "MakeTripzy Commission (15%)",
+        "Vendor Payout (85%)",
+        "Status",
+        "Assigned Driver",
+        "Driver Phone",
+        "Cab Number"
+      ];
+
+      const rows = list.map(b => {
+        const isPeak = isPeakTimeWindow(b.time, b.rawTime) ? "YES (PEAK)" : "NO (REGULAR)";
+        const total = Number(b.total) || 0;
+        const comm = Math.round(total * 0.15);
+        const vendorPay = total - comm;
+        const pickup45 = b.pickupPay || Math.round(total * 0.45);
+        const drop55 = b.dropPay || (total - pickup45);
+
+        return [
+          `"${b.bookingId || ''}"`,
+          `"${b.bookedDate || ''}"`,
+          `"${b.date || ''}"`,
+          `"${b.time || ''}"`,
+          `"${isPeak}"`,
+          `"${b.type || 'One Way'}"`,
+          `"${(b.name || '').replace(/"/g, '""')}"`,
+          `"${b.phone || ''}"`,
+          `"${(b.from || '').replace(/"/g, '""')}"`,
+          `"${(b.to || '').replace(/"/g, '""')}"`,
+          `"${b.includedKm || b.estimatedDistanceKm || 56}"`,
+          `"${b.vehicle || ''}"`,
+          `"${b.carrierRequired ? 'YES' : 'NO'}"`,
+          total,
+          pickup45,
+          drop55,
+          comm,
+          vendorPay,
+          `"${b.status || ''}"`,
+          `"${(b.driverName || '').replace(/"/g, '""')}"`,
+          `"${b.driverPhone || ''}"`,
+          `"${b.cabNumber || ''}"`
+        ].join(',');
+      });
+
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      
+      const fileName = `MakeTripzy_${segment.replace(/\s+/g, '_')}_${dateRange}_${new Date().toISOString().slice(0,10)}.csv`;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // FIXED PRICING OVERRIDE (SUPER ADMIN ONLY)
+    function saveFixedPricingRoute() {
+      if (currentUserRole !== "superadmin") return alert("Super Admin access required!");
+
+      const from = document.getElementById('fixedFromCity').value.trim().toLowerCase();
+      const to = document.getElementById('fixedToCity').value.trim().toLowerCase();
+      const h = Number(document.getElementById('fixedHatch').value);
+      const s = Number(document.getElementById('fixedSedan').value);
+      const m = Number(document.getElementById('fixedMuv').value);
+      const suv = Number(document.getElementById('fixedSuv').value);
+
+      if (!from || !to || !h || !s || !m || !suv) {
+        return alert("Dono cities aur sabhi 4 categories ke package rate bharein!");
+      }
+
+      const key = `${from}-${to}`;
+      db.collection("pricing_rules").doc("fixed_routes").set({
+        [key]: {
+          Hatchback: h,
+          Sedan: s,
+          MUV: m,
+          SUV: suv
+        }
+      }, { merge: true }).then(() => {
+        alert(`Fixed Package for ${from.toUpperCase()} ➔ ${to.toUpperCase()} saved successfully!`);
+        document.getElementById('fixedFromCity').value = '';
+        document.getElementById('fixedToCity').value = '';
+      });
+    }
   </script>
 </body>
 </html>
