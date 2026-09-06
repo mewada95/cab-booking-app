@@ -132,7 +132,7 @@
         </div>
       </div>
 
-      <!-- Custom Date Row (Hidden by default) -->
+      <!-- Custom Date Row -->
       <div id="customDateRow" class="hidden grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
         <div>
           <label class="block font-semibold text-slate-600 mb-1">From Date</label>
@@ -227,7 +227,7 @@
         <div class="space-y-2.5 text-xs">
           <div>
             <label class="block font-semibold text-slate-600 mb-1">Staff Google Email Address</label>
-            <input id="staffEmailInput" type="email" placeholder="staff@gmail.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
+            <input id="staffEmailInput" type="email" placeholder="operator@gmail.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
           </div>
           <div>
             <label class="block font-semibold text-slate-600 mb-1">Assign Operational Role</label>
@@ -337,10 +337,15 @@
     let currentUserRole = null; // 'superadmin' | 'staff'
     let allMasterBookings = [];
 
-    // HARDCODED SUPER ADMIN EMAILS
+    // HARDCODED SUPER ADMINS (FULL FINANCIAL & PRICING ACCESS)
     const HARDCODED_SUPER_ADMINS = [
-      "mewadajay95@gmail.com",
-      "admin@maketripzy.com"
+      "admin@maketripzy.com",
+      "mewada1995@gmail.com"
+    ];
+
+    // HARDCODED STAFF ADMINS (DISPATCH & CSV EXPORT ONLY)
+    const HARDCODED_STAFF_ADMINS = [
+      "mewada95@gmail.com"
     ];
 
     function toggleCustomDateInputs(val) {
@@ -354,7 +359,7 @@
       }
     }
 
-    // 1-CLICK GOOGLE SIGN-IN FOR ADMIN / STAFF
+    // 1-CLICK GOOGLE SIGN-IN
     function loginAdminWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
@@ -372,14 +377,19 @@
     // AUTH & ROLE VERIFICATION ENGINE
     auth.onAuthStateChanged(async (user) => {
       if (user) {
-        const userEmail = user.email.toLowerCase();
+        const userEmail = (user.email || '').toLowerCase();
+        let role = null;
 
         // 1. Check Super Admin hardcoded list
-        let role = null;
         if (HARDCODED_SUPER_ADMINS.includes(userEmail)) {
           role = "superadmin";
-        } else {
-          // 2. Check Staff in Firestore collection
+        } 
+        // 2. Check Staff Admin hardcoded list
+        else if (HARDCODED_STAFF_ADMINS.includes(userEmail)) {
+          role = "staff";
+        } 
+        // 3. Check Dynamic Staff in Firestore collection
+        else {
           try {
             const roleDoc = await db.collection("staff_roles").doc(userEmail).get();
             if (roleDoc.exists && roleDoc.data().role) {
@@ -390,7 +400,7 @@
           }
         }
 
-        // 3. Unauthorized access check
+        // 4. Unauthorized access check
         if (!role) {
           alert(`⛔ Unauthorized Access!\n\nEmail ${user.email} MakeTripzy Admin ya Staff ke roop me registered nahi hai.`);
           auth.signOut();
@@ -452,25 +462,49 @@
       db.collection("staff_roles").onSnapshot((snap) => {
         const container = document.getElementById('staffListContainer');
         if (!container) return;
-        if (snap.empty) {
-          container.innerHTML = `<p class="text-slate-400">No additional staff added.</p>`;
-          return;
+
+        let staffHtml = `
+          <div class="flex justify-between items-center bg-purple-50 p-2 rounded-xl border border-purple-200">
+            <div>
+              <p class="font-bold text-slate-800">admin@maketripzy.com</p>
+              <span class="text-[9px] uppercase font-bold text-purple-700">SUPER ADMIN (ROOT)</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-semibold">Protected</span>
+          </div>
+          <div class="flex justify-between items-center bg-purple-50 p-2 rounded-xl border border-purple-200">
+            <div>
+              <p class="font-bold text-slate-800">mewada1995@gmail.com</p>
+              <span class="text-[9px] uppercase font-bold text-purple-700">SUPER ADMIN (ROOT)</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-semibold">Protected</span>
+          </div>
+          <div class="flex justify-between items-center bg-blue-50 p-2 rounded-xl border border-blue-200">
+            <div>
+              <p class="font-bold text-slate-800">mewada95@gmail.com</p>
+              <span class="text-[9px] uppercase font-bold text-blue-700">STAFF ADMIN (DISPATCHER)</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-semibold">Static Role</span>
+          </div>
+        `;
+
+        if (!snap.empty) {
+          staffHtml += snap.docs.map(doc => {
+            const s = doc.data();
+            return `
+              <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-200">
+                <div>
+                  <p class="font-bold text-slate-800">${s.email}</p>
+                  <span class="text-[9px] uppercase font-bold text-slate-400">${s.role}</span>
+                </div>
+                <button onclick="removeStaffMember('${s.email}')" class="text-rose-600 hover:text-rose-700 text-xs p-1">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            `;
+          }).join('');
         }
 
-        container.innerHTML = snap.docs.map(doc => {
-          const s = doc.data();
-          return `
-            <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-200">
-              <div>
-                <p class="font-bold text-slate-800">${s.email}</p>
-                <span class="text-[9px] uppercase font-bold text-slate-400">${s.role}</span>
-              </div>
-              <button onclick="removeStaffMember('${s.email}')" class="text-rose-600 hover:text-rose-700 text-xs p-1">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-            </div>
-          `;
-        }).join('');
+        container.innerHTML = staffHtml;
       });
     }
 
@@ -609,7 +643,7 @@
       }
     }
 
-    // PEAK TIME WINDOW DETECTION (07:00-11:00 AM & 05:00-09:00 PM)
+    // PEAK TIME DETECTION HELPER (07:00-11:00 AM & 05:00-09:00 PM)
     function isPeakTimeWindow(timeStr, rawTime) {
       let h = -1;
       if (rawTime && rawTime.includes(':')) {
