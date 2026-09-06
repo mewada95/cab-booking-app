@@ -28,7 +28,7 @@
         <p class="text-[11px] text-slate-400">Bookings, KYC Audits, Fleet & Broadcast Engine</p>
       </div>
     </div>
-    
+   
     <div class="flex items-center gap-3">
       <span id="adminUserEmail" class="text-xs text-slate-300 hidden md:inline"></span>
       <button onclick="handleAdminLogout()" class="text-xs bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/40 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5">
@@ -87,7 +87,7 @@
 
     <!-- VIEW 1: BOOKINGS & DISPATCH HUB -->
     <div id="viewBookings" class="space-y-6">
-      
+     
       <!-- MODULAR CSV EXPORT & FILTER HUB -->
       <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100">
@@ -97,7 +97,7 @@
             </h2>
             <p class="text-xs text-slate-500">Trip category aur peak-hours ke hisab se separated CSV download karein</p>
           </div>
-          
+         
           <div class="flex items-center gap-2 text-xs">
             <span class="text-slate-400 text-[11px] font-medium">Auto-Peak Detection:</span>
             <span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-lg font-bold text-[10px]">Morning: 07:00-11:00 AM</span>
@@ -216,7 +216,7 @@
 
       <!-- SUPER ADMIN CONFIG: STAFF & PRICING -->
       <div id="superAdminSettingsSection" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
-        
+       
         <!-- STAFF OPERATOR MANAGEMENT -->
         <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100">
@@ -367,7 +367,7 @@
       </div>
     </div>
 
-    <!-- VIEW 4: BROADCAST OFFERS & ANNOUNCEMENTS ENGINE -->
+    <!-- VIEW 4: BROADCAST & OFFERS -->
     <div id="viewBroadcast" class="hidden space-y-6">
       <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
         <div class="flex justify-between items-center pb-3 border-b border-slate-100">
@@ -402,18 +402,18 @@
 
           <div>
             <label class="block font-semibold text-slate-600 mb-1">Promo Coupon Code (Optional)</label>
-            <input id="broadcastCoupon" type="text" placeholder="e.g. DIWALI100, RIDE50" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs uppercase font-mono font-bold" />
+            <input id="broadcastCoupon" type="text" placeholder="e.g. DIWALI100" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs uppercase font-mono font-bold" />
           </div>
         </div>
 
         <div class="space-y-3 text-xs">
           <div>
             <label class="block font-semibold text-slate-600 mb-1">Broadcast Title *</label>
-            <input id="broadcastTitle" type="text" placeholder="e.g. Flat ₹100 Discount on Indore-Bhopal Route!" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold" />
+            <input id="broadcastTitle" type="text" placeholder="e.g. Flat ₹100 Discount on Indore Route!" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold" />
           </div>
           <div>
             <label class="block font-semibold text-slate-600 mb-1">Detailed Message / Description *</label>
-            <textarea id="broadcastMessage" rows="2" placeholder="Announcement ya offer terms yahan type karein..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs"></textarea>
+            <textarea id="broadcastMessage" rows="2" placeholder="Announcement details..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs"></textarea>
           </div>
           <button onclick="publishBroadcastAnnouncement()" id="publishBroadcastBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-sm flex items-center gap-1.5 transition">
             <i class="fa-solid fa-paper-plane"></i> Publish Live Announcement
@@ -421,7 +421,6 @@
         </div>
       </div>
 
-      <!-- RECENT ACTIVE BROADCASTS LIST -->
       <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-3">
         <div class="flex justify-between items-center pb-2 border-b border-slate-100">
           <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Active Published Announcements</h4>
@@ -552,7 +551,6 @@
       <div class="space-y-2">
         <label class="block font-semibold text-slate-700">Custom Penalty Amount (₹)</label>
         <input id="cancelPenaltyInput" type="number" value="300" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold" />
-        <p class="text-[10px] text-slate-400">Standard penalty 10% (Min ₹300, Max ₹1,000) hoti hai.</p>
       </div>
 
       <div class="grid grid-cols-2 gap-2 pt-2">
@@ -566,7 +564,7 @@
     </div>
   </div>
 
-  <!-- MODAL: VENDOR SUSPENSION & BLOCK CONTROLLER -->
+  <!-- MODAL: VENDOR BLOCK -->
   <div id="vendorBlockModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4 text-xs">
       <div class="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -581,29 +579,29 @@
       <input type="hidden" id="blockModalVendorUid" />
       <div>
         <p class="font-bold text-slate-800 mb-1" id="blockModalVendorName">Vendor Name</p>
-        <p class="text-slate-500">Block hone par is partner ka Available Leads pool freeze ho jayega aur wo koi ride accept nahi kar sakega.</p>
+        <p class="text-slate-500">Block hone par is partner ka Available Leads pool freeze ho jayega.</p>
       </div>
 
       <div>
         <label class="block font-semibold text-slate-700 mb-1">Reason for Suspension *</label>
-        <textarea id="blockReasonInput" rows="2.5" placeholder="e.g. Repeated duty drop, fake KYC, rash driving complaint..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-rose-500"></textarea>
+        <textarea id="blockReasonInput" rows="2.5" placeholder="Reason..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-rose-500"></textarea>
       </div>
 
       <div class="pt-1">
-        <button onclick="confirmBlockVendor(true)" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm">
+        <button onclick="confirmBlockVendor()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm">
           Confirm & Block Partner Immediately
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: PARTNER KYC AUDIT & APPROVAL -->
+  <!-- MODAL: PARTNER KYC AUDIT -->
   <div id="partnerDetailsModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4 text-xs max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-slate-100 pb-2">
         <div>
           <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-            <i class="fa-solid fa-shield-halved text-blue-600"></i> Partner KYC Audit & Approvals
+            <i class="fa-solid fa-shield-halved text-blue-600"></i> Partner KYC Audit
           </h3>
           <p class="text-[10px] text-slate-500" id="kycModalVendorUid">Vendor UID: -</p>
         </div>
@@ -1035,7 +1033,7 @@
         if (snap.empty) { container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">No active cabs.</div>`; return; }
         const unique = []; const seen = new Set();
         snap.forEach(d => { const b = d.data(); if (b.cabNumber && !seen.has(b.cabNumber)) { seen.add(b.cabNumber); unique.push(b); } });
-        
+       
         container.innerHTML = unique.map(f => `
           <div class="bg-slate-50 border rounded-2xl p-4 space-y-1">
             <p class="font-mono font-bold text-slate-900">${f.cabNumber}</p>
@@ -1140,4 +1138,4 @@
     }
   </script>
 </body>
-</html>
+</html> 
