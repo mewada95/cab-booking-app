@@ -80,7 +80,7 @@
               <label class="block text-xs font-medium text-slate-600 mb-1">From (Pickup City/Locality)</label>
               <div class="relative flex items-center">
                 <i class="fa-solid fa-location-dot absolute left-3 text-slate-400 text-sm"></i>
-                <input id="pickupLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'pickup')" placeholder="e.g. Bhopal, Jaipur, Ahmedabad" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
+                <input id="pickupLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'pickup')" placeholder="e.g. Indore, Bhopal, Jaipur" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
               </div>
               <div id="pickupSuggestions" class="hidden absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-2xl mt-1 z-50 max-h-52 overflow-y-auto text-xs"></div>
             </div>
@@ -89,7 +89,7 @@
               <label class="block text-xs font-medium text-slate-600 mb-1">To (Drop City/Destination)</label>
               <div class="relative flex items-center">
                 <i class="fa-solid fa-location-crosshairs absolute left-3 text-amber-500 text-sm"></i>
-                <input id="dropLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'drop')" placeholder="e.g. Indore, Delhi, Udaipur" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
+                <input id="dropLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'drop')" placeholder="e.g. Ujjain, Dewas, Delhi" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
               </div>
               <div id="dropSuggestions" class="hidden absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-2xl mt-1 z-50 max-h-52 overflow-y-auto text-xs"></div>
             </div>
@@ -98,27 +98,21 @@
               <i class="fa-solid fa-route text-blue-600 mr-1"></i> <span id="distanceBadgeText">Calculating route...</span>
             </div>
 
-            <!-- BACK DATE AND EXPIRED TIME PREVENTION -->
+            <!-- DATE & NATIVE TIME PICKER -->
             <div class="grid grid-cols-2 gap-3 pt-1">
               <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1">Pickup Date</label>
-                <input id="pickupDate" type="date" onchange="validateScheduleTiming()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-blue-500 text-slate-600" />
+                <input id="pickupDate" type="date" onchange="validateScheduleTiming()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-blue-500 text-slate-600 font-medium" />
               </div>
               <div>
-                <label class="block text-xs font-medium text-slate-600 mb-1">Pickup Time</label>
-                <select id="pickupTime" onchange="validateScheduleTiming()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-blue-500 text-slate-600">
-                  <option value="06:00 AM">06:00 AM</option>
-                  <option value="08:00 AM">08:00 AM</option>
-                  <option value="10:00 AM" selected>10:00 AM</option>
-                  <option value="12:00 PM">12:00 PM</option>
-                  <option value="02:00 PM">02:00 PM</option>
-                  <option value="04:00 PM">04:00 PM</option>
-                  <option value="06:00 PM">06:00 PM</option>
-                  <option value="08:00 PM">08:00 PM</option>
-                  <option value="10:00 PM">10:00 PM</option>
-                </select>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-xs font-medium text-slate-600">Pickup Time</label>
+                  <span class="text-[9px] text-blue-600 font-bold">Watch or Type</span>
+                </div>
+                <input id="pickupTime" type="time" step="300" onchange="validateScheduleTiming()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-700 font-semibold" />
               </div>
             </div>
+            <p class="text-[10px] text-slate-400 pl-1">* Kam se kam 1 ghanta aage ka time select karein (har 5 minute interval par).</p>
           </div>
         </div>
 
@@ -154,7 +148,7 @@
               <i class="fa-solid fa-car-side text-blue-600"></i>
               <h3 class="text-sm font-bold text-slate-800">Select Vehicle</h3>
             </div>
-            <span id="rateModeBadge" class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-md">Auto KM Engine</span>
+            <span id="rateModeBadge" class="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md border border-blue-100">All Inclusive Fare</span>
           </div>
 
           <div class="space-y-2.5">
@@ -164,12 +158,15 @@
                 <input type="radio" name="vehicle" checked class="text-blue-600" />
                 <div>
                   <p class="text-sm font-bold text-slate-800">Hatchback</p>
-                  <p class="text-[11px] text-slate-500">WagonR, Swift • ₹11/KM (1.65x)</p>
+                  <p class="text-[11px] text-slate-500">WagonR, Swift • 4 seats</p>
+                  <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
+                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 56 KM</span>
+                    <span class="text-slate-600">Extra: ₹11/KM</span>
+                  </div>
                 </div>
               </div>
               <div class="text-right">
                 <span id="priceTagHatchback" class="text-sm font-bold text-slate-900">₹1,815</span>
-                <p class="text-[10px] text-slate-400">4 seats</p>
               </div>
             </label>
 
@@ -179,12 +176,15 @@
                 <input type="radio" name="vehicle" class="text-blue-600" />
                 <div>
                   <p class="text-sm font-bold text-slate-800">Sedan</p>
-                  <p class="text-[11px] text-slate-500">Dzire, Etios, Aura • ₹12/KM (1.70x)</p>
+                  <p class="text-[11px] text-slate-500">Dzire, Etios, Aura • 4 seats</p>
+                  <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
+                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 56 KM</span>
+                    <span class="text-slate-600">Extra: ₹12/KM</span>
+                  </div>
                 </div>
               </div>
               <div class="text-right">
                 <span id="priceTagSedan" class="text-sm font-bold text-slate-900">₹2,040</span>
-                <p class="text-[10px] text-slate-400">4 seats</p>
               </div>
             </label>
 
@@ -194,12 +194,15 @@
                 <input type="radio" name="vehicle" class="text-blue-600" />
                 <div>
                   <p class="text-sm font-bold text-slate-800">Ertiga (MUV)</p>
-                  <p class="text-[11px] text-slate-500">Maruti Ertiga • ₹14/KM (1.85x)</p>
+                  <p class="text-[11px] text-slate-500">Maruti Ertiga • 6 seats</p>
+                  <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
+                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 56 KM</span>
+                    <span class="text-slate-600">Extra: ₹14/KM</span>
+                  </div>
                 </div>
               </div>
               <div class="text-right">
                 <span id="priceTagMUV" class="text-sm font-bold text-slate-900">₹2,590</span>
-                <p class="text-[10px] text-slate-400">6 seats</p>
               </div>
             </label>
 
@@ -209,12 +212,15 @@
                 <input type="radio" name="vehicle" class="text-blue-600" />
                 <div>
                   <p class="text-sm font-bold text-slate-800">Innova Crysta</p>
-                  <p class="text-[11px] text-slate-500">Toyota Crysta • ₹20/KM (2.0x)</p>
+                  <p class="text-[11px] text-slate-500">Toyota Crysta • 6–7 seats</p>
+                  <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
+                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 56 KM</span>
+                    <span class="text-slate-600">Extra: ₹20/KM</span>
+                  </div>
                 </div>
               </div>
               <div class="text-right">
                 <span id="priceTagSUV" class="text-sm font-bold text-slate-900">₹4,000</span>
-                <p class="text-[10px] text-slate-400">6–7 seats</p>
               </div>
             </label>
           </div>
@@ -354,10 +360,11 @@
         <p class="text-slate-500 pt-1 border-t border-slate-100">Landmark: <span id="receiptCustLandmark"></span></p>
       </div>
 
+      <!-- FARE BREAKDOWN (CLEAR INCLUDED ROUTE KM & EXTRA CHARGE SPEC) -->
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
         <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare Breakdown</h4>
         <div class="flex justify-between text-slate-600">
-          <span>Base Fare (<span id="receiptEstimatedKm">Calculated Fare</span>)</span>
+          <span>Vehicle Fare (<span id="receiptEstimatedKm">Route Distance</span>)</span>
           <span id="receiptBaseFare" class="font-semibold">₹1,815</span>
         </div>
         <div class="flex justify-between text-slate-600">
@@ -389,8 +396,18 @@
           </div>
         </div>
 
-        <div class="text-[10px] text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200 mt-2">
-          * Fastag Toll, State Border Tax aur Parking charges customer ko directly raste me pay karne honge.
+        <!-- EXTRA KM RATE & TOLL DECLARATION -->
+        <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200 space-y-1 mt-2 text-[10px] text-amber-900">
+          <p class="font-bold flex justify-between items-center">
+            <span>Extra Distance Rate:</span>
+            <span id="receiptExtraKmRate" class="font-black">₹11/KM</span>
+          </p>
+          <p class="text-amber-800 leading-relaxed">
+            * Agar actual running route included KM se zyada hoti hai toh extra KM rate driver ko add-on pay hoga.
+          </p>
+          <p class="text-amber-800 leading-relaxed">
+            * Fastag Toll, State Border Tax aur Parking charges customer ko directly raste me pay karne honge.
+          </p>
         </div>
       </div>
 
@@ -541,8 +558,10 @@
         <p>• Pickup time se 6 ghante pehle cancellation bilkul <b>FREE (₹0 Penalty)</b> hai.</p>
         <p>• Pickup time ke 6 ghante ke andar cancel karne par <b>10% (Min ₹300, Max ₹1,000)</b> late fee penalty record hoti hai.</p>
         <p class="font-bold text-slate-800">2. Scheduled Timing Rule</p>
-        <p>Current time se pehle ki booking banana allowed nahi hai. Har ride ko kam se kam 2 ghante aage schedule karna anivarya hai.</p>
-        <p class="font-bold text-slate-800">3. Toll & State Taxes</p>
+        <p>Ride ko kam se kam 1 ghanta aage schedule karna compulsory hai. Current ya expired time ki booking allow nahi hai.</p>
+        <p class="font-bold text-slate-800">3. Extra Distance Policy</p>
+        <p>Included route KM se zyada gaadi chalne par vehicle category ke anusar per KM extra charges applicable honge.</p>
+        <p class="font-bold text-slate-800">4. Toll & State Taxes</p>
         <p>Fastag Toll, State Border Tax aur Parking charges base fare me shamil nahi hain. Yeh raste me passenger ko directly pay karne hote hain.</p>
       </div>
     </div>
@@ -588,9 +607,40 @@
     const auth = firebase.auth();
 
     let currentUser = null;
-    let customerProfile = null;
     let isCarrierRequired = false;
     const carrierChargeAmount = 300;
+
+    // INTERNAL CONFIG (BASE RATE & EXTRA KM CHARGE)
+    const CAB_CONFIG = {
+      'Hatchback': { baseRate: 11, oneWayMultiplier: 1.65, extraKmRate: 11 },
+      'Sedan':     { baseRate: 12, oneWayMultiplier: 1.70, extraKmRate: 12 },
+      'MUV':       { baseRate: 14, oneWayMultiplier: 1.85, extraKmRate: 14 },
+      'SUV':       { baseRate: 20, oneWayMultiplier: 2.00, extraKmRate: 20 }
+    };
+
+    let selectedTripType = 'One Way';
+    let selectedVehicle = 'Hatchback';
+    let baseFare = 1815;
+    let currentDisplayKm = 56;
+    const driverAllowance = 300;
+    let currentDocId = '';
+    let currentBookingData = null;
+    let unsubscribeBooking = null;
+
+    let pickupCoords = null;
+    let dropCoords = null;
+    let pickupCityName = '';
+    let dropCityName = '';
+    let calculatedDistanceKm = 0;
+    let searchDebounceTimer = null;
+
+    let adminFixedRoutes = {};
+    db.collection("pricing_rules").doc("fixed_routes").onSnapshot((doc) => {
+      if (doc.exists) {
+        adminFixedRoutes = doc.data() || {};
+        updateDynamicVehicleFares(calculatedDistanceKm);
+      }
+    });
 
     function toggleDrawer(open) {
       const drawer = document.getElementById('sideDrawer');
@@ -632,45 +682,62 @@
 
     function initializeSchedulingRestrictions() {
       const datePicker = document.getElementById('pickupDate');
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
+      const timePicker = document.getElementById('pickupTime');
+      
+      const now = new Date();
+      const defaultTime = new Date(now.getTime() + (75 * 60 * 1000));
+      const rem = defaultTime.getMinutes() % 5;
+      if (rem !== 0) defaultTime.setMinutes(defaultTime.getMinutes() + (5 - rem));
+
+      const yyyy = defaultTime.getFullYear();
+      const mm = String(defaultTime.getMonth() + 1).padStart(2, '0');
+      const dd = String(defaultTime.getDate()).padStart(2, '0');
       const minDate = `${yyyy}-${mm}-${dd}`;
 
       if (datePicker) {
-        datePicker.min = minDate;
-        if (!datePicker.value || datePicker.value < minDate) {
+        datePicker.min = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        if (!datePicker.value || datePicker.value < datePicker.min) {
           datePicker.value = minDate;
         }
       }
+
+      if (timePicker && !timePicker.value) {
+        const hh = String(defaultTime.getHours()).padStart(2, '0');
+        const min = String(defaultTime.getMinutes()).padStart(2, '0');
+        timePicker.value = `${hh}:${min}`;
+      }
+
       validateScheduleTiming();
     }
 
     function validateScheduleTiming() {
       const dateInput = document.getElementById('pickupDate');
-      const timeSelect = document.getElementById('pickupTime');
-      if (!dateInput || !timeSelect) return true;
+      const timeInput = document.getElementById('pickupTime');
+      if (!dateInput || !timeInput) return true;
 
       const selectedDate = dateInput.value;
-      const selectedTime = timeSelect.value;
+      const selectedTime = timeInput.value;
       if (!selectedDate || !selectedTime) return false;
 
-      const [timePart, modifier] = selectedTime.split(' ');
-      let [hours, minutes] = timePart.split(':').map(Number);
-      if (modifier === 'PM' && hours < 12) hours += 12;
-      if (modifier === 'AM' && hours === 12) hours = 0;
-
+      const [hours, minutes] = selectedTime.split(':').map(Number);
       const scheduleDateTime = new Date(`${selectedDate}T00:00:00`);
       scheduleDateTime.setHours(hours, minutes, 0, 0);
 
       const now = new Date();
-      const minAllowed = new Date(now.getTime() + (90 * 60 * 1000));
+      const minAllowed = new Date(now.getTime() + (60 * 60 * 1000));
 
       if (scheduleDateTime < minAllowed) {
         return false;
       }
       return true;
+    }
+
+    function formatDisplayTime(timeStr24) {
+      if (!timeStr24) return '';
+      const [h, m] = timeStr24.split(':').map(Number);
+      const modifier = h >= 12 ? 'PM' : 'AM';
+      const displayH = h % 12 || 12;
+      return `${String(displayH).padStart(2, '0')}:${String(m).padStart(2, '0')} ${modifier}`;
     }
 
     function toggleCarrierAddon(checked) {
@@ -697,7 +764,6 @@
           alert("Login Successful! Welcome " + (u.displayName || u.email));
         })
         .catch((error) => {
-          console.error("Popup Error:", error);
           if (error.code === 'auth/popup-blocked') {
             auth.signInWithRedirect(provider);
           } else {
@@ -810,36 +876,6 @@
       }
     }
 
-    const CAB_CONFIG = {
-      'Hatchback': { baseRate: 11, oneWayMultiplier: 1.65 },
-      'Sedan':     { baseRate: 12, oneWayMultiplier: 1.70 },
-      'MUV':       { baseRate: 14, oneWayMultiplier: 1.85 },
-      'SUV':       { baseRate: 20, oneWayMultiplier: 2.00 }
-    };
-
-    let selectedTripType = 'One Way';
-    let selectedVehicle = 'Hatchback';
-    let baseFare = 1815;
-    const driverAllowance = 300;
-    let currentDocId = '';
-    let currentBookingData = null;
-    let unsubscribeBooking = null;
-
-    let pickupCoords = null;
-    let dropCoords = null;
-    let pickupCityName = '';
-    let dropCityName = '';
-    let calculatedDistanceKm = 0;
-    let searchDebounceTimer = null;
-
-    let adminFixedRoutes = {};
-    db.collection("pricing_rules").doc("fixed_routes").onSnapshot((doc) => {
-      if (doc.exists) {
-        adminFixedRoutes = doc.data() || {};
-        updateDynamicVehicleFares(calculatedDistanceKm);
-      }
-    });
-
     function handleAddressSearch(query, type) {
       clearTimeout(searchDebounceTimer);
       const listContainer = document.getElementById(type === 'pickup' ? 'pickupSuggestions' : 'dropSuggestions');
@@ -925,6 +961,7 @@
         .catch(err => console.error(err));
     }
 
+    // CALCULATE FARE WITH EXACT DISTANCE EXPOSURE
     function calculateSegmentFare(vehicleType, oneWayDistanceKm, tripType) {
       if (pickupCityName && dropCityName && tripType === 'One Way') {
         const forwardKey = `${pickupCityName}-${dropCityName}`;
@@ -932,28 +969,47 @@
         const fixedPackage = adminFixedRoutes[forwardKey] || adminFixedRoutes[reverseKey];
 
         if (fixedPackage && fixedPackage[vehicleType]) {
-          return { fare: Number(fixedPackage[vehicleType]), isAdminOverride: true };
+          return { 
+            fare: Number(fixedPackage[vehicleType]), 
+            isAdminOverride: true, 
+            displayKm: oneWayDistanceKm || 56 
+          };
         }
       }
 
       const config = CAB_CONFIG[vehicleType] || CAB_CONFIG['Sedan'];
-      const dist = Number(oneWayDistanceKm) || 100;
+      const realDist = Number(oneWayDistanceKm) || 56;
 
       if (tripType === 'One Way') {
-        const billableKm = Math.max(100, dist);
-        return { fare: Math.round(billableKm * config.baseRate * config.oneWayMultiplier), isAdminOverride: false, billableKm };
+        // Internal slab minimum 100 KM for sustainable pricing
+        const billableSlab = Math.max(100, realDist);
+        const fare = Math.round(billableSlab * config.baseRate * config.oneWayMultiplier);
+        return { 
+          fare: fare, 
+          isAdminOverride: false, 
+          displayKm: realDist // Displays exact route KM (e.g. 56 KM)
+        };
       } else if (tripType === 'Round Trip') {
-        const totalRoundKm = dist * 2;
-        const billableKm = Math.max(300, totalRoundKm);
-        return { fare: Math.round(billableKm * config.baseRate), isAdminOverride: false, billableKm };
+        const totalRoundKm = realDist * 2;
+        const billableSlab = Math.max(300, totalRoundKm);
+        const fare = Math.round(billableSlab * config.baseRate);
+        return { 
+          fare: fare, 
+          isAdminOverride: false, 
+          displayKm: totalRoundKm 
+        };
       } else {
-        const billableKm = Math.max(100, dist);
-        return { fare: Math.round(billableKm * config.baseRate), isAdminOverride: false, billableKm };
+        const billableSlab = Math.max(100, realDist);
+        return { 
+          fare: Math.round(billableSlab * config.baseRate), 
+          isAdminOverride: false, 
+          displayKm: realDist 
+        };
       }
     }
 
     function updateDynamicVehicleFares(distanceKm) {
-      const dist = distanceKm || calculatedDistanceKm || 100;
+      const dist = distanceKm || calculatedDistanceKm || 56;
 
       const hRes = calculateSegmentFare('Hatchback', dist, selectedTripType);
       const sRes = calculateSegmentFare('Sedan', dist, selectedTripType);
@@ -967,29 +1023,19 @@
 
       const cur = calculateSegmentFare(selectedVehicle, dist, selectedTripType);
       baseFare = cur.fare;
+      currentDisplayKm = cur.displayKm;
 
-      const modeBadge = document.getElementById('rateModeBadge');
-      if (modeBadge) {
-        if (cur.isAdminOverride) {
-          modeBadge.className = 'text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-md';
-          modeBadge.innerText = 'Admin Fixed Rate';
-        } else {
-          modeBadge.className = 'text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-md';
-          modeBadge.innerText = selectedTripType === 'Round Trip' ? 'Round Trip (Min 300 KM)' : 'Auto KM Engine';
-        }
-      }
+      // Update exact searched KM tags on all cards (Shows exact 56 KM, not 100 KM)
+      document.querySelectorAll('.inc-km-tag').forEach(el => {
+        el.innerText = `Included: ${currentDisplayKm} KM`;
+      });
 
       const badgeText = document.getElementById('distanceBadgeText');
       if (badgeText && calculatedDistanceKm > 0) {
-        if (cur.isAdminOverride) {
-          badgeText.innerText = `Route: ${calculatedDistanceKm} KM (Fixed Rate from Admin Panel)`;
-        } else if (selectedTripType === 'Round Trip') {
-          const totalKm = calculatedDistanceKm * 2;
-          const billable = Math.max(300, totalKm);
-          badgeText.innerText = `Round Trip: ${totalKm} KM (${billable} KM Billable Slab @ Base Rate)`;
+        if (selectedTripType === 'Round Trip') {
+          badgeText.innerText = `Route: Approx ${calculatedDistanceKm * 2} KM Round Trip (Included: ${currentDisplayKm} KM)`;
         } else {
-          const billable = Math.max(100, calculatedDistanceKm);
-          badgeText.innerText = `One Way: ${calculatedDistanceKm} KM (${billable} KM Billable Slab with Multiplier)`;
+          badgeText.innerText = `Route: Approx ${calculatedDistanceKm} KM Direct Road (Included: ${currentDisplayKm} KM)`;
         }
       }
     }
@@ -1007,8 +1053,9 @@
 
     function selectVehicle(name, element) {
       selectedVehicle = name;
-      const res = calculateSegmentFare(name, calculatedDistanceKm || 100, selectedTripType);
+      const res = calculateSegmentFare(name, calculatedDistanceKm || 56, selectedTripType);
       baseFare = res.fare;
+      currentDisplayKm = res.displayKm;
 
       document.querySelectorAll('.vehicle-card').forEach(card => {
         card.classList.remove('border-2', 'border-blue-600', 'bg-blue-50/50');
@@ -1034,11 +1081,10 @@
         dropCityName = '';
         calculatedDistanceKm = 0;
         initializeSchedulingRestrictions();
-        updateDynamicVehicleFares(100);
+        updateDynamicVehicleFares(56);
       }
     }
 
-    // 45% PICKUP & 55% DROPOFF BOOKING ENGINE
     function handleBooking() {
       if (!currentUser) {
         alert("🔒 Booking ke liye Customer Login anivarya hai! Kripya Google ya Email se Login karein.");
@@ -1047,7 +1093,7 @@
       }
 
       if (!validateScheduleTiming()) {
-        alert("⚠️ Invalid Pickup Time!\n\nPast time ya expired samay ki booking allow nahi hai. Kripya kam se kam 2 ghante aage ka samay select karein.");
+        alert("⚠️ Invalid Pickup Time!\n\nKam se kam 1 ghante baad ka samay chunein. Gujra hua ya immediate samay allowed nahi hai.");
         return;
       }
 
@@ -1057,7 +1103,8 @@
       const phone = document.getElementById('custPhone').value.trim();
       const landmark = document.getElementById('custLandmark').value.trim();
       const date = document.getElementById('pickupDate').value;
-      const time = document.getElementById('pickupTime').value;
+      const rawTime = document.getElementById('pickupTime').value;
+      const displayTime = formatDisplayTime(rawTime);
 
       if (!from || !to) {
         alert('Pickup aur Drop location select karein!');
@@ -1068,16 +1115,15 @@
         return;
       }
 
-      // Calculation: Base + Allowance + Optional Carrier
       const carrierFee = isCarrierRequired ? carrierChargeAmount : 0;
       const total = baseFare + driverAllowance + carrierFee;
       
-      // 45% Pickup allowance & 55% Dropoff settlement
       const pickupPay = Math.round(total * 0.45);
       const dropPay = total - pickupPay;
       
       const bookingId = 'MTZ-' + Math.floor(1000 + Math.random() * 9000);
       const bookedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const extraKmRate = (CAB_CONFIG[selectedVehicle] || CAB_CONFIG['Sedan']).extraKmRate;
 
       const bookingPayload = {
         userId: currentUser.uid,
@@ -1085,9 +1131,12 @@
         bookingId: bookingId,
         from: from,
         to: to,
-        estimatedDistanceKm: calculatedDistanceKm || 100,
+        estimatedDistanceKm: calculatedDistanceKm || currentDisplayKm || 56,
+        includedKm: currentDisplayKm, // Saves exact 56 KM in record
+        extraKmRate: extraKmRate,
         date: date,
-        time: time,
+        time: displayTime,
+        rawTime: rawTime,
         vehicle: selectedVehicle,
         type: selectedTripType,
         name: name,
@@ -1156,11 +1205,14 @@
       document.getElementById('receiptCustName').innerText = data.name;
       document.getElementById('receiptCustPhone').innerText = data.phone;
       document.getElementById('receiptCustLandmark').innerText = data.landmark || 'Direct Pickup';
-      document.getElementById('receiptEstimatedKm').innerText = `${data.estimatedDistanceKm || 100} KM Route`;
+      document.getElementById('receiptEstimatedKm').innerText = `Included: ${data.includedKm || data.estimatedDistanceKm || 56} KM`;
       document.getElementById('receiptBaseFare').innerText = '₹' + (data.baseFare || (data.total - driverAllowance - (data.carrierCharge || 0))).toLocaleString('en-IN');
       document.getElementById('receiptTotalFare').innerText = '₹' + data.total.toLocaleString('en-IN');
       document.getElementById('receiptPickupAmount').innerText = '₹' + data.pickupPay.toLocaleString('en-IN');
       document.getElementById('receiptDropAmount').innerText = '₹' + data.dropPay.toLocaleString('en-IN');
+      
+      const extraRate = data.extraKmRate || (CAB_CONFIG[data.vehicle] || CAB_CONFIG['Sedan']).extraKmRate || 12;
+      document.getElementById('receiptExtraKmRate').innerText = `₹${extraRate}/KM`;
 
       const carrierRow = document.getElementById('receiptCarrierRow');
       if (carrierRow) {
@@ -1255,15 +1307,16 @@
 
       try {
         const pickupDateStr = currentBookingData.date;
-        const pickupTimeStr = currentBookingData.time;
+        const pickupTimeStr = currentBookingData.rawTime || currentBookingData.time;
 
         if (pickupDateStr && pickupTimeStr) {
-          const [timePart, modifier] = pickupTimeStr.split(' ');
-          let [hours, minutes] = timePart.split(':').map(Number);
-          if (modifier === 'PM' && hours < 12) hours += 12;
-          if (modifier === 'AM' && hours === 12) hours = 0;
-
-          const scheduledDate = new Date(pickupDateStr);
+          let hours = 0, minutes = 0;
+          if (pickupTimeStr.includes(':')) {
+            const parts = pickupTimeStr.split(':');
+            hours = parseInt(parts[0], 10);
+            minutes = parseInt(parts[1], 10);
+          }
+          const scheduledDate = new Date(`${pickupDateStr}T00:00:00`);
           scheduledDate.setHours(hours, minutes, 0, 0);
           const diffMs = scheduledDate.getTime() - new Date().getTime();
           hoursRemaining = diffMs / (1000 * 60 * 60);
