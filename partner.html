@@ -157,7 +157,7 @@
     </div>
   </div>
 
-  <!-- PARTNER KYC & PROFILE MODAL -->
+  <!-- PARTNER KYC & PROFILE MODAL (MANDATORY FIELDS + EDITABLE NAME, MOBILE, CITY) -->
   <div id="kycModal" class="fixed inset-0 bg-slate-900/80 z-[85] hidden items-center justify-center p-3">
     <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -209,11 +209,11 @@
           </div>
         </div>
 
-        <!-- 2. PERSONAL, MOBILE & CITY DETAILS -->
+        <!-- 2. EDITABLE EDITABLE PROFILE FIELDS (NAME, MOBILE, CITY) -->
         <div class="space-y-3">
           <div>
-            <label class="block font-semibold text-slate-700 mb-1">Full Legal Name *</label>
-            <input id="kycFullName" type="text" placeholder="Aadhaar / PAN ke anusار naam" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+            <label class="block font-semibold text-slate-700 mb-1">Full Legal / Agency Name *</label>
+            <input id="kycFullName" type="text" placeholder="Aadhaar / PAN ke anusar naam" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
           </div>
 
           <div>
@@ -228,7 +228,7 @@
 
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Permanent Residential / Office Address *</label>
-            <textarea id="kycAddress" rows="2" placeholder="House/Flat No, Street, State, PIN Code" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500"></textarea>
+            <textarea id="kycAddress" rows="2" placeholder="House/Flat No, Street, City, State, PIN Code" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500"></textarea>
           </div>
         </div>
 
@@ -244,11 +244,11 @@
           </div>
           <div>
             <label class="block text-[11px] text-slate-500 mb-1">Aadhaar Card Front Photo *</label>
-            <input id="kycAadhaarFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700" />
+            <input id="kycAadhaarFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
           </div>
         </div>
 
-        <!-- 4. PAN CARD FOR TDS -->
+        <!-- 4. PAN CARD FOR TDS COMPLIANCE -->
         <div class="space-y-2 pt-1 border-t border-slate-100">
           <div class="flex justify-between items-center">
             <label class="block font-semibold text-slate-700">PAN Card (For 1% TDS Compliance) *</label>
@@ -260,7 +260,20 @@
           </div>
           <div>
             <label class="block text-[11px] text-slate-500 mb-1">PAN Card Photo *</label>
-            <input id="kycPanFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700" />
+            <input id="kycPanFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+          </div>
+        </div>
+
+        <!-- 5. DRIVING LICENSE (OPTIONAL) -->
+        <div class="space-y-2 pt-1 border-t border-slate-100 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+          <div class="flex justify-between items-center">
+            <label class="block font-semibold text-slate-700">Commercial Driving License (Optional)</label>
+            <span class="text-[9px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded font-bold">If Available</span>
+          </div>
+          <input id="kycDlNum" type="text" placeholder="DL Number" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs uppercase font-mono focus:outline-none focus:border-blue-500" />
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-1">DL Photo (Optional)</label>
+            <input id="kycDlFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-200 file:text-slate-700" />
           </div>
         </div>
 
@@ -277,7 +290,7 @@
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
           <h3 class="font-bold text-slate-800 text-sm">Partner Authentication</h3>
-          <p class="text-[10px] text-slate-500">Access fleet dispatch and wallet</p>
+          <p class="text-[10px] text-slate-500">Access your fleet dispatch and wallet</p>
         </div>
         <button type="button" onclick="closeModal('vendorAuthModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -455,12 +468,21 @@
             if (alertBanner) alertBanner.classList.remove('hidden');
           }
 
-          if (currentVendorProfile.agencyName && document.getElementById('kycFullName')) document.getElementById('kycFullName').value = currentVendorProfile.agencyName;
-          else if (currentVendorProfile.name && document.getElementById('kycFullName')) document.getElementById('kycFullName').value = currentVendorProfile.name;
-
-          if (currentVendorProfile.phone && document.getElementById('kycMobileNum')) document.getElementById('kycMobileNum').value = currentVendorProfile.phone;
-          if (currentVendorProfile.city && document.getElementById('kycCityInput')) document.getElementById('kycCityInput').value = currentVendorProfile.city;
-          if (currentVendorProfile.address && document.getElementById('kycAddress')) document.getElementById('kycAddress').value = currentVendorProfile.address;
+          // Pre-fill editable profile fields
+          if (currentVendorProfile.agencyName && document.getElementById('kycFullName')) {
+            document.getElementById('kycFullName').value = currentVendorProfile.agencyName;
+          } else if (currentVendorProfile.name && document.getElementById('kycFullName')) {
+            document.getElementById('kycFullName').value = currentVendorProfile.name;
+          }
+          if (currentVendorProfile.phone && document.getElementById('kycMobileNum')) {
+            document.getElementById('kycMobileNum').value = currentVendorProfile.phone;
+          }
+          if (currentVendorProfile.city && document.getElementById('kycCityInput')) {
+            document.getElementById('kycCityInput').value = currentVendorProfile.city;
+          }
+          if (currentVendorProfile.address && document.getElementById('kycAddress')) {
+            document.getElementById('kycAddress').value = currentVendorProfile.address;
+          }
 
           if (currentVendorProfile.aadhaar) {
             document.getElementById('kycAadhaarNum').value = currentVendorProfile.aadhaar;
@@ -581,40 +603,96 @@
       const phone = document.getElementById('kycMobileNum').value.trim();
       const city = document.getElementById('kycCityInput').value.trim();
       const address = document.getElementById('kycAddress').value.trim();
+      const aadhaarNum = document.getElementById('kycAadhaarNum').value.trim();
+      const panNum = document.getElementById('kycPanNum').value.trim().toUpperCase();
+      const dlNum = document.getElementById('kycDlNum').value.trim();
+
+      const aadhaarFile = document.getElementById('kycAadhaarFile').files[0];
+      const panFile = document.getElementById('kycPanFile').files[0];
+      const dlFile = document.getElementById('kycDlFile').files[0];
 
       if (!name || phone.length < 10 || !city || !address) {
         return alert("Full Name, 10-digit Mobile Number, City aur Address bharna anivarya hai!");
       }
+      if (!capturedSelfieBase64 && (!currentVendorProfile || !currentVendorProfile.selfieUrl)) {
+        return alert("Live Camera Selfie capture karna mandatory hai!");
+      }
+      if (!autoValidateAadhaar(aadhaarNum)) {
+        return alert("Kripya 12-digit valid Aadhaar Number enter karein!");
+      }
+      if (!autoValidatePan(panNum)) {
+        return alert("Kripya valid 10-digit PAN Number enter karein!");
+      }
 
       const btn = document.getElementById('submitKycBtn');
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Submitting...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Uploading & Verifying...`;
       btn.disabled = true;
 
       try {
+        let selfieUrl = currentVendorProfile?.selfieUrl || '';
+        let aadhaarUrl = currentVendorProfile?.aadhaarUrl || '';
+        let panUrl = currentVendorProfile?.panUrl || '';
+        let dlUrl = currentVendorProfile?.dlUrl || '';
+
+        if (capturedSelfieBase64) {
+          const selfieRef = storage.ref(`partners/${currentVendor.uid}/selfie_${Date.now()}.jpg`);
+          const selfieSnapshot = await selfieRef.putString(capturedSelfieBase64, 'data_url');
+          selfieUrl = await selfieSnapshot.ref.getDownloadURL();
+        }
+
+        if (aadhaarFile) {
+          const aRef = storage.ref(`partners/${currentVendor.uid}/aadhaar_${Date.now()}_${aadhaarFile.name}`);
+          const aSnap = await aRef.put(aadhaarFile);
+          aadhaarUrl = await aSnap.ref.getDownloadURL();
+        }
+
+        if (panFile) {
+          const pRef = storage.ref(`partners/${currentVendor.uid}/pan_${Date.now()}_${panFile.name}`);
+          const pSnap = await pRef.put(panFile);
+          panUrl = await pSnap.ref.getDownloadURL();
+        }
+
+        if (dlFile) {
+          const dRef = storage.ref(`partners/${currentVendor.uid}/dl_${Date.now()}_${dlFile.name}`);
+          const dSnap = await dRef.put(dlFile);
+          dlUrl = await dSnap.ref.getDownloadURL();
+        }
+
+        const isAutoVerified = Boolean(name && phone && city && address && aadhaarNum.length === 12 && panNum.length === 10 && selfieUrl);
+
         await db.collection("vendors").doc(currentVendor.uid).set({
           name: name,
           agencyName: name,
           phone: phone,
           city: city,
           address: address,
-          kycVerified: true,
-          kycStatus: 'Approved',
+          aadhaar: aadhaarNum,
+          aadhaarUrl: aadhaarUrl,
+          pan: panNum,
+          panUrl: panUrl,
+          dlNumber: dlNum || 'Not Provided',
+          dlUrl: dlUrl || '',
+          selfieUrl: selfieUrl,
+          kycVerified: isAutoVerified,
+          kycStatus: isAutoVerified ? 'Auto-Approved' : 'Under Review',
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
         btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Verification Completed`;
         btn.disabled = false;
         closeModal('kycModal');
-        alert("🎉 Partner Profile & KYC successfully verified!");
+        alert("🎉 Partner Profile & KYC successfully verified and saved!");
       } catch (err) {
-        btn.innerHTML = `Submit KYC & Complete Verification`;
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Auto-Verify & Submit KYC`;
         btn.disabled = false;
-        alert("Error: " + err.message);
+        alert("Upload Error: " + err.message);
       }
     }
 
     function vendorLoginWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+
       auth.signInWithPopup(provider)
         .then((res) => {
           const u = res.user;
@@ -622,12 +700,13 @@
             name: u.displayName || '',
             agencyName: u.displayName || 'Google Partner',
             city: 'Bhopal',
+            phone: u.phoneNumber || '',
             email: u.email || '',
             kycVerified: false,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
           closeModal('vendorAuthModal');
-          alert("Login Successful! Admin panel me data reflect ho raha hai.");
+          alert("Partner Login Successful! Data synced to Admin panel.");
         })
         .catch(err => alert("Login Error: " + err.message));
     }
@@ -658,10 +737,10 @@
             });
           })
           .then(() => {
-            alert("Partner Registered Successfully!");
+            alert("Partner Registered Successfully! Data synced to Admin panel.");
             closeModal('vendorAuthModal');
           })
-          .catch(err => alert("Error: " + err.message));
+          .catch(err => alert("Sign Up Error: " + err.message));
       } else {
         auth.signInWithEmailAndPassword(email, pass)
           .then(() => {
@@ -671,7 +750,7 @@
             }, { merge: true });
             closeModal('vendorAuthModal');
           })
-          .catch(err => alert("Error: " + err.message));
+          .catch(err => alert("Login Error: " + err.message));
       }
     }
 
@@ -681,6 +760,7 @@
       }
     }
 
+    // FIRESTORE DISPATCH LISTENER
     function listenToAllBookings() {
       db.collection("bookings").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
         allBookingsCache = [];
@@ -688,7 +768,7 @@
           allBookingsCache.push({ docId: doc.id, ...doc.data() });
         });
         renderPortals();
-      }, (err) => console.error(err));
+      }, (err) => console.error("Bookings load error:", err));
     }
 
     function renderPortals() {
@@ -702,61 +782,235 @@
       document.getElementById("availableBadgeCount").innerText = availableLeads.length;
       document.getElementById("myRidesBadgeCount").innerText = myAssignedRides.length;
 
+      let netPayoutTotal = 0;
+      let cutTotal = 0;
+      myAssignedRides.forEach(b => {
+        if (b.status !== 'Cancelled') {
+          const fare = Number(b.total) || 0;
+          const comm = Math.round(fare * 0.15);
+          cutTotal += comm;
+          netPayoutTotal += (fare - comm);
+        }
+      });
+      document.getElementById("kpiVendorAcceptedCount").innerText = myAssignedRides.length;
+      document.getElementById("kpiVendorNetPayout").innerText = `₹${netPayoutTotal.toLocaleString('en-IN')}`;
+      document.getElementById("kpiVendorCut").innerText = `₹${cutTotal.toLocaleString('en-IN')}`;
+
       // 1. RENDER AVAILABLE LEADS
       if (availableLeads.length === 0) {
         availableContainer.innerHTML = `
-          <div class="text-center py-10 bg-white rounded-3xl border p-6 text-slate-400 text-xs">
+          <div class="text-center py-10 bg-white rounded-3xl border border-slate-200 p-6 text-slate-400 text-xs">
+            <i class="fa-solid fa-mug-hot text-3xl mb-2 text-slate-300"></i>
             <p class="font-bold text-slate-600">No Pending Requests</p>
+            <p class="text-[11px] mt-1">Jab bhi koi customer ride request karega, instant yahan display hogi.</p>
           </div>
         `;
       } else {
-        availableContainer.innerHTML = availableLeads.map(b => `
-          <div class="bg-white rounded-3xl p-4 border shadow-sm text-xs space-y-3">
-            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-              <span class="font-mono font-bold text-blue-700">${b.bookingId || 'MTZ'}</span>
-              <span class="px-2 py-0.5 rounded-full font-bold text-[10px] bg-amber-100 text-amber-800">Ready</span>
+        availableContainer.innerHTML = availableLeads.map(b => {
+          const totalFare = Number(b.total) || 0;
+          const fee15 = Math.round(totalFare * 0.15);
+          const vendorNet = totalFare - fee15;
+          const pickupFuel = b.pickupPay || Math.round(totalFare * 0.45);
+          const dropBal = totalFare - pickupFuel;
+
+          return `
+            <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
+              <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                <span class="font-mono font-bold text-blue-700">${b.bookingId || 'MTZ'}</span>
+                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] bg-amber-100 text-amber-800">
+                  Ready to Accept
+                </span>
+              </div>
+
+              <div>
+                <p class="font-bold text-slate-800 text-sm">${b.from} ➔ ${b.to}</p>
+                <div class="flex flex-wrap gap-2 text-[11px] text-slate-500 mt-1 font-medium">
+                  <span><i class="fa-regular fa-calendar text-slate-400 mr-0.5"></i> ${b.date} (${b.time})</span>
+                  <span>•</span>
+                  <span><i class="fa-solid fa-car-side text-slate-400 mr-0.5"></i> ${b.vehicle} (${b.type})</span>
+                </div>
+                ${b.carrierRequired ? `
+                  <div class="mt-2 bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md text-[10px] font-bold inline-flex items-center gap-1">
+                    <i class="fa-solid fa-truck-ramp-box"></i> Roof Carrier Required (+₹300 Included)
+                  </div>
+                ` : ''}
+              </div>
+
+              <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 space-y-1 text-[11px]">
+                <div class="flex justify-between text-slate-600">
+                  <span>Customer Gross Fare:</span>
+                  <span class="font-semibold">₹${totalFare}</span>
+                </div>
+                <div class="flex justify-between text-blue-700">
+                  <span>MakeTripzy Commission (15%):</span>
+                  <span class="font-bold">-₹${fee15}</span>
+                </div>
+                <div class="flex justify-between text-emerald-800 font-bold pt-1 border-t border-slate-200">
+                  <span>Your Net Fleet Earning:</span>
+                  <span class="text-sm font-black text-emerald-600">₹${vendorNet}</span>
+                </div>
+                <div class="text-[10px] text-slate-500 pt-0.5 flex justify-between border-t border-dashed border-slate-200">
+                  <span>Customer 45% Fuel at Pickup: <b>₹${pickupFuel}</b></span>
+                  <span>55% at Drop: <b>₹${dropBal}</b></span>
+                </div>
+                <p class="text-[9px] text-amber-700 pt-1">* Fastag Toll, State Border Tax & Parking customer directly pay karega.</p>
+              </div>
+
+              <button onclick="instantAcceptRide('${b.docId}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+                <i class="fa-solid fa-hand-holding-dollar"></i> Accept Ride (Lock To Fleet)
+              </button>
             </div>
-            <div>
-              <p class="font-bold text-slate-800 text-sm">${b.from} ➔ ${b.to}</p>
-              <p class="text-[11px] text-slate-500 mt-1">${b.date} • ${b.vehicle} (${b.type})</p>
-            </div>
-            <button onclick="instantAcceptRide('${b.docId}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs">
-              Accept Ride
-            </button>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       }
 
-      // 2. RENDER MY RIDES
+      // 2. RENDER MY FLEET RIDES
       if (!currentVendor) {
-        myRidesContainer.innerHTML = `<div class="text-center py-10 bg-white rounded-3xl border p-6 text-xs">Partner Login Required</div>`;
-      } else if (myAssignedRides.length === 0) {
-        myRidesContainer.innerHTML = `<div class="text-center py-10 bg-white rounded-3xl border p-6 text-xs text-slate-400">No Active Rides</div>`;
-      } else {
-        myRidesContainer.innerHTML = myAssignedRides.map(b => `
-          <div class="bg-white rounded-3xl p-4 border shadow-sm text-xs space-y-2">
-            <div class="flex justify-between font-bold text-blue-700"><span>${b.bookingId}</span><span>${b.status}</span></div>
-            <p class="font-bold text-slate-800">${b.from} ➔ ${b.to}</p>
-            <p class="text-slate-500 text-[11px]">${b.date} • ${b.vehicle}</p>
-            ${!b.driverName ? `<button onclick="openAssignDriverModal('${b.docId}', '${b.from} ➔ ${b.to}', '${b.bookingId}')" class="w-full bg-amber-600 text-white font-bold py-2 rounded-xl text-xs">+ Assign Driver & Cab</button>` : `<p class="text-emerald-700 font-bold">Driver: ${b.driverName} (${b.cabNumber})</p>`}
+        myRidesContainer.innerHTML = `
+          <div class="text-center py-10 bg-white rounded-3xl border border-slate-200 p-6 space-y-2">
+            <i class="fa-solid fa-lock text-slate-300 text-3xl"></i>
+            <p class="font-bold text-slate-700">Partner Login Required</p>
+            <p class="text-xs text-slate-400">Apni accepted rides manage karne ke liye login karein.</p>
+            <button onclick="openVendorAuthModal()" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl text-xs">Login as Partner</button>
           </div>
-        `).join('');
+        `;
+      } else if (myAssignedRides.length === 0) {
+        myRidesContainer.innerHTML = `
+          <div class="text-center py-10 bg-white rounded-3xl border border-slate-200 p-6 text-slate-400 text-xs">
+            <p class="font-bold text-slate-600">Koi active ride nahi hai.</p>
+            <p class="text-[11px] mt-1">Available Leads tab me jakar nayi rides accept karein.</p>
+          </div>
+        `;
+      } else {
+        myRidesContainer.innerHTML = myAssignedRides.map(b => {
+          const totalFare = Number(b.total) || 0;
+          const fee15 = Math.round(totalFare * 0.15);
+          const vendorNet = totalFare - fee15;
+
+          const isConfirmed = b.status === "Confirmed";
+          const isStarted = b.status === "Trip Started";
+          const isCompleted = b.status === "Trip Completed";
+          const isDriverAssigned = Boolean(b.driverName && b.cabNumber);
+
+          return `
+            <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
+              <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                <span class="font-mono font-bold text-blue-700">${b.bookingId}</span>
+                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
+                  isCompleted ? 'bg-purple-100 text-purple-800' :
+                  isStarted ? 'bg-blue-100 text-blue-800' :
+                  isConfirmed ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                }">
+                  ${b.status}
+                </span>
+              </div>
+
+              <div>
+                <p class="font-bold text-slate-800 text-sm">${b.from} ➔ ${b.to}</p>
+                <p class="text-slate-500 text-[11px] mt-0.5">${b.date} • ${b.time} • ${b.vehicle}</p>
+                ${b.carrierRequired ? `
+                  <span class="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded mt-1 inline-block">Roof Carrier Cab</span>
+                ` : ''}
+              </div>
+
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/70 text-[11px] flex justify-between items-center">
+                <div>
+                  <p class="text-slate-400 uppercase font-bold text-[9px]">Passenger</p>
+                  <p class="font-bold text-slate-800">${b.name}</p>
+                </div>
+                <div class="text-right">
+                  <a href="tel:${b.phone}" class="inline-flex items-center gap-1 text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200 font-bold">
+                    <i class="fa-solid fa-phone text-[9px]"></i> ${b.phone}
+                  </a>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl border ${isDriverAssigned ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'} space-y-1.5">
+                <div class="flex justify-between items-center">
+                  <span class="font-bold text-[11px] flex items-center gap-1">
+                    <i class="fa-solid ${isDriverAssigned ? 'fa-id-card text-emerald-600' : 'fa-triangle-exclamation text-amber-600'}"></i>
+                    ${isDriverAssigned ? 'Assigned Driver & Cab' : 'Driver Not Assigned Yet'}
+                  </span>
+                  ${!isCompleted ? `
+                    <button onclick="openAssignDriverModal('${b.docId}', '${b.from.replace(/'/g, "\\'")} ➔ ${b.to.replace(/'/g, "\\'")}', '${b.bookingId}', '${(b.driverName || '').replace(/'/g, "\\'")}', '${b.driverPhone || ''}', '${b.cabNumber || ''}')" class="text-[10px] font-bold px-2 py-0.5 rounded-md ${isDriverAssigned ? 'bg-white border border-emerald-300 text-emerald-700' : 'bg-amber-600 text-white shadow-sm'}">
+                      ${isDriverAssigned ? 'Change Driver' : '+ Assign Driver & Cab'}
+                    </button>
+                  ` : ''}
+                </div>
+
+                ${isDriverAssigned ? `
+                  <div class="grid grid-cols-2 text-[10px] pt-1 border-t border-emerald-200/60">
+                    <p><b>Driver:</b> ${b.driverName} (${b.driverPhone})</p>
+                    <p class="text-right"><b>Cab No:</b> <span class="font-mono font-bold">${b.cabNumber}</span></p>
+                  </div>
+                ` : `
+                  <p class="text-[10px] text-amber-800">Customer ko driver details bhejne ke liye upar diye button se driver add karein.</p>
+                `}
+              </div>
+
+              <div class="flex justify-between items-center text-[11px] font-bold pt-1">
+                <span>Net Vendor Settlement:</span>
+                <span class="text-emerald-700 font-black text-sm">₹${vendorNet}</span>
+              </div>
+
+              <div class="pt-1 space-y-2">
+                ${isConfirmed ? `
+                  <button onclick="startTripAction('${b.docId}', ${isDriverAssigned})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-solid fa-play"></i> Start Ride (45% Fuel Collected)
+                  </button>
+                  <button onclick="cancelByVendor('${b.docId}', '${totalFare}')" class="w-full text-rose-600 hover:text-rose-700 bg-rose-50 border border-rose-200 font-semibold py-2 rounded-xl text-xs">
+                    Cancel & Reassign
+                  </button>
+                ` : isStarted ? `
+                  <button onclick="completeTripAction('${b.docId}')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-solid fa-flag-checkered"></i> Mark Trip Completed (Collect 55%)
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
       }
     }
 
+    // DISPATCH LOGIC
     function instantAcceptRide(docId) {
-      if (!currentVendor) { openVendorAuthModal(); return; }
+      if (!currentVendor) {
+        alert("Ride accept karne ke liye Vendor/Partner login anivarya hai!");
+        openVendorAuthModal();
+        return;
+      }
+
+      if (currentVendorProfile && currentVendorProfile.kycVerified !== true) {
+        alert("⚠️ KYC Incomplete!\n\nRides accept karne se pehle apna Aadhaar, PAN aur Camera Selfie verify karein.");
+        openKycModal();
+        return;
+      }
+
+      if (!confirm("Kya aap yeh booking accept karke apne fleet me lock karna chahte hain?")) {
+        return;
+      }
+
       db.collection("bookings").doc(docId).update({
         status: "Confirmed",
         vendorId: currentVendor.uid,
+        vendorEmail: currentVendor.email || '',
         acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => { alert("Ride Accepted!"); switchVendorTab('myrides'); });
+      }).then(() => {
+        alert("Ride accepted! Ab aap 'My Fleet Rides' tab me jakar Driver & Cab assign kar sakte hain.");
+        switchVendorTab('myrides');
+      }).catch(err => {
+        alert("Error accepting ride: " + err.message);
+      });
     }
 
-    function openAssignDriverModal(docId, routeText, bookingId) {
+    function openAssignDriverModal(docId, routeText, bookingId, dName, dPhone, cNum) {
       document.getElementById('modalDocId').value = docId;
       document.getElementById('modalRouteText').innerText = routeText;
       document.getElementById('modalBookingIdText').innerText = bookingId;
+      document.getElementById('modalDriverName').value = dName || '';
+      document.getElementById('modalDriverPhone').value = dPhone || '';
+      document.getElementById('modalCabNumber').value = cNum || '';
       openModal('assignDriverModal');
     }
 
@@ -766,19 +1020,73 @@
       const dPhone = document.getElementById('modalDriverPhone').value.trim();
       const cabNum = document.getElementById('modalCabNumber').value.trim();
 
-      if (!dName || dPhone.length < 10 || !cabNum) return alert("All driver fields mandatory!");
+      if (!dName || dPhone.length < 10 || !cabNum) {
+        return alert("Driver Name, 10-digit Phone aur Commercial Cab Number bharna compulsory hai!");
+      }
+
+      const btn = document.getElementById('modalSaveDriverBtn');
+      btn.innerText = "Saving Details...";
+      btn.disabled = true;
 
       db.collection("bookings").doc(docId).update({
         driverName: dName,
         driverPhone: dPhone,
-        cabNumber: cabNum.toUpperCase()
+        cabNumber: cabNum.toUpperCase(),
+        driverAssignedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
+        btn.innerText = "Save & Send Details to Customer";
+        btn.disabled = false;
         closeModal('assignDriverModal');
-        alert("Driver assigned successfully!");
+        alert("Driver aur Cab details successfully save ho gayi! Customer ke screen par live reflect ho gayi hain.");
+      }).catch(err => {
+        btn.innerText = "Save & Send Details to Customer";
+        btn.disabled = false;
+        alert("Error: " + err.message);
       });
     }
 
-    window.addEventListener("load", () => { listenToAllBookings(); });
+    function startTripAction(docId, isDriverAssigned) {
+      if (!isDriverAssigned) {
+        alert("⚠️ Kripya trip shuru karne se pehle '+ Assign Driver & Cab' button se Driver details assign karein!");
+        return;
+      }
+      if (confirm("Customer pickup ho chuka hai aur 45% fuel allowance verify ho gayi hai?")) {
+        db.collection("bookings").doc(docId).update({
+          status: "Trip Started",
+          tripStartedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    }
+
+    function completeTripAction(docId) {
+      if (confirm("Trip destination par complete ho chuki hai aur remaining 55% payment collect ho gayi hai?")) {
+        db.collection("bookings").doc(docId).update({
+          status: "Trip Completed",
+          tripCompletedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    }
+
+    function cancelByVendor(docId, totalFare) {
+      const penalty = Math.max(300, Math.round(Number(totalFare) * 0.10));
+      if (confirm(`⚠️ VENDOR PENALTY WARNING:\nRide accept karne ke baad drop karne par ₹${penalty} penalty lagegi aur ride wapas open pool me chali jayegi.\n\nKya aap sach me cancel karna chahte hain?`)) {
+        db.collection("bookings").doc(docId).update({
+          status: "Confirmation Pending",
+          reassignedNotice: true,
+          lastVendorPenalty: penalty,
+          vendorId: firebase.firestore.FieldValue.delete(),
+          driverName: "",
+          driverPhone: "",
+          cabNumber: ""
+        }).then(() => {
+          alert("Ride pool me wapas bhej di gayi hai.");
+        });
+      }
+    }
+
+    window.addEventListener("load", () => {
+      listenToAllBookings();
+    });
   </script>
 </body>
 </html>
