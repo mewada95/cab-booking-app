@@ -40,7 +40,7 @@
       <div class="border-r border-slate-100 pr-1">
         <p class="text-[9px] uppercase font-bold text-slate-400">Total Rides</p>
         <p id="kpiVendorAcceptedCount" class="text-lg font-black text-slate-900 mt-0.5">0</p>
-        <span class="text-[9px] text-emerald-600 font-bold">Assigned</span>
+        <span class="text-[9px] text-emerald-600 font-bold">Accepted</span>
       </div>
       <div class="border-r border-slate-100 px-1">
         <p class="text-[9px] uppercase font-bold text-slate-400">Gross Payout</p>
@@ -85,7 +85,7 @@
     <div id="viewMyRides" class="hidden space-y-3">
       <div class="flex justify-between items-center px-1">
         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Assigned Trips & Dispatch</span>
-        <span class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">Live Status</span>
+        <span class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">Fleet Control</span>
       </div>
 
       <div id="myRidesContainer" class="space-y-3">
@@ -96,13 +96,13 @@
     </div>
   </main>
 
-  <!-- ACCEPT RIDE / DRIVER ASSIGNMENT MODAL -->
+  <!-- STEP 2: DEDICATED DRIVER & CAB ASSIGNMENT MODAL -->
   <div id="assignDriverModal" class="fixed inset-0 bg-slate-900/70 z-[70] hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
-          <h3 class="font-bold text-slate-800 text-sm">Accept & Assign Cab</h3>
-          <p class="text-[10px] text-slate-500">Customer ko yeh driver details share ki jayengi</p>
+          <h3 class="font-bold text-slate-800 text-sm">Assign Driver & Cab Details</h3>
+          <p class="text-[10px] text-slate-500">Yeh details customer ke receipt view par unlock honge</p>
         </div>
         <button type="button" onclick="closeModal('assignDriverModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -110,33 +110,30 @@
       </div>
 
       <div class="p-5 space-y-3 text-xs">
-        <input type="hidden" id="acceptingDocId" />
+        <input type="hidden" id="modalDocId" />
         
-        <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-100 text-blue-900 space-y-1">
-          <p id="acceptingRoute" class="font-bold text-xs">Bhopal ➔ Indore</p>
-          <div class="flex justify-between text-[11px]">
-            <span>Net Vendor Payout (85%):</span>
-            <b id="acceptingPayout">₹0</b>
-          </div>
+        <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-100 text-blue-900 space-y-0.5">
+          <p id="modalRouteText" class="font-bold text-xs">Bhopal ➔ Indore</p>
+          <p id="modalBookingIdText" class="text-[10px] font-mono text-blue-700">MTZ-XXXX</p>
         </div>
 
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Driver Name *</label>
-          <input id="assignDriverName" type="text" placeholder="Driver ka poora naam" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+          <input id="modalDriverName" type="text" placeholder="e.g. Ramesh Kumar" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
         </div>
 
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Driver Mobile Number *</label>
-          <input id="assignDriverPhone" type="tel" maxlength="10" placeholder="10-digit mobile" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+          <input id="modalDriverPhone" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
         </div>
 
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Commercial Cab Number *</label>
-          <input id="assignCabNumber" type="text" placeholder="e.g. MP04TB5049" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-mono font-bold uppercase" />
+          <input id="modalCabNumber" type="text" placeholder="e.g. MP04TB5049" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-mono font-bold uppercase" />
         </div>
 
-        <button type="button" id="confirmAcceptBtn" onclick="confirmAcceptRide()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
-          <i class="fa-solid fa-circle-check"></i> Confirm Acceptance & Lock Ride
+        <button type="button" id="modalSaveDriverBtn" onclick="saveDriverCabDetails()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-circle-check"></i> Save & Send Details to Customer
         </button>
       </div>
     </div>
@@ -156,7 +153,6 @@
       </div>
 
       <div class="p-5 space-y-3.5 text-xs">
-        <!-- GOOGLE POPUP LOGIN -->
         <button type="button" onclick="vendorLoginWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-4 rounded-xl border border-slate-300 flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
           <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
           Partner Sign-in with Google
@@ -217,7 +213,6 @@
     let currentVendor = null;
     let allBookingsCache = [];
 
-    // MODAL HELPERS
     function openModal(id) {
       const el = document.getElementById(id);
       if (el) {
@@ -238,7 +233,6 @@
       openModal('vendorAuthModal');
     }
 
-    // TAB SWITCHER
     function switchVendorTab(tab) {
       const vAvail = document.getElementById('viewAvailable');
       const vRides = document.getElementById('viewMyRides');
@@ -258,7 +252,6 @@
       }
     }
 
-    // AUTHENTICATION ENGINE
     auth.onAuthStateChanged((user) => {
       currentVendor = user;
       const label = document.getElementById('partnerAuthLabel');
@@ -333,7 +326,6 @@
       }
     }
 
-    // REAL-TIME FIRESTORE DISPATCH LISTENER
     function listenToAllBookings() {
       db.collection("bookings").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
         allBookingsCache = [];
@@ -356,11 +348,9 @@
         myAssignedRides = allBookingsCache.filter(b => b.vendorId === currentVendor.uid);
       }
 
-      // Update Badges
       document.getElementById("availableBadgeCount").innerText = availableLeads.length;
       document.getElementById("myRidesBadgeCount").innerText = myAssignedRides.length;
 
-      // Update Financial Stats
       let netPayoutTotal = 0;
       let cutTotal = 0;
       myAssignedRides.forEach(b => {
@@ -375,7 +365,7 @@
       document.getElementById("kpiVendorNetPayout").innerText = `₹${netPayoutTotal.toLocaleString('en-IN')}`;
       document.getElementById("kpiVendorCut").innerText = `₹${cutTotal.toLocaleString('en-IN')}`;
 
-      // 1. RENDER AVAILABLE LEADS
+      // 1. RENDER AVAILABLE LEADS (STEP 1: 1-CLICK INSTANT ACCEPT & LOCK)
       if (availableLeads.length === 0) {
         availableContainer.innerHTML = `
           <div class="text-center py-10 bg-white rounded-3xl border border-slate-200 p-6 text-slate-400 text-xs">
@@ -389,8 +379,8 @@
           const totalFare = Number(b.total) || 0;
           const fee15 = Math.round(totalFare * 0.15);
           const vendorNet = totalFare - fee15;
-          const pickupFuel = Math.round(totalFare * 0.20);
-          const dropBal = vendorNet - pickupFuel;
+          const pickupFuel = b.pickupPay || Math.round(totalFare * 0.45);
+          const dropBal = totalFare - pickupFuel;
 
           return `
             <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
@@ -408,9 +398,14 @@
                   <span>•</span>
                   <span><i class="fa-solid fa-car-side text-slate-400 mr-0.5"></i> ${b.vehicle} (${b.type})</span>
                 </div>
+                ${b.carrierRequired ? `
+                  <div class="mt-2 bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md text-[10px] font-bold inline-flex items-center gap-1">
+                    <i class="fa-solid fa-truck-ramp-box"></i> Roof Carrier Required (+₹300 Included)
+                  </div>
+                ` : ''}
               </div>
 
-              <!-- PRICING SPLIT CARD (15% CUT GUARANTEE) -->
+              <!-- 15% PLATFORM COMMISSION & 45% FUEL SPLIT -->
               <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 space-y-1 text-[11px]">
                 <div class="flex justify-between text-slate-600">
                   <span>Customer Gross Fare:</span>
@@ -421,24 +416,26 @@
                   <span class="font-bold">-₹${fee15}</span>
                 </div>
                 <div class="flex justify-between text-emerald-800 font-bold pt-1 border-t border-slate-200">
-                  <span>Your Net Earning:</span>
+                  <span>Your Net Fleet Earning:</span>
                   <span class="text-sm font-black text-emerald-600">₹${vendorNet}</span>
                 </div>
-                <div class="text-[10px] text-slate-500 pt-0.5 flex justify-between">
-                  <span>Pickup Fuel (20%): ₹${pickupFuel}</span>
-                  <span>Drop Payout: ₹${dropBal}</span>
+                <div class="text-[10px] text-slate-500 pt-0.5 flex justify-between border-t border-dashed border-slate-200">
+                  <span>Customer 45% Fuel at Pickup: <b>₹${pickupFuel}</b></span>
+                  <span>55% at Drop: <b>₹${dropBal}</b></span>
                 </div>
+                <p class="text-[9px] text-amber-700 pt-1">* Fastag Toll, State Border Tax & Parking customer directly pay karega.</p>
               </div>
 
-              <button onclick="promptAcceptRide('${b.docId}', '${b.from} ➔ ${b.to}', '${vendorNet}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
-                <i class="fa-solid fa-hand-holding-dollar"></i> Accept This Booking
+              <!-- INSTANT 1-CLICK ACCEPT BUTTON -->
+              <button onclick="instantAcceptRide('${b.docId}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+                <i class="fa-solid fa-hand-holding-dollar"></i> Accept Ride (Lock To Fleet)
               </button>
             </div>
           `;
         }).join('');
       }
 
-      // 2. RENDER MY FLEET RIDES
+      // 2. RENDER MY FLEET RIDES (STEP 2: DRIVER & CAB ASSIGNMENT TAG)
       if (!currentVendor) {
         myRidesContainer.innerHTML = `
           <div class="text-center py-10 bg-white rounded-3xl border border-slate-200 p-6 space-y-2">
@@ -464,7 +461,7 @@
           const isConfirmed = b.status === "Confirmed";
           const isStarted = b.status === "Trip Started";
           const isCompleted = b.status === "Trip Completed";
-          const isCancelled = b.status === "Cancelled";
+          const isDriverAssigned = Boolean(b.driverName && b.cabNumber);
 
           return `
             <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
@@ -482,39 +479,65 @@
               <div>
                 <p class="font-bold text-slate-800 text-sm">${b.from} ➔ ${b.to}</p>
                 <p class="text-slate-500 text-[11px] mt-0.5">${b.date} • ${b.time} • ${b.vehicle}</p>
+                ${b.carrierRequired ? `
+                  <span class="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded mt-1 inline-block">Roof Carrier Cab</span>
+                ` : ''}
               </div>
 
-              <!-- PASSENGER & CAB LOG -->
-              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/70 grid grid-cols-2 gap-2 text-[11px]">
+              <!-- PASSENGER INFO -->
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/70 text-[11px] flex justify-between items-center">
                 <div>
                   <p class="text-slate-400 uppercase font-bold text-[9px]">Passenger</p>
                   <p class="font-bold text-slate-800">${b.name}</p>
-                  <a href="tel:${b.phone}" class="text-blue-600 underline font-semibold">${b.phone}</a>
                 </div>
                 <div class="text-right">
-                  <p class="text-slate-400 uppercase font-bold text-[9px]">Cab & Driver</p>
-                  <p class="font-bold text-slate-800">${b.driverName || '-'} (${b.driverPhone || '-'})</p>
-                  <p class="font-mono font-bold text-slate-700">${b.cabNumber || '-'}</p>
+                  <a href="tel:${b.phone}" class="inline-flex items-center gap-1 text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200 font-bold">
+                    <i class="fa-solid fa-phone text-[9px]"></i> ${b.phone}
+                  </a>
                 </div>
               </div>
 
-              <div class="flex justify-between items-center text-[11px] font-bold">
+              <!-- DRIVER & CAB STATUS BOX / ASSIGNMENT TAG -->
+              <div class="p-2.5 rounded-xl border ${isDriverAssigned ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'} space-y-1.5">
+                <div class="flex justify-between items-center">
+                  <span class="font-bold text-[11px] flex items-center gap-1">
+                    <i class="fa-solid ${isDriverAssigned ? 'fa-id-card text-emerald-600' : 'fa-triangle-exclamation text-amber-600'}"></i>
+                    ${isDriverAssigned ? 'Assigned Driver & Cab' : 'Driver Not Assigned Yet'}
+                  </span>
+                  ${!isCompleted ? `
+                    <button onclick="openAssignDriverModal('${b.docId}', '${b.from.replace(/'/g, "\\'")} ➔ ${b.to.replace(/'/g, "\\'")}', '${b.bookingId}', '${(b.driverName || '').replace(/'/g, "\\'")}', '${b.driverPhone || ''}', '${b.cabNumber || ''}')" class="text-[10px] font-bold px-2 py-0.5 rounded-md ${isDriverAssigned ? 'bg-white border border-emerald-300 text-emerald-700' : 'bg-amber-600 text-white shadow-sm'}">
+                      ${isDriverAssigned ? 'Change Driver' : '+ Assign Driver & Cab'}
+                    </button>
+                  ` : ''}
+                </div>
+
+                ${isDriverAssigned ? `
+                  <div class="grid grid-cols-2 text-[10px] pt-1 border-t border-emerald-200/60">
+                    <p><b>Driver:</b> ${b.driverName} (${b.driverPhone})</p>
+                    <p class="text-right"><b>Cab No:</b> <span class="font-mono font-bold">${b.cabNumber}</span></p>
+                  </div>
+                ` : `
+                  <p class="text-[10px] text-amber-800">Customer ko driver details bhejne ke liye upar diye button se driver add karein.</p>
+                `}
+              </div>
+
+              <div class="flex justify-between items-center text-[11px] font-bold pt-1">
                 <span>Net Vendor Settlement:</span>
                 <span class="text-emerald-700 font-black text-sm">₹${vendorNet}</span>
               </div>
 
-              <!-- CONTROLLERS -->
+              <!-- TRIP LIFECYCLE CONTROLLERS -->
               <div class="pt-1 space-y-2">
                 ${isConfirmed ? `
-                  <button onclick="startTripAction('${b.docId}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
-                    <i class="fa-solid fa-play"></i> Start Ride (Pickup Verified)
+                  <button onclick="startTripAction('${b.docId}', ${isDriverAssigned})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-solid fa-play"></i> Start Ride (45% Fuel Collected)
                   </button>
                   <button onclick="cancelByVendor('${b.docId}', '${totalFare}')" class="w-full text-rose-600 hover:text-rose-700 bg-rose-50 border border-rose-200 font-semibold py-2 rounded-xl text-xs">
                     Cancel & Reassign
                   </button>
                 ` : isStarted ? `
                   <button onclick="completeTripAction('${b.docId}')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
-                    <i class="fa-solid fa-flag-checkered"></i> Mark Trip Completed (Collect 80%)
+                    <i class="fa-solid fa-flag-checkered"></i> Mark Trip Completed (Collect 55%)
                   </button>
                 ` : ''}
               </div>
@@ -524,56 +547,79 @@
       }
     }
 
-    // DISPATCH ACTIONS
-    function promptAcceptRide(docId, routeText, netPay) {
+    // STEP 1: INSTANT ACCEPT & LOCK (NO PROMPTS NEEDED)
+    function instantAcceptRide(docId) {
       if (!currentVendor) {
         alert("Ride accept karne ke liye Vendor/Partner login anivarya hai!");
         openVendorAuthModal();
         return;
       }
-      document.getElementById('acceptingDocId').value = docId;
-      document.getElementById('acceptingRoute').innerText = routeText;
-      document.getElementById('acceptingPayout').innerText = `₹${netPay}`;
-      openModal('assignDriverModal');
-    }
 
-    function confirmAcceptRide() {
-      const docId = document.getElementById('acceptingDocId').value;
-      const dName = document.getElementById('assignDriverName').value.trim();
-      const dPhone = document.getElementById('assignDriverPhone').value.trim();
-      const cabNum = document.getElementById('assignCabNumber').value.trim();
-
-      if (!dName || dPhone.length < 10 || !cabNum) {
-        return alert("Driver Name, 10-digit Phone aur Commercial Cab Number bharna compulsory hai!");
+      if (!confirm("Kya aap yeh booking accept karke apne fleet me lock karna chahte hain?")) {
+        return;
       }
-
-      const btn = document.getElementById('confirmAcceptBtn');
-      btn.innerText = "Assigning Driver...";
-      btn.disabled = true;
 
       db.collection("bookings").doc(docId).update({
         status: "Confirmed",
         vendorId: currentVendor.uid,
         vendorEmail: currentVendor.email || '',
+        acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert("Ride accepted! Ab aap 'My Fleet Rides' tab me jakar Driver & Cab assign kar sakte hain.");
+        switchVendorTab('myrides');
+      }).catch(err => {
+        alert("Error accepting ride: " + err.message);
+      });
+    }
+
+    // STEP 2: DEDICATED ASSIGN DRIVER MODAL CONTROLLER
+    function openAssignDriverModal(docId, routeText, bookingId, dName, dPhone, cNum) {
+      document.getElementById('modalDocId').value = docId;
+      document.getElementById('modalRouteText').innerText = routeText;
+      document.getElementById('modalBookingIdText').innerText = bookingId;
+      document.getElementById('modalDriverName').value = dName || '';
+      document.getElementById('modalDriverPhone').value = dPhone || '';
+      document.getElementById('modalCabNumber').value = cNum || '';
+      openModal('assignDriverModal');
+    }
+
+    function saveDriverCabDetails() {
+      const docId = document.getElementById('modalDocId').value;
+      const dName = document.getElementById('modalDriverName').value.trim();
+      const dPhone = document.getElementById('modalDriverPhone').value.trim();
+      const cabNum = document.getElementById('modalCabNumber').value.trim();
+
+      if (!dName || dPhone.length < 10 || !cabNum) {
+        return alert("Driver Name, 10-digit Phone aur Commercial Cab Number bharna compulsory hai!");
+      }
+
+      const btn = document.getElementById('modalSaveDriverBtn');
+      btn.innerText = "Saving Details...";
+      btn.disabled = true;
+
+      db.collection("bookings").doc(docId).update({
         driverName: dName,
         driverPhone: dPhone,
         cabNumber: cabNum.toUpperCase(),
-        acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+        driverAssignedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        btn.innerText = "Confirm Acceptance & Lock Ride";
+        btn.innerText = "Save & Send Details to Customer";
         btn.disabled = false;
         closeModal('assignDriverModal');
-        alert("Ride successfully assign aur confirm ho gayi!");
-        switchVendorTab('myrides');
+        alert("Driver aur Cab details successfully save ho gayi! Customer ke screen par live reflect ho gayi hain.");
       }).catch(err => {
-        btn.innerText = "Confirm Acceptance & Lock Ride";
+        btn.innerText = "Save & Send Details to Customer";
         btn.disabled = false;
         alert("Error: " + err.message);
       });
     }
 
-    function startTripAction(docId) {
-      if (confirm("Customer pickup ho chuka hai aur 20% fuel allowance verify ho gayi hai?")) {
+    function startTripAction(docId, isDriverAssigned) {
+      if (!isDriverAssigned) {
+        alert("⚠️ Kripya trip shuru karne se pehle '+ Assign Driver & Cab' button se Driver details assign karein!");
+        return;
+      }
+      if (confirm("Customer pickup ho chuka hai aur 45% fuel allowance verify ho gayi hai?")) {
         db.collection("bookings").doc(docId).update({
           status: "Trip Started",
           tripStartedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -582,7 +628,7 @@
     }
 
     function completeTripAction(docId) {
-      if (confirm("Trip destination par complete ho chuki hai aur remaining 80% payment collect ho gayi hai?")) {
+      if (confirm("Trip destination par complete ho chuki hai aur remaining 55% payment collect ho gayi hai?")) {
         db.collection("bookings").doc(docId).update({
           status: "Trip Completed",
           tripCompletedAt: firebase.firestore.FieldValue.serverTimestamp()
