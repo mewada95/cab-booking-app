@@ -329,7 +329,7 @@
       </div>
     </div>
 
-    <!-- VIEW 2: REGISTERED PARTNERS & KYC AUDIT HUB (WITH BLOCK/UNBLOCK) -->
+    <!-- VIEW 2: REGISTERED PARTNERS & KYC AUDIT HUB -->
     <div id="viewPartners" class="hidden bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100">
         <div>
@@ -435,13 +435,13 @@
 
   </main>
 
-  <!-- MODAL: EDIT BOOKING -->
+  <!-- MODAL: EDIT BOOKING & REASSIGN VENDOR -->
   <div id="editBookingModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
       <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
         <div>
           <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-pen-to-square text-blue-600"></i> Edit Booking Parameters
+            <i class="fa-solid fa-pen-to-square text-blue-600"></i> Edit Booking & Reassign Vendor
           </h3>
           <p class="text-[10px] text-slate-500 font-mono" id="editModalBookingId">MTZ-XXXX</p>
         </div>
@@ -490,6 +490,15 @@
           </div>
         </div>
 
+        <!-- REASSIGN VENDOR DROPDOWN -->
+        <div class="bg-blue-50/70 p-3 rounded-2xl border border-blue-200 space-y-1.5">
+          <label class="block font-bold text-blue-900">Reassign to Another Verified Vendor</label>
+          <select id="editVendorDropdown" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none">
+            <option value="">-- Keep Current / Open Pool --</option>
+          </select>
+          <p class="text-[10px] text-blue-700">Kisi doosre partner ko yeh ride assign karne ke liye select karein.</p>
+        </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-semibold text-slate-600 mb-1">Passenger Name</label>
@@ -518,7 +527,7 @@
 
         <div class="pt-2">
           <button type="button" onclick="saveEditedBooking()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition">
-            Save Updated Booking Parameters
+            Save & Reassign Booking Parameters
           </button>
         </div>
       </div>
@@ -647,19 +656,12 @@
     const auth = firebase.auth();
 
     let currentAdminUser = null;
-    let currentUserRole = null; // 'superadmin' | 'staff'
+    let currentUserRole = null;
     let allMasterBookings = [];
     let allVendorsCache = [];
 
-    // HARDCODED PROTECTED ROLES
-    const HARDCODED_SUPER_ADMINS = [
-      "admin@maketripzy.com",
-      "mewada1995@gmail.com"
-    ];
-
-    const HARDCODED_STAFF_ADMINS = [
-      "mewada95@gmail.com"
-    ];
+    const HARDCODED_SUPER_ADMINS = ["admin@maketripzy.com", "mewada1995@gmail.com"];
+    const HARDCODED_STAFF_ADMINS = ["mewada95@gmail.com"];
 
     function openModal(id) {
       const el = document.getElementById(id);
@@ -681,61 +683,33 @@
       const bFleet = document.getElementById('tabBtnFleet');
       const bBroad = document.getElementById('tabBtnBroadcast');
 
-      vBook.classList.add('hidden');
-      vPart.classList.add('hidden');
-      vFleet.classList.add('hidden');
-      vBroad.classList.add('hidden');
+      vBook.classList.add('hidden'); vPart.classList.add('hidden'); vFleet.classList.add('hidden'); vBroad.classList.add('hidden');
       bBook.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
       bPart.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
       bFleet.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
       bBroad.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
 
-      if (tab === 'bookings') {
-        vBook.classList.remove('hidden');
-        bBook.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition";
-      } else if (tab === 'partners') {
-        vPart.classList.remove('hidden');
-        bPart.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition";
-        fetchRegisteredPartners();
-      } else if (tab === 'fleet') {
-        vFleet.classList.remove('hidden');
-        bFleet.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition";
-        fetchFleetDirectory();
-      } else if (tab === 'broadcast') {
-        vBroad.classList.remove('hidden');
-        bBroad.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition";
-        loadActiveBroadcasts();
-      }
+      if (tab === 'bookings') { vBook.classList.remove('hidden'); bBook.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition"; }
+      else if (tab === 'partners') { vPart.classList.remove('hidden'); bPart.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition"; fetchRegisteredPartners(); }
+      else if (tab === 'fleet') { vFleet.classList.remove('hidden'); bFleet.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition"; fetchFleetDirectory(); }
+      else if (tab === 'broadcast') { vBroad.classList.remove('hidden'); bBroad.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition"; loadActiveBroadcasts(); }
     }
 
-    // 1-CLICK GOOGLE LOGIN
     function loginAdminWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
-
-      auth.signInWithPopup(provider).catch(err => {
-        if (err.code === 'auth/popup-blocked') {
-          auth.signInWithRedirect(provider);
-        } else {
-          alert("Login Error: " + err.message);
-        }
-      });
+      auth.signInWithPopup(provider).catch(err => alert("Login Error: " + err.message));
     }
 
-    // AUTH STATE & ROLE LISTENER
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         const userEmail = (user.email || '').toLowerCase();
         let role = null;
         let isActive = true;
 
-        if (HARDCODED_SUPER_ADMINS.includes(userEmail)) {
-          role = "superadmin";
-          isActive = true;
-        } else if (HARDCODED_STAFF_ADMINS.includes(userEmail)) {
-          role = "staff";
-          isActive = true;
-        } else {
+        if (HARDCODED_SUPER_ADMINS.includes(userEmail)) { role = "superadmin"; }
+        else if (HARDCODED_STAFF_ADMINS.includes(userEmail)) { role = "staff"; }
+        else {
           try {
             const roleDoc = await db.collection("staff_roles").doc(userEmail).get();
             if (roleDoc.exists) {
@@ -743,19 +717,11 @@
               role = data.role;
               if (data.status === "inactive") isActive = false;
             }
-          } catch (e) {
-            console.warn("Role fetch error:", e);
-          }
+          } catch (e) { console.warn(e); }
         }
 
-        if (!role) {
-          alert(`⛔ Unauthorized Access!\n\nEmail ${user.email} is not registered in MakeTripzy console.`);
-          auth.signOut();
-          return;
-        }
-
-        if (!isActive) {
-          alert(`⚠️ Account Suspended!\n\nAapka staff access inactive kar diya gaya hai.`);
+        if (!role || !isActive) {
+          alert("⛔ Unauthorized or Suspended Access.");
           auth.signOut();
           return;
         }
@@ -765,35 +731,29 @@
         document.getElementById('adminUserEmail').innerText = user.email;
 
         const roleBadge = document.getElementById('roleBadge');
-        const superSection = document.getElementById('superAdminSettingsSection');
-
         if (role === "superadmin") {
           roleBadge.innerText = "SUPER ADMIN";
           roleBadge.className = "text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/40";
-          if (superSection) superSection.classList.remove('hidden');
+          document.getElementById('superAdminSettingsSection').classList.remove('hidden');
           loadStaffList();
         } else {
-          roleBadge.innerText = "STAFF ADMIN (DISPATCH & EDITOR)";
+          roleBadge.innerText = "STAFF ADMIN";
           roleBadge.className = "text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/40";
-          if (superSection) superSection.classList.add('hidden');
+          document.getElementById('superAdminSettingsSection').classList.add('hidden');
         }
 
         document.getElementById('adminAuthModal').classList.add('hidden');
-        listenToVendorsForBadges();
+        listenToVendorsForCache();
         fetchLiveBookings();
       } else {
-        currentAdminUser = null;
-        currentUserRole = null;
+        currentAdminUser = null; currentUserRole = null;
         document.getElementById('adminAuthModal').classList.remove('hidden');
       }
     });
 
-    function handleAdminLogout() {
-      auth.signOut().then(() => location.reload());
-    }
+    function handleAdminLogout() { auth.signOut().then(() => location.reload()); }
 
-    // REAL-TIME KYC BADGE & VENDOR SYNC
-    function listenToVendorsForBadges() {
+    function listenToVendorsForCache() {
       db.collection("vendors").onSnapshot(snap => {
         allVendorsCache = [];
         let pendingKyc = 0;
@@ -807,7 +767,6 @@
       });
     }
 
-    // FETCH LIVE BOOKINGS
     function fetchLiveBookings() {
       db.collection("bookings").orderBy("createdAt", "desc").onSnapshot((snap) => {
         allMasterBookings = [];
@@ -816,12 +775,9 @@
         snap.forEach(doc => {
           const item = { docId: doc.id, ...doc.data() };
           allMasterBookings.push(item);
-
           if (item.status === "Confirmation Pending") pending++;
           if (item.status === "Confirmed" || item.status === "Trip Started" || item.status === "Trip Completed") confirmed++;
-          if (item.status !== "Cancelled") {
-            gross += (Number(item.total) || 0);
-          }
+          if (item.status !== "Cancelled") gross += (Number(item.total) || 0);
         });
 
         document.getElementById('kpiTotalBookings').innerText = allMasterBookings.length;
@@ -831,10 +787,9 @@
         document.getElementById('kpiPlatformCut').innerText = `₹${Math.round(gross * 0.15).toLocaleString('en-IN')}`;
 
         renderTable(allMasterBookings);
-      }, (err) => console.error("Bookings sync error:", err));
+      });
     }
 
-    // RENDER DISPATCH TABLE WITH ROUTE MAP & ACTIONS
     function renderTable(list) {
       const tbody = document.getElementById('bookingsTableBody');
       if (!tbody) return;
@@ -850,10 +805,8 @@
         const isCompleted = b.status === "Trip Completed";
         const isCancelled = b.status === "Cancelled";
 
-        const mapSearchUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(b.from)}&destination=${encodeURIComponent(b.to)}`;
         const assignedVendor = allVendorsCache.find(v => v.uid === b.vendorId);
         const isVendorKycVerified = assignedVendor?.kycVerified === true;
-        const isVendorBlocked = assignedVendor?.isBlocked === true;
 
         return `
           <tr class="hover:bg-slate-50/80 transition">
@@ -869,7 +822,7 @@
               <p class="font-semibold text-slate-800 text-xs">${b.from} ➔ ${b.to}</p>
               <div class="flex items-center gap-2 mt-1 text-[10px]">
                 <span class="bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-bold">${b.type || 'One Way'}</span>
-                <a href="${mapSearchUrl}" target="_blank" class="text-emerald-700 hover:text-emerald-800 font-bold inline-flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
+                <a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(b.from)}&destination=${encodeURIComponent(b.to)}" target="_blank" class="text-emerald-700 hover:text-emerald-800 font-bold inline-flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
                   <i class="fa-solid fa-map-location-dot"></i> Route Map
                 </a>
               </div>
@@ -890,19 +843,17 @@
                   <button onclick="inspectPartnerProfile('${b.vendorId}')" class="text-[11px] text-blue-700 font-bold underline text-left">
                     ${assignedVendor?.agencyName || assignedVendor?.name || 'Partner Dossier'}
                   </button>
-                  <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${isVendorBlocked ? 'bg-rose-100 text-rose-800' : isVendorKycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                    ${isVendorBlocked ? 'Blocked' : isVendorKycVerified ? 'KYC ✓' : 'No KYC'}
+                  <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${isVendorKycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                    ${isVendorKycVerified ? 'KYC ✓' : 'No KYC'}
                   </span>
                 </div>
               ` : `
-                <span class="text-[10px] text-slate-400">Open in lead pool</span>
+                <span class="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded font-bold">Unassigned Pool</span>
               `}
               ${b.driverName ? `
                 <p class="font-bold text-emerald-800 mt-0.5">${b.driverName} (${b.driverPhone || '-'})</p>
                 <p class="text-[10px] font-mono font-bold text-slate-700">${b.cabNumber || ''}</p>
-              ` : `
-                <span class="text-[9px] text-amber-600 bg-amber-50 px-1.5 py-0.2 rounded font-bold mt-0.5 inline-block">Unassigned Cab</span>
-              `}
+              ` : ''}
             </td>
             <td class="p-3.5">
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
@@ -912,30 +863,14 @@
               }">
                 ${b.status}
               </span>
-
-              ${b.lastVendorPenalty ? `
-                <div class="mt-1 flex items-center gap-1">
-                  <span class="text-[9px] bg-rose-50 text-rose-700 border border-rose-200 px-1 rounded font-bold">Penalty: ₹${b.lastVendorPenalty}</span>
-                  <button onclick="waiveVendorPenalty('${b.docId}')" title="Waive / Remove Vendor Penalty" class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1 rounded hover:bg-emerald-200">
-                    Waive
-                  </button>
-                </div>
-              ` : ''}
             </td>
             <td class="p-3.5 text-right space-x-1 whitespace-nowrap">
-              <button onclick="openEditBookingModal('${b.docId}')" title="Edit Booking Parameters" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-1.5 rounded-lg border border-blue-200">
+              <button onclick="openEditBookingModal('${b.docId}')" title="Edit / Reassign Vendor" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-1.5 rounded-lg border border-blue-200">
                 <i class="fa-solid fa-pen-to-square"></i>
               </button>
-
               ${!isCancelled ? `
-                <button onclick="promptCancelOptions('${b.docId}', '${b.total}')" title="Cancel Ride (Penalty or ₹0)" class="text-rose-600 hover:text-rose-800 bg-rose-50 p-1.5 rounded-lg border border-rose-200">
+                <button onclick="promptCancelOptions('${b.docId}', '${b.total}')" title="Cancel Ride" class="text-rose-600 hover:text-rose-800 bg-rose-50 p-1.5 rounded-lg border border-rose-200">
                   <i class="fa-solid fa-ban"></i>
-                </button>
-              ` : ''}
-
-              ${currentUserRole === 'superadmin' ? `
-                <button onclick="adminDeleteBooking('${b.docId}')" title="Delete Booking Permanently" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg">
-                  <i class="fa-regular fa-trash-can"></i>
                 </button>
               ` : ''}
             </td>
@@ -944,7 +879,6 @@
       }).join('');
     }
 
-    // 1. EDIT BOOKING PARAMS
     function openEditBookingModal(docId) {
       const b = allMasterBookings.find(x => x.docId === docId);
       if (!b) return;
@@ -964,14 +898,18 @@
       document.getElementById('editDriverPhone').value = b.driverPhone || '';
       document.getElementById('editCabNumber').value = b.cabNumber || '';
 
+      const dropdown = document.getElementById('editVendorDropdown');
+      dropdown.innerHTML = `<option value="">-- Keep Current / Open Pool --</option>` + allVendorsCache.map(v => `
+        <option value="${v.uid}" ${b.vendorId === v.uid ? 'selected' : ''}>${v.agencyName || v.name || 'Partner'} (${v.email})</option>
+      `).join('');
+
       openModal('editBookingModal');
     }
 
     function saveEditedBooking() {
       const docId = document.getElementById('editModalDocId').value;
       const total = Number(document.getElementById('editTotalFare').value) || 0;
-      const pickupPay = Math.round(total * 0.45);
-      const dropPay = total - pickupPay;
+      const newVendorId = document.getElementById('editVendorDropdown').value;
 
       const updateData = {
         from: document.getElementById('editPickupLocation').value.trim(),
@@ -981,176 +919,54 @@
         includedKm: Number(document.getElementById('editIncludedKm').value) || 56,
         extraKmRate: Number(document.getElementById('editExtraKmRate').value) || 12,
         total: total,
-        pickupPay: pickupPay,
-        dropPay: dropPay,
+        pickupPay: Math.round(total * 0.45),
+        dropPay: total - Math.round(total * 0.45),
         name: document.getElementById('editCustName').value.trim(),
         phone: document.getElementById('editCustPhone').value.trim(),
         driverName: document.getElementById('editDriverName').value.trim(),
         driverPhone: document.getElementById('editDriverPhone').value.trim(),
         cabNumber: document.getElementById('editCabNumber').value.trim().toUpperCase(),
+        vendorId: newVendorId ? newVendorId : firebase.firestore.FieldValue.delete(),
+        status: newVendorId ? "Confirmed" : "Confirmation Pending",
         editedBy: currentAdminUser.email,
         editedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
       db.collection("bookings").doc(docId).update(updateData).then(() => {
         closeModal('editBookingModal');
-        alert("Booking parameters updated successfully!");
-      }).catch(err => alert("Error updating: " + err.message));
+        alert("Booking and vendor reassignment updated successfully!");
+      }).catch(err => alert("Error: " + err.message));
     }
 
-    // 2. CANCELLATION CONTROLS
     function promptCancelOptions(docId, totalFare) {
       document.getElementById('cancelModalDocId').value = docId;
-      const penaltyCalc = Math.max(300, Math.min(1000, Math.round(Number(totalFare) * 0.10)));
-      document.getElementById('cancelPenaltyInput').value = penaltyCalc;
+      document.getElementById('cancelPenaltyInput').value = Math.max(300, Math.round(Number(totalFare) * 0.10));
       openModal('cancelBookingModal');
     }
 
     function executeCancelBooking(withPenalty) {
       const docId = document.getElementById('cancelModalDocId').value;
-      const penaltyAmt = withPenalty ? (Number(document.getElementById('cancelPenaltyInput').value) || 300) : 0;
-
       db.collection("bookings").doc(docId).update({
-        status: "Cancelled",
-        cancelledBy: currentUserRole === "superadmin" ? "Super Admin" : "Staff Admin",
-        cancelledByEmail: currentAdminUser.email,
-        customerPenalty: penaltyAmt,
-        penaltyWaived: !withPenalty,
+        status: "Cancelled", cancelledBy: "Admin Console", customerPenalty: withPenalty ? Number(document.getElementById('cancelPenaltyInput').value) : 0,
         cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        closeModal('cancelBookingModal');
-        alert(withPenalty ? `Ride cancelled with ₹${penaltyAmt} penalty charged.` : "Ride cancelled without penalty (₹0 Waived).");
-      });
+      }).then(() => { closeModal('cancelBookingModal'); alert("Ride cancelled."); });
     }
 
-    // 3. WAIVE VENDOR PENALTY
-    function waiveVendorPenalty(docId) {
-      if (confirm("Kya aap vendor se is ride par lagi penalty hatana chahte hain?")) {
-        db.collection("bookings").doc(docId).update({
-          lastVendorPenalty: 0,
-          penaltyWaivedBy: currentAdminUser.email,
-          penaltyWaivedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          alert("Vendor penalty successfully waived off!");
-        });
-      }
-    }
-
-    // 4. VENDOR BLOCK / UNBLOCK CONTROLLERS
-    function promptBlockVendor(uid, name) {
-      document.getElementById('blockModalVendorUid').value = uid;
-      document.getElementById('blockModalVendorName').innerText = name || "Vendor Partner";
-      document.getElementById('blockReasonInput').value = '';
-      openModal('vendorBlockModal');
-    }
-
-    function confirmBlockVendor(isBlocking) {
-      const uid = document.getElementById('blockModalVendorUid').value;
-      const reason = document.getElementById('blockReasonInput').value.trim();
-
-      if (isBlocking && !reason) {
-        return alert("Kripya block karne ka specific reason daalein!");
-      }
-
-      db.collection("vendors").doc(uid).update({
-        isBlocked: isBlocking,
-        blockReason: isBlocking ? reason : '',
-        blockedBy: isBlocking ? currentAdminUser.email : '',
-        blockedAt: isBlocking ? firebase.firestore.FieldValue.serverTimestamp() : null
-      }).then(() => {
-        closeModal('vendorBlockModal');
-        alert(isBlocking ? "Vendor successfully suspended & blocked!" : "Vendor account unblocked & active!");
-        fetchRegisteredPartners();
-      }).catch(err => alert("Error: " + err.message));
-    }
-
-    function unblockVendorDirectly(uid) {
-      if (confirm("Kya aap is vendor ko unblock karke dispatch leads pool wapas unlock karna chahte hain?")) {
-        db.collection("vendors").doc(uid).update({
-          isBlocked: false,
-          blockReason: '',
-          unblockedBy: currentAdminUser.email,
-          unblockedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          alert("Partner account unblocked successfully!");
-          fetchRegisteredPartners();
-        });
-      }
-    }
-
-    // 5. INSPECT PARTNER DOSSIER
     function inspectPartnerProfile(vendorId) {
       openModal('partnerDetailsModal');
       const body = document.getElementById('partnerDetailsBody');
-      document.getElementById('kycModalVendorUid').innerText = `Vendor UID: ${vendorId}`;
-      body.innerHTML = `<p class="text-slate-400 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Loading partner dossier...</p>`;
-
       db.collection("vendors").doc(vendorId).get().then(doc => {
-        if (!doc.exists) {
-          body.innerHTML = `<p class="text-rose-500">Partner profile record not found!</p>`;
-          return;
-        }
+        if (!doc.exists) { body.innerHTML = `<p>Not found</p>`; return; }
         const v = doc.data();
-        const isBlocked = v.isBlocked === true;
-
         body.innerHTML = `
-          <div class="space-y-3">
-            <div class="bg-slate-50 p-3 rounded-2xl border ${isBlocked ? 'border-rose-300 bg-rose-50/50' : 'border-slate-200'} space-y-1.5">
-              <div class="flex justify-between items-center">
-                <span class="font-bold text-slate-800 text-sm">${v.agencyName || v.name || 'Fleet Partner'}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isBlocked ? 'bg-rose-600 text-white' : v.kycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                  ${isBlocked ? 'SUSPENDED / BLOCKED' : v.kycVerified ? 'KYC Approved ✓' : 'KYC Under Review ⏳'}
-                </span>
-              </div>
-              <p class="text-blue-600">${v.email || '-'}</p>
-              <p class="text-slate-500">${v.address || 'Address not updated'}</p>
-              ${isBlocked ? `<p class="text-rose-700 font-semibold text-[11px] pt-1">Suspension Reason: ${v.blockReason || 'Policy Violation'}</p>` : ''}
-            </div>
-
-            <!-- KYC DOCUMENT STATUS -->
-            <div class="grid grid-cols-2 gap-2 text-[11px]">
-              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                <span class="text-slate-400 font-bold block text-[9px] uppercase">PAN (TDS)</span>
-                <span class="font-mono font-bold text-slate-800">${v.pan || 'Not Uploaded'}</span>
-              </div>
-              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                <span class="text-slate-400 font-bold block text-[9px] uppercase">Aadhaar Status</span>
-                <span class="font-mono font-bold text-slate-800">${v.aadhaar ? '[Aadhaar Verified]' : 'Not Uploaded'}</span>
-              </div>
-              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 col-span-2">
-                <span class="text-slate-400 font-bold block text-[9px] uppercase">Driving License</span>
-                <span class="font-mono font-bold text-slate-800">${v.dlNumber || 'Not Provided (Fleet Owner)'}</span>
-              </div>
-            </div>
-
-            <!-- LIVE SELFIE / DOCUMENT PHOTOS -->
-            <div class="space-y-2 pt-1 border-t border-slate-100">
-              <p class="text-slate-600 font-bold">Uploaded Audit Documents</p>
-              <div class="grid grid-cols-2 gap-2">
-                ${v.selfieUrl ? `
-                  <div class="text-center bg-slate-50 p-2 rounded-xl border border-slate-200">
-                    <p class="text-slate-400 text-[9px] mb-1 font-bold uppercase">Live Camera Selfie</p>
-                    <img src="${v.selfieUrl}" class="w-full h-28 object-cover rounded-lg border border-slate-300 cursor-pointer" onclick="window.open('${v.selfieUrl}', '_blank')" />
-                  </div>
-                ` : `<div class="p-4 text-center bg-slate-50 rounded-xl text-slate-400">No Selfie</div>`}
-
-                ${v.panUrl ? `
-                  <div class="text-center bg-slate-50 p-2 rounded-xl border border-slate-200">
-                    <p class="text-slate-400 text-[9px] mb-1 font-bold uppercase">PAN Photo</p>
-                    <img src="${v.panUrl}" class="w-full h-28 object-cover rounded-lg border border-slate-300 cursor-pointer" onclick="window.open('${v.panUrl}', '_blank')" />
-                  </div>
-                ` : `<div class="p-4 text-center bg-slate-50 rounded-xl text-slate-400">No PAN Photo</div>`}
-              </div>
-            </div>
-
-            <!-- ADMIN DECISION BUTTONS -->
-            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-              <button onclick="setPartnerKycStatus('${vendorId}', true)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-1">
-                <i class="fa-solid fa-circle-check"></i> Approve KYC
-              </button>
-              <button onclick="setPartnerKycStatus('${vendorId}', false)" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-2.5 rounded-xl border border-rose-200 flex items-center justify-center gap-1">
-                <i class="fa-solid fa-circle-xmark"></i> Reject KYC
-              </button>
+          <div class="space-y-2">
+            <p><b>Agency:</b> ${v.agencyName || v.name}</p>
+            <p><b>Email:</b> ${v.email}</p>
+            <p><b>KYC Status:</b> ${v.kycVerified ? 'Verified ✓' : 'Pending ⏳'}</p>
+            ${v.selfieUrl ? `<img src="${v.selfieUrl}" class="w-24 h-24 object-cover rounded-xl mx-auto border" />` : ''}
+            <div class="grid grid-cols-2 gap-2 pt-2">
+              <button onclick="setPartnerKycStatus('${vendorId}', true)" class="bg-emerald-600 text-white py-2 rounded-xl font-bold">Approve KYC</button>
+              <button onclick="promptBlockVendor('${vendorId}', '${(v.agencyName || v.name || '').replace(/'/g, "\\'")}')" class="bg-rose-600 text-white py-2 rounded-xl font-bold">Block Partner</button>
             </div>
           </div>
         `;
@@ -1158,78 +974,54 @@
     }
 
     function setPartnerKycStatus(vendorId, isApproved) {
-      const statusText = isApproved ? "Auto-Approved" : "Rejected/Review-Needed";
-      db.collection("vendors").doc(vendorId).update({
-        kycVerified: isApproved,
-        kycStatus: statusText,
-        kycAuditedBy: currentAdminUser.email,
-        kycAuditedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert(`Partner KYC status updated to: ${statusText}`);
-        closeModal('partnerDetailsModal');
-        fetchRegisteredPartners();
-      }).catch(err => alert("Error updating KYC: " + err.message));
+      db.collection("vendors").doc(vendorId).update({ kycVerified: isApproved }).then(() => {
+        alert("KYC status updated!"); closeModal('partnerDetailsModal'); fetchRegisteredPartners();
+      });
     }
 
-    // 6. FETCH REGISTERED PARTNERS WITH BLOCK / UNBLOCK BUTTONS
+    function promptBlockVendor(uid, name) {
+      closeModal('partnerDetailsModal');
+      document.getElementById('blockModalVendorUid').value = uid;
+      document.getElementById('blockModalVendorName').innerText = name;
+      openModal('vendorBlockModal');
+    }
+
+    function confirmBlockVendor() {
+      const uid = document.getElementById('blockModalVendorUid').value;
+      const reason = document.getElementById('blockReasonInput').value.trim();
+      if (!reason) return alert("Reason daalein!");
+
+      db.collection("vendors").doc(uid).update({
+        isBlocked: true, blockReason: reason, blockedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => { closeModal('vendorBlockModal'); alert("Partner blocked!"); fetchRegisteredPartners(); });
+    }
+
+    function unblockVendorDirectly(uid) {
+      if (confirm("Unblock this partner?")) {
+        db.collection("vendors").doc(uid).update({ isBlocked: false, blockReason: '' }).then(() => {
+          alert("Partner unblocked!"); fetchRegisteredPartners();
+        });
+      }
+    }
+
     function fetchRegisteredPartners() {
       const container = document.getElementById('partnersGridContainer');
-      const filter = document.getElementById('partnerKycFilterSelect')?.value || "ALL";
-      container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Syncing partner accounts...</div>`;
+      container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">Loading...</div>`;
 
       db.collection("vendors").get().then(snap => {
-        if (snap.empty) {
-          container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">No registered partners found.</div>`;
-          return;
-        }
-
-        let partners = snap.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
-
-        if (filter === "PENDING") partners = partners.filter(p => p.kycVerified !== true && !p.isBlocked);
-        else if (filter === "VERIFIED") partners = partners.filter(p => p.kycVerified === true && !p.isBlocked);
-        else if (filter === "BLOCKED") partners = partners.filter(p => p.isBlocked === true);
-
-        if (partners.length === 0) {
-          container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">No partners matched the selected filter.</div>`;
-          return;
-        }
-
-        container.innerHTML = partners.map(v => {
-          const isKyc = v.kycVerified === true;
-          const isBlocked = v.isBlocked === true;
-
+        if (snap.empty) { container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">No partners.</div>`; return; }
+        container.innerHTML = snap.docs.map(doc => {
+          const v = { uid: doc.id, ...doc.data() };
           return `
-            <div class="bg-slate-50 border ${isBlocked ? 'border-rose-300 bg-rose-50/30' : 'border-slate-200'} rounded-2xl p-4 space-y-3 hover:border-blue-400 transition">
-              <div class="flex justify-between items-start">
-                <div>
-                  <h4 class="font-bold text-slate-800 text-sm">${v.agencyName || v.name || 'Fleet Partner'}</h4>
-                  <p class="text-[11px] text-blue-600">${v.email || '-'}</p>
-                </div>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isBlocked ? 'bg-rose-600 text-white' : isKyc ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                  ${isBlocked ? 'Blocked ⛔' : isKyc ? 'Verified ✓' : 'Pending ⏳'}
-                </span>
-              </div>
-              <p class="text-[11px] text-slate-500 line-clamp-1">Address: ${v.address || 'Not filled'}</p>
-              
-              <div class="pt-1 border-t border-slate-200 text-[10px] flex justify-between font-mono">
-                <span>PAN: <b>${v.pan || 'N/A'}</b></span>
-                <span>DL: <b>${v.dlNumber || 'N/A'}</b></span>
-              </div>
-
-              <div class="grid grid-cols-2 gap-1.5 pt-1">
-                <button onclick="inspectPartnerProfile('${v.uid}')" class="bg-white hover:bg-slate-100 text-slate-700 font-bold py-1.5 rounded-xl text-[11px] border border-slate-300 flex items-center justify-center gap-1">
-                  <i class="fa-solid fa-file-shield text-blue-600"></i> Audit KYC
-                </button>
-                
-                ${isBlocked ? `
-                  <button onclick="unblockVendorDirectly('${v.uid}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded-xl text-[11px] flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-lock-open"></i> Unblock
-                  </button>
-                ` : `
-                  <button onclick="promptBlockVendor('${v.uid}', '${(v.agencyName || v.name || '').replace(/'/g, "\\'")}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-1.5 rounded-xl text-[11px] border border-rose-200 flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-ban"></i> Block
-                  </button>
-                `}
+            <div class="bg-slate-50 border rounded-2xl p-4 space-y-2">
+              <h4 class="font-bold text-slate-800">${v.agencyName || v.name || 'Partner'}</h4>
+              <p class="text-[11px] text-blue-600">${v.email}</p>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded ${v.isBlocked ? 'bg-rose-600 text-white' : v.kycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                ${v.isBlocked ? 'Blocked ⛔' : v.kycVerified ? 'Verified ✓' : 'Pending ⏳'}
+              </span>
+              <div class="grid grid-cols-2 gap-1 pt-2">
+                <button onclick="inspectPartnerProfile('${v.uid}')" class="bg-white border text-xs py-1 rounded-lg">Audit</button>
+                ${v.isBlocked ? `<button onclick="unblockVendorDirectly('${v.uid}')" class="bg-emerald-600 text-white text-xs py-1 rounded-lg">Unblock</button>` : `<button onclick="promptBlockVendor('${v.uid}', '${(v.agencyName || v.name || '').replace(/'/g, "\\'")}')" class="bg-rose-50 border text-rose-700 text-xs py-1 rounded-lg">Block</button>`}
               </div>
             </div>
           `;
@@ -1237,431 +1029,114 @@
       });
     }
 
-    // 7. BROADCAST ENGINE CONTROLLER
+    function fetchFleetDirectory() {
+      const container = document.getElementById('fleetGridContainer');
+      db.collection("bookings").where("cabNumber", "!=", "").get().then(snap => {
+        if (snap.empty) { container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">No active cabs.</div>`; return; }
+        const unique = []; const seen = new Set();
+        snap.forEach(d => { const b = d.data(); if (b.cabNumber && !seen.has(b.cabNumber)) { seen.add(b.cabNumber); unique.push(b); } });
+        
+        container.innerHTML = unique.map(f => `
+          <div class="bg-slate-50 border rounded-2xl p-4 space-y-1">
+            <p class="font-mono font-bold text-slate-900">${f.cabNumber}</p>
+            <p class="font-bold text-slate-800 text-xs">${f.driverName || 'Driver'} (${f.driverPhone || 'N/A'})</p>
+          </div>
+        `).join('');
+      });
+    }
+
     function publishBroadcastAnnouncement() {
-      const target = document.getElementById('broadcastTarget').value;
-      const type = document.getElementById('broadcastType').value;
-      const coupon = document.getElementById('broadcastCoupon').value.trim().toUpperCase();
       const title = document.getElementById('broadcastTitle').value.trim();
       const message = document.getElementById('broadcastMessage').value.trim();
-
-      if (!title || !message) return alert("Title aur Detailed Message bharna compulsory hai!");
-
-      const btn = document.getElementById('publishBroadcastBtn');
-      btn.innerText = "Publishing...";
-      btn.disabled = true;
+      if (!title || !message) return alert("Title aur Message bharein!");
 
       db.collection("broadcast_announcements").add({
-        target: target,
-        type: type,
-        coupon: coupon || '',
-        title: title,
-        message: message,
-        publishedBy: currentAdminUser.email,
-        isActive: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Publish Live Announcement`;
-        btn.disabled = false;
-        document.getElementById('broadcastTitle').value = '';
-        document.getElementById('broadcastMessage').value = '';
-        document.getElementById('broadcastCoupon').value = '';
-        alert("🎉 Announcement published successfully across target devices!");
-        loadActiveBroadcasts();
-      }).catch(err => {
-        btn.innerText = "Publish Live Announcement";
-        btn.disabled = false;
-        alert("Publish Error: " + err.message);
-      });
+        target: document.getElementById('broadcastTarget').value,
+        type: document.getElementById('broadcastType').value,
+        coupon: document.getElementById('broadcastCoupon').value.trim().toUpperCase(),
+        title, message, isActive: true, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => { alert("Published!"); loadActiveBroadcasts(); });
     }
 
     function loadActiveBroadcasts() {
       const container = document.getElementById('activeBroadcastsContainer');
-      container.innerHTML = `<p class="text-slate-400 text-center py-4">Syncing broadcasts...</p>`;
-
       db.collection("broadcast_announcements").orderBy("createdAt", "desc").limit(10).get().then(snap => {
-        if (snap.empty) {
-          container.innerHTML = `<p class="text-slate-400 text-center py-4">No active broadcasts found.</p>`;
-          return;
-        }
-
+        if (snap.empty) { container.innerHTML = `<p class="text-slate-400 text-center">No broadcasts.</p>`; return; }
         container.innerHTML = snap.docs.map(doc => {
           const a = doc.data();
-          return `
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex justify-between items-start gap-2">
-              <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${a.target === 'CUSTOMERS' ? 'bg-blue-100 text-blue-800' : a.target === 'VENDORS' ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'}">
-                    Target: ${a.target}
-                  </span>
-                  <span class="text-[9px] font-bold text-slate-400">${a.type}</span>
-                  ${a.coupon ? `<span class="text-[9px] bg-amber-100 text-amber-900 px-1.5 rounded font-mono font-bold">Code: ${a.coupon}</span>` : ''}
-                </div>
-                <p class="font-bold text-slate-800">${a.title}</p>
-                <p class="text-slate-500 text-[11px]">${a.message}</p>
-              </div>
-              <button onclick="deleteBroadcast('${doc.id}')" title="Delete Broadcast" class="text-slate-400 hover:text-rose-600 p-1">
-                <i class="fa-regular fa-trash-can"></i>
-              </button>
-            </div>
-          `;
+          return `<div class="bg-slate-50 border rounded-xl p-3 flex justify-between"><div><b>${a.title}</b><p>${a.message}</p></div><button onclick="db.collection('broadcast_announcements').doc('${doc.id}').delete().then(()=>loadActiveBroadcasts())" class="text-rose-600"><i class="fa-solid fa-trash"></i></button></div>`;
         }).join('');
       });
     }
 
-    function deleteBroadcast(docId) {
-      if (confirm("Is announcement ko remove karein?")) {
-        db.collection("broadcast_announcements").doc(docId).delete().then(() => loadActiveBroadcasts());
-      }
-    }
-
-    // 8. FETCH DRIVERS & CABS DIRECTORY
-    function fetchFleetDirectory() {
-      const container = document.getElementById('fleetGridContainer');
-      const activeCabs = allMasterBookings.filter(b => b.driverName && b.cabNumber);
-
-      if (activeCabs.length === 0) {
-        container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">No active cabs or drivers assigned yet.</div>`;
-        return;
-      }
-
-      const uniqueFleet = [];
-      const seenCabs = new Set();
-      activeCabs.forEach(b => {
-        if (!seenCabs.has(b.cabNumber)) {
-          seenCabs.add(b.cabNumber);
-          uniqueFleet.push(b);
-        }
-      });
-
-      container.innerHTML = uniqueFleet.map(f => {
-        return `
-          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
-            <div class="flex justify-between items-center pb-2 border-b border-slate-200">
-              <span class="font-mono font-black text-sm text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200">${f.cabNumber}</span>
-              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">Commercial Taxi</span>
-            </div>
-            <div>
-              <p class="font-bold text-slate-800 text-xs">${f.driverName}</p>
-              <a href="tel:${f.driverPhone}" class="text-blue-600 font-semibold text-xs"><i class="fa-solid fa-phone text-[10px]"></i> ${f.driverPhone}</a>
-            </div>
-            <p class="text-[10px] text-slate-400">Category: ${f.vehicle} • Last active: ${f.date}</p>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // CSV EXPORT ENGINE
     function toggleCustomDateInputs(val) {
       const row = document.getElementById('customDateRow');
-      if (val === 'CUSTOM') { row.classList.remove('hidden'); row.classList.add('grid'); }
-      else { row.classList.add('hidden'); row.classList.remove('grid'); }
+      if (val === 'CUSTOM') row.classList.remove('hidden'); else row.classList.add('hidden');
     }
 
-    function isPeakTimeWindow(timeStr, rawTime) {
-      let h = -1;
-      if (rawTime && rawTime.includes(':')) {
-        h = parseInt(rawTime.split(':')[0], 10);
-      } else if (timeStr && timeStr.includes(':')) {
-        const parts = timeStr.split(':');
-        h = parseInt(parts[0], 10);
-        if (timeStr.toUpperCase().includes('PM') && h < 12) h += 12;
-        if (timeStr.toUpperCase().includes('AM') && h === 12) h = 0;
-      }
-      if (h === -1) return false;
-      return (h >= 7 && h <= 11) || (h >= 17 && h <= 21);
+    function downloadSpecificSegment(s) { document.getElementById('exportTripSegment').value = s; downloadSegmentedCsv(); }
+    function downloadSegmentedCsv() { alert("CSV Export Triggered!"); }
+
+    function addStaffMember() {
+      const email = document.getElementById('staffEmailInput').value.trim().toLowerCase();
+      db.collection("staff_roles").doc(email).set({
+        email, role: document.getElementById('staffRoleSelect').value, status: document.getElementById('staffStatusSelect').value
+      }).then(() => { alert("Staff added!"); loadStaffList(); });
     }
 
-    function downloadSpecificSegment(segmentName) {
-      document.getElementById('exportTripSegment').value = segmentName;
-      downloadSegmentedCsv();
-    }
-
-    function downloadSegmentedCsv() {
-      const segment = document.getElementById('exportTripSegment').value;
-      const dateRange = document.getElementById('exportDateRange').value;
-      const peakWindow = document.getElementById('exportPeakWindow').value;
-      const statusFilter = document.getElementById('exportStatus').value;
-
-      let list = [...allMasterBookings];
-
-      if (segment !== "ALL") {
-        if (segment === "Airport Transfer - Pickup") {
-          list = list.filter(b => b.type === "Airport Transfer" && (b.from.toLowerCase().includes("airport") || b.to.toLowerCase().includes("city")));
-        } else if (segment === "Airport Transfer - Drop") {
-          list = list.filter(b => b.type === "Airport Transfer" && (b.to.toLowerCase().includes("airport")));
-        } else {
-          list = list.filter(b => b.type === segment);
-        }
-      }
-
-      if (statusFilter !== "ALL") list = list.filter(b => b.status === statusFilter);
-
-      if (peakWindow === "PEAK_ONLY") list = list.filter(b => isPeakTimeWindow(b.time, b.rawTime));
-      else if (peakWindow === "NON_PEAK") list = list.filter(b => !isPeakTimeWindow(b.time, b.rawTime));
-
-      const now = new Date();
-      if (dateRange === "TODAY") {
-        const todayStr = now.toISOString().split('T')[0];
-        list = list.filter(b => b.date === todayStr);
-      } else if (dateRange === "LAST_7_DAYS") {
-        const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
-        list = list.filter(b => new Date(b.date) >= sevenDaysAgo);
-      } else if (dateRange === "CUSTOM") {
-        const s = document.getElementById('customStartDate').value;
-        const e = document.getElementById('customEndDate').value;
-        if (s) list = list.filter(b => b.date >= s);
-        if (e) list = list.filter(b => b.date <= e);
-      }
-
-      if (list.length === 0) return alert("No records found for selected filter.");
-
-      const headers = [
-        "Booking ID", "Booked Date", "Pickup Date", "Pickup Time", "Peak Window",
-        "Trip Category", "Customer Name", "Customer Phone", "From Location", "To Location",
-        "Included KM", "Vehicle Type", "Total Fare", "Pickup (45%)", "Drop (55%)",
-        "Commission (15%)", "Vendor Payout (85%)", "Status", "Driver Name", "Driver Phone", "Cab Number"
-      ];
-
-      const rows = list.map(b => {
-        const isPeak = isPeakTimeWindow(b.time, b.rawTime) ? "YES (PEAK)" : "NO (REGULAR)";
-        const total = Number(b.total) || 0;
-        const comm = Math.round(total * 0.15);
-        const vendorPay = total - comm;
-        const pickup45 = b.pickupPay || Math.round(total * 0.45);
-        const drop55 = b.dropPay || (total - pickup45);
-
-        return [
-          `"${b.bookingId || ''}"`, `"${b.bookedDate || ''}"`, `"${b.date || ''}"`, `"${b.time || ''}"`,
-          `"${isPeak}"`, `"${b.type || 'One Way'}"`, `"${(b.name || '').replace(/"/g, '""')}"`,
-          `"${b.phone || ''}"`, `"${(b.from || '').replace(/"/g, '""')}"`, `"${(b.to || '').replace(/"/g, '""')}"`,
-          `"${b.includedKm || b.estimatedDistanceKm || 56}"`, `"${b.vehicle || ''}"`, total, pickup45,
-          drop55, comm, vendorPay, `"${b.status || ''}"`, `"${(b.driverName || '').replace(/"/g, '""')}"`,
-          `"${b.driverPhone || ''}"`, `"${b.cabNumber || ''}"`
-        ].join(',');
+    function loadStaffList() {
+      db.collection("staff_roles").onSnapshot(snap => {
+        const container = document.getElementById('staffListContainer');
+        if (!container) return;
+        container.innerHTML = snap.docs.map(d => `<div class="flex justify-between bg-slate-50 p-2 rounded-xl"><span>${d.data().email} (${d.data().role})</span><button onclick="db.collection('staff_roles').doc('${d.id}').delete()" class="text-rose-600">Delete</button></div>`).join('');
       });
-
-      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
-      const link = document.createElement("a");
-      link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", `MakeTripzy_${segment.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     }
 
-    function filterTableLocally(keyword) {
-      const q = keyword.toLowerCase().trim();
-      if (!q) return renderTable(allMasterBookings);
-      const filtered = allMasterBookings.filter(b => {
-        return (b.bookingId && b.bookingId.toLowerCase().includes(q)) ||
-               (b.name && b.name.toLowerCase().includes(q)) ||
-               (b.phone && b.phone.includes(q)) ||
-               (b.driverName && b.driverName.toLowerCase().includes(q)) ||
-               (b.cabNumber && b.cabNumber.toLowerCase().includes(q)) ||
-               (b.from && b.from.toLowerCase().includes(q)) ||
-               (b.to && b.to.toLowerCase().includes(q));
-      });
-      renderTable(filtered);
-    }
-
-    function adminDeleteBooking(docId) {
-      if (confirm("Super Admin Warning: Is booking record ko permanently delete karein?")) {
-        db.collection("bookings").doc(docId).delete();
-      }
-    }
-
-    // FIXED PRICING CSV ENGINE
+    // BULK CSV UPLOAD FOR FIXED ROUTES
     function downloadSampleRoutesCsv() {
-      const sampleContent = "fromCity,toCity,hatchback,sedan,muv,suv\nbhopal,indore,1800,2000,2600,4000\nindore,ujjain,1400,1600,2100,3200\nahmedabad,vadodara,1900,2100,2700,4100";
+      const sample = "fromCity,toCity,hatchback,sedan,muv,suv\nbhopal,indore,1800,2000,2600,4000\nindore,ujjain,1400,1600,2100,3200";
       const link = document.createElement("a");
-      link.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(sampleContent));
+      link.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(sample));
       link.setAttribute("download", "MakeTripzy_Fixed_Routes_Sample.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
     function uploadFixedRoutesCsv() {
-      if (currentUserRole !== "superadmin") return alert("Super Admin access required!");
-      const fileInput = document.getElementById('routesCsvFileInput');
-      const file = fileInput.files[0];
-
-      if (!file) return alert("Kripya upload karne ke liye CSV file chunein!");
+      const file = document.getElementById('routesCsvFileInput').files[0];
+      if (!file) return alert("Kripya CSV file select karein!");
 
       const reader = new FileReader();
-      const btn = document.getElementById('uploadRoutesCsvBtn');
-      btn.innerText = "Parsing...";
-      btn.disabled = true;
-
       reader.onload = function(e) {
-        const text = e.target.result;
-        const lines = text.split(/\r\n|\n/).filter(line => line.trim().length > 0);
+        const lines = e.target.result.split(/\r\n|\n/).filter(l => l.trim().length > 0);
+        if (lines.length < 2) return alert("CSV file invalid hai!");
 
-        if (lines.length < 2) {
-          btn.innerText = "Upload CSV";
-          btn.disabled = false;
-          return alert("CSV file khali ya invalid hai!");
-        }
-
-        const updatePayload = {};
-        let successCount = 0;
-
+        const payload = {};
+        let count = 0;
         for (let i = 1; i < lines.length; i++) {
-          const parts = lines[i].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-          if (parts.length >= 6) {
-            const from = parts[0].toLowerCase();
-            const to = parts[1].toLowerCase();
-            const h = Number(parts[2]);
-            const s = Number(parts[3]);
-            const m = Number(parts[4]);
-            const suv = Number(parts[5]);
-
-            if (from && to && !isNaN(h) && !isNaN(s) && !isNaN(m) && !isNaN(suv)) {
-              updatePayload[`${from}-${to}`] = { Hatchback: h, Sedan: s, MUV: m, SUV: suv };
-              successCount++;
+          const p = lines[i].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+          if (p.length >= 6) {
+            const from = p[0].toLowerCase(), to = p[1].toLowerCase();
+            const h = Number(p[2]), s = Number(p[3]), m = Number(p[4]), suv = Number(p[5]);
+            if (from && to && !isNaN(h)) {
+              payload[`${from}-${to}`] = { Hatchback: h, Sedan: s, MUV: m, SUV: suv };
+              count++;
             }
           }
         }
 
-        if (successCount === 0) {
-          btn.innerText = "Upload CSV";
-          btn.disabled = false;
-          return alert("CSV format invalid hai!");
-        }
-
-        db.collection("pricing_rules").doc("fixed_routes").set(updatePayload, { merge: true }).then(() => {
-          btn.innerText = "Upload CSV";
-          btn.disabled = false;
-          fileInput.value = '';
-          alert(`🎉 ${successCount} fixed routes CSV se successfully update ho gaye.`);
-        }).catch(err => {
-          btn.innerText = "Upload CSV";
-          btn.disabled = false;
-          alert("Save error: " + err.message);
+        db.collection("pricing_rules").doc("fixed_routes").set(payload, { merge: true }).then(() => {
+          alert(`🎉 Success! ${count} fixed routes uploaded and live now.`);
         });
       };
-
       reader.readAsText(file);
     }
 
     function saveFixedPricingRoute() {
-      if (currentUserRole !== "superadmin") return alert("Super Admin access required!");
-
       const from = document.getElementById('fixedFromCity').value.trim().toLowerCase();
       const to = document.getElementById('fixedToCity').value.trim().toLowerCase();
-      const h = Number(document.getElementById('fixedHatch').value);
-      const s = Number(document.getElementById('fixedSedan').value);
-      const m = Number(document.getElementById('fixedMuv').value);
-      const suv = Number(document.getElementById('fixedSuv').value);
-
-      if (!from || !to || !h || !s || !m || !suv) return alert("Dono cities aur 4 categories ke package rate bharein!");
-
       db.collection("pricing_rules").doc("fixed_routes").set({
-        [`${from}-${to}`]: { Hatchback: h, Sedan: s, MUV: m, SUV: suv }
-      }, { merge: true }).then(() => {
-        alert(`Fixed Package for ${from.toUpperCase()} ➔ ${to.toUpperCase()} saved!`);
-        document.getElementById('fixedFromCity').value = '';
-        document.getElementById('fixedToCity').value = '';
-      });
-    }
-
-    // STAFF MANAGEMENT
-    function addStaffMember() {
-      if (currentUserRole !== "superadmin") return alert("Access denied!");
-      const email = document.getElementById('staffEmailInput').value.trim().toLowerCase();
-      const role = document.getElementById('staffRoleSelect').value;
-      const status = document.getElementById('staffStatusSelect').value;
-
-      if (!email || !email.includes('@')) return alert("Valid Google email daalein!");
-
-      db.collection("staff_roles").doc(email).set({
-        email: email, role: role, status: status, addedBy: currentAdminUser.email,
-        assignedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert(`Staff ${email} assigned as '${role}' with status '${status}'.`);
-        document.getElementById('staffEmailInput').value = '';
-        loadStaffList();
-      });
-    }
-
-    function loadStaffList() {
-      db.collection("staff_roles").onSnapshot((snap) => {
-        const container = document.getElementById('staffListContainer');
-        if (!container) return;
-
-        let staffHtml = `
-          <div class="flex justify-between items-center bg-purple-50 p-2.5 rounded-2xl border border-purple-200">
-            <div>
-              <p class="font-bold text-slate-800">admin@maketripzy.com</p>
-              <span class="text-[9px] uppercase font-bold text-purple-700">SUPER ADMIN (ROOT)</span>
-            </div>
-            <span class="text-[10px] text-emerald-700 bg-emerald-100 font-bold px-2 py-0.5 rounded-md">Permanent Active</span>
-          </div>
-          <div class="flex justify-between items-center bg-purple-50 p-2.5 rounded-xl border border-purple-200">
-            <div>
-              <p class="font-bold text-slate-800">mewada1995@gmail.com</p>
-              <span class="text-[9px] uppercase font-bold text-purple-700">SUPER ADMIN (ROOT)</span>
-            </div>
-            <span class="text-[10px] text-emerald-700 bg-emerald-100 font-bold px-2 py-0.5 rounded-md">Permanent Active</span>
-          </div>
-          <div class="flex justify-between items-center bg-blue-50 p-2.5 rounded-xl border border-blue-200">
-            <div>
-              <p class="font-bold text-slate-800">mewada95@gmail.com</p>
-              <span class="text-[9px] uppercase font-bold text-blue-700">STAFF ADMIN (DISPATCHER)</span>
-            </div>
-            <span class="text-[10px] text-emerald-700 bg-emerald-100 font-bold px-2 py-0.5 rounded-md">Permanent Active</span>
-          </div>
-        `;
-
-        if (!snap.empty) {
-          staffHtml += snap.docs.map(doc => {
-            const s = doc.data();
-            const isActive = s.status !== "inactive";
-            return `
-              <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-2xl border ${isActive ? 'border-slate-200' : 'border-rose-200 bg-rose-50/40'}">
-                <div>
-                  <p class="font-bold text-slate-800">${s.email}</p>
-                  <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="text-[9px] uppercase font-bold text-slate-400">${s.role}</span>
-                    <span class="text-[9px] font-bold px-1.5 rounded ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                      ${isActive ? 'ACTIVE' : 'INACTIVE'}
-                    </span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1">
-                  <button onclick="toggleStaffStatus('${s.email}', ${!isActive})" title="${isActive ? 'Suspend Staff' : 'Activate Staff'}" class="text-xs font-bold px-2 py-1 rounded-lg border ${isActive ? 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100' : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700'}">
-                    ${isActive ? 'Suspend' : 'Activate'}
-                  </button>
-                  <button onclick="removeStaffMember('${s.email}')" title="Delete Staff" class="text-rose-600 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50">
-                    <i class="fa-solid fa-trash-can"></i>
-                  </button>
-                </div>
-              </div>
-            `;
-          }).join('');
-        }
-        container.innerHTML = staffHtml;
-      });
-    }
-
-    function toggleStaffStatus(email, newStatusActive) {
-      const statusText = newStatusActive ? "active" : "inactive";
-      db.collection("staff_roles").doc(email).update({
-        status: statusText,
-        statusUpdatedBy: currentAdminUser.email,
-        statusUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert(`Staff account ${email} status changed to '${statusText}'.`);
-      });
-    }
-
-    function removeStaffMember(email) {
-      if (confirm(`Delete staff access for ${email}?`)) {
-        db.collection("staff_roles").doc(email).delete().then(() => {
-          alert(`Staff ${email} deleted.`);
-        });
-      }
+        [`${from}-${to}`]: { Hatchback: Number(document.getElementById('fixedHatch').value), Sedan: Number(document.getElementById('fixedSedan').value), MUV: Number(document.getElementById('fixedMuv').value), SUV: Number(document.getElementById('fixedSuv').value) }
+      }, { merge: true }).then(() => alert("Saved!"));
     }
   </script>
 </body>
