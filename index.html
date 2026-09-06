@@ -237,7 +237,7 @@
             <span class="text-xs font-bold text-slate-700 bg-white px-2 py-1 rounded-lg border border-slate-200">+₹300</span>
           </div>
 
-          <!-- EXTRA CHARGES NOTICE (TOLL, STATE TAX, PARKING) -->
+          <!-- EXTRA CHARGES NOTICE -->
           <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 mt-3 text-[11px] text-amber-900 space-y-1">
             <p class="font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Toll, State Tax & Parking Extra
@@ -247,7 +247,7 @@
             </p>
           </div>
 
-          <!-- PAYMENT SPLIT INFO (0 ADVANCE, 45% PICKUP, 55% DROP) -->
+          <!-- PAYMENT SPLIT INFO -->
           <div class="mt-3 bg-blue-50 p-3 rounded-xl border border-blue-200 text-xs text-blue-950 space-y-1">
             <p class="font-bold flex items-center gap-1.5 text-blue-900">
               <i class="fa-solid fa-circle-check text-emerald-600"></i> ₹0 Advance Booking Guarantee
@@ -269,7 +269,7 @@
       </div>
     </div>
 
-    <!-- RECEIPT VIEW (FULL DETAILS & LIVE CANCEL CONTROLLER) -->
+    <!-- RECEIPT VIEW -->
     <div id="receiptSection" class="hidden px-4 pt-4">
       <button onclick="backToBooking()" class="text-xs font-semibold text-blue-600 flex items-center gap-1 mb-3">
         <i class="fa-solid fa-arrow-left"></i> Book Another Trip
@@ -360,7 +360,6 @@
         <p class="text-slate-500 pt-1 border-t border-slate-100">Landmark: <span id="receiptCustLandmark"></span></p>
       </div>
 
-      <!-- FARE BREAKDOWN (CLEAR INCLUDED ROUTE KM & EXTRA CHARGE SPEC) -->
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
         <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare Breakdown</h4>
         <div class="flex justify-between text-slate-600">
@@ -380,7 +379,6 @@
           <span id="receiptTotalFare">₹2,115</span>
         </div>
 
-        <!-- 45% PICKUP & 55% DROPOFF SPLIT DISPLAY -->
         <div class="bg-blue-50/70 rounded-xl p-3 border border-blue-100 space-y-1.5 mt-2">
           <div class="flex justify-between text-blue-900 font-medium">
             <span>Advance (Now):</span>
@@ -396,7 +394,6 @@
           </div>
         </div>
 
-        <!-- EXTRA KM RATE & TOLL DECLARATION -->
         <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200 space-y-1 mt-2 text-[10px] text-amber-900">
           <p class="font-bold flex justify-between items-center">
             <span>Extra Distance Rate:</span>
@@ -404,9 +401,6 @@
           </p>
           <p class="text-amber-800 leading-relaxed">
             * Agar actual running route included KM se zyada hoti hai toh extra KM rate driver ko add-on pay hoga.
-          </p>
-          <p class="text-amber-800 leading-relaxed">
-            * Fastag Toll, State Border Tax aur Parking charges customer ko directly raste me pay karne honge.
           </p>
         </div>
       </div>
@@ -610,7 +604,6 @@
     let isCarrierRequired = false;
     const carrierChargeAmount = 300;
 
-    // INTERNAL CONFIG (BASE RATE & EXTRA KM CHARGE)
     const CAB_CONFIG = {
       'Hatchback': { baseRate: 11, oneWayMultiplier: 1.65, extraKmRate: 11 },
       'Sedan':     { baseRate: 12, oneWayMultiplier: 1.70, extraKmRate: 12 },
@@ -633,8 +626,9 @@
     let dropCityName = '';
     let calculatedDistanceKm = 0;
     let searchDebounceTimer = null;
-
     let adminFixedRoutes = {};
+
+    // REAL-TIME LISTENER FOR CSV UPLOADED FIXED ROUTES
     db.collection("pricing_rules").doc("fixed_routes").onSnapshot((doc) => {
       if (doc.exists) {
         adminFixedRoutes = doc.data() || {};
@@ -811,24 +805,6 @@
       }
     });
 
-    auth.getRedirectResult().then((result) => {
-      if (result && result.user) {
-        const u = result.user;
-        db.collection("customers").doc(u.uid).set({
-          name: u.displayName || '',
-          email: u.email || '',
-          photo: u.photoURL || '',
-          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-        closeModal('authModal');
-        toggleDrawer(false);
-      }
-    }).catch(err => {
-      if (err.code !== 'auth/credential-already-in-use') {
-        console.error("Redirect check:", err);
-      }
-    });
-
     function handleEmailAuth(isSignUp) {
       const email = document.getElementById('loginEmail').value.trim();
       const pass = document.getElementById('loginPassword').value.trim();
@@ -961,7 +937,7 @@
         .catch(err => console.error(err));
     }
 
-    // CALCULATE FARE WITH EXACT DISTANCE EXPOSURE
+    // CALCULATE FARE WITH CSV FIXED PACKAGE PRIORITY
     function calculateSegmentFare(vehicleType, oneWayDistanceKm, tripType) {
       if (pickupCityName && dropCityName && tripType === 'One Way') {
         const forwardKey = `${pickupCityName}-${dropCityName}`;
@@ -971,7 +947,7 @@
         if (fixedPackage && fixedPackage[vehicleType]) {
           return { 
             fare: Number(fixedPackage[vehicleType]), 
-            isAdminOverride: true, 
+            isCsvPackage: true, 
             displayKm: oneWayDistanceKm || 56 
           };
         }
@@ -981,30 +957,17 @@
       const realDist = Number(oneWayDistanceKm) || 56;
 
       if (tripType === 'One Way') {
-        // Internal slab minimum 100 KM for sustainable pricing
         const billableSlab = Math.max(100, realDist);
         const fare = Math.round(billableSlab * config.baseRate * config.oneWayMultiplier);
-        return { 
-          fare: fare, 
-          isAdminOverride: false, 
-          displayKm: realDist // Displays exact route KM (e.g. 56 KM)
-        };
+        return { fare: fare, isCsvPackage: false, displayKm: realDist };
       } else if (tripType === 'Round Trip') {
         const totalRoundKm = realDist * 2;
         const billableSlab = Math.max(300, totalRoundKm);
         const fare = Math.round(billableSlab * config.baseRate);
-        return { 
-          fare: fare, 
-          isAdminOverride: false, 
-          displayKm: totalRoundKm 
-        };
+        return { fare: fare, isCsvPackage: false, displayKm: totalRoundKm };
       } else {
         const billableSlab = Math.max(100, realDist);
-        return { 
-          fare: Math.round(billableSlab * config.baseRate), 
-          isAdminOverride: false, 
-          displayKm: realDist 
-        };
+        return { fare: Math.round(billableSlab * config.baseRate), isCsvPackage: false, displayKm: realDist };
       }
     }
 
@@ -1025,7 +988,12 @@
       baseFare = cur.fare;
       currentDisplayKm = cur.displayKm;
 
-      // Update exact searched KM tags on all cards (Shows exact 56 KM, not 100 KM)
+      if (cur.isCsvPackage) {
+        document.getElementById('rateModeBadge').innerText = "CSV Fixed Package Active";
+      } else {
+        document.getElementById('rateModeBadge').innerText = "All Inclusive Fare";
+      }
+
       document.querySelectorAll('.inc-km-tag').forEach(el => {
         el.innerText = `Included: ${currentDisplayKm} KM`;
       });
@@ -1117,10 +1085,8 @@
 
       const carrierFee = isCarrierRequired ? carrierChargeAmount : 0;
       const total = baseFare + driverAllowance + carrierFee;
-      
       const pickupPay = Math.round(total * 0.45);
       const dropPay = total - pickupPay;
-      
       const bookingId = 'MTZ-' + Math.floor(1000 + Math.random() * 9000);
       const bookedDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       const extraKmRate = (CAB_CONFIG[selectedVehicle] || CAB_CONFIG['Sedan']).extraKmRate;
@@ -1132,7 +1098,7 @@
         from: from,
         to: to,
         estimatedDistanceKm: calculatedDistanceKm || currentDisplayKm || 56,
-        includedKm: currentDisplayKm, // Saves exact 56 KM in record
+        includedKm: currentDisplayKm,
         extraKmRate: extraKmRate,
         date: date,
         time: displayTime,
@@ -1268,24 +1234,7 @@
           if (confirmedState) confirmedState.classList.add('hidden');
           if (pendingState) pendingState.classList.remove('hidden');
 
-          if (data.reassignedNotice) {
-            if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmed • Assigning New Cab';
-            pendingState.innerHTML = `
-              <div class="text-center py-2">
-                <i class="fa-solid fa-arrows-rotate text-blue-600 text-2xl mb-1 animate-spin"></i>
-                <p class="text-xs font-bold text-slate-800">Booking Confirmed</p>
-                <p class="text-[11px] text-blue-600 font-semibold mt-0.5">Nearby alternate cab partner being assigned...</p>
-                <p class="text-[10px] text-slate-400 mt-1">Driver details sharing soon.</p>
-              </div>
-            `;
-          } else {
-            if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmation Pending';
-            pendingState.innerHTML = `
-              <i class="fa-solid fa-hourglass-half text-amber-500 text-2xl mb-1.5 animate-pulse"></i>
-              <p class="text-xs font-bold text-slate-800">Waiting for Partner to Accept...</p>
-              <p class="text-[11px] text-slate-500 mt-0.5">Partner accept karte hi driver details yahan unlock honge.</p>
-            `;
-          }
+          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmation Pending';
         } else if (data.status === 'Cancelled') {
           if (headerBox) headerBox.className = 'bg-slate-700 text-white rounded-2xl p-5 shadow-sm mb-4';
           if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled by You';
@@ -1327,96 +1276,51 @@
         console.error("Time parsing error:", e);
       }
 
-      let confirmMsg = "";
-      let finalPenalty = 0;
-
-      if (isWithin6Hours) {
-        finalPenalty = calculatedPenalty;
-        confirmMsg = `⚠️ CANCELLATION POLICY WARNING:\n\nRide me 6 ghante se kam bache hain (${hoursRemaining > 0 ? hoursRemaining.toFixed(1) + ' hrs' : 'Pickup time shuru ho chuka hai'}). Policy anusaar 10% late fee (₹${finalPenalty}) lagegi.\n\nKya aap booking cancel karna chahte hain?`;
-      } else {
-        finalPenalty = 0;
-        confirmMsg = `Ride me 6 ghante se zyada samay bacha hai. Cancellation FREE (₹0) hai. Kya aap booking cancel karna chahte hain?`;
-      }
+      let confirmMsg = isWithin6Hours 
+        ? `⚠️ Ride me 6 ghante se kam bache hain. Policy anusaar 10% late fee (₹${calculatedPenalty}) lagegi. Cancel karein?` 
+        : `Ride me 6 ghante se zyada samay bacha hai. Cancellation FREE (₹0) hai. Cancel karein?`;
 
       if (confirm(confirmMsg)) {
         db.collection("bookings").doc(currentDocId).update({
           status: 'Cancelled',
           cancelledBy: 'customer',
-          customerPenalty: finalPenalty,
+          customerPenalty: isWithin6Hours ? calculatedPenalty : 0,
           cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          alert('Booking cancelled successfully.');
-        });
+        }).then(() => alert('Booking cancelled successfully.'));
       }
     }
 
     function renderBookingHistory() {
       const container = document.getElementById('historyListContainer');
       if (!currentUser) {
-        container.innerHTML = `
-          <div class="text-center py-6 space-y-2">
-            <i class="fa-solid fa-lock text-slate-300 text-3xl"></i>
-            <p class="text-slate-600 font-bold">Login to view your bookings</p>
-            <button onclick="openModal('authModal')" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl text-xs">Sign In Now</button>
-          </div>`;
+        container.innerHTML = `<div class="text-center py-6"><p class="text-slate-600 font-bold mb-2">Login to view bookings</p><button onclick="openModal('authModal')" class="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold">Sign In</button></div>`;
         return;
       }
 
-      container.innerHTML = `<div class="text-center py-4 text-slate-400"><i class="fa-solid fa-spinner fa-spin text-base mr-1 text-blue-600"></i> Fetching your bookings...</div>`;
+      container.innerHTML = `<div class="text-center py-4 text-slate-400">Fetching bookings...</div>`;
 
-      db.collection("bookings")
-        .orderBy("createdAt", "desc")
-        .limit(25)
-        .get()
-        .then((snapshot) => {
-          const docs = snapshot.docs.filter(doc => {
-            const data = doc.data();
-            return data.userId === currentUser.uid || 
-                   data.userEmail === currentUser.email || 
-                   (currentUser.phoneNumber && data.phone === currentUser.phoneNumber.slice(-10));
-          });
+      db.collection("bookings").orderBy("createdAt", "desc").limit(25).get().then((snapshot) => {
+        const docs = snapshot.docs.filter(doc => doc.data().userId === currentUser.uid);
 
-          if (docs.length === 0) {
-            container.innerHTML = `<div class="text-center py-6 text-slate-400">Aapki koi active ya purani booking nahi mili.</div>`;
-            return;
-          }
+        if (docs.length === 0) {
+          container.innerHTML = `<div class="text-center py-6 text-slate-400">Aapki koi booking nahi mili.</div>`;
+          return;
+        }
 
-          container.innerHTML = docs.map(doc => {
-            const item = doc.data();
-            const docId = doc.id;
-            const isConfirmed = item.status === 'Confirmed';
-            const isCancelled = item.status === 'Cancelled';
-
-            return `
-              <div onclick="viewBookingFromHistory('${docId}')" class="bg-slate-50 hover:bg-blue-50/60 border border-slate-200 hover:border-blue-400 rounded-2xl p-3.5 text-xs space-y-2 transition cursor-pointer active:scale-95 shadow-sm">
-                <div class="flex justify-between items-center">
-                  <span class="font-bold text-blue-700 text-sm font-mono flex items-center gap-1.5">
-                    ${item.bookingId || 'MTZ'} <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-                  </span>
-                  <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
-                    isConfirmed ? 'bg-emerald-100 text-emerald-700' :
-                    isCancelled ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-800'
-                  }">
-                    ${item.status || 'Pending'}
-                  </span>
-                </div>
-
-                <p class="font-bold text-slate-800 text-xs">${item.from} ➔ ${item.to}</p>
-                <div class="flex justify-between items-center text-[11px] text-slate-500 pt-1 border-t border-slate-200">
-                  <span>${item.date || ''} • ${item.vehicle || ''} ${item.carrierRequired ? '• Carrier' : ''}</span>
-                  <span class="font-bold text-slate-900">₹${item.total || 0}</span>
-                </div>
-
-                <div class="text-[10px] text-blue-600 font-bold text-right pt-0.5 flex items-center justify-end gap-1">
-                  <span>Tap to view live & cancel</span> <i class="fa-solid fa-arrow-right text-[8px]"></i>
-                </div>
+        container.innerHTML = docs.map(doc => {
+          const item = doc.data();
+          return `
+            <div onclick="viewBookingFromHistory('${doc.id}')" class="bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-2xl p-3 text-xs space-y-1.5 cursor-pointer">
+              <div class="flex justify-between font-bold text-blue-700">
+                <span>${item.bookingId}</span>
+                <span>₹${item.total}</span>
               </div>
-            `;
-          }).join('');
-        })
-        .catch(err => {
-          container.innerHTML = `<div class="text-center py-4 text-rose-500">Error loading history: ${err.message}</div>`;
-        });
+              <p class="text-slate-800">${item.from} ➔ ${item.to}</p>
+              <p class="text-[10px] text-slate-400">${item.date} • ${item.status}</p>
+            </div>
+          `;
+        }).join('');
+      });
     }
 
     function backToBooking() {
@@ -1428,26 +1332,17 @@
       const id = document.getElementById('bookingIdBadge').innerText;
       const from = document.getElementById('receiptPickup').innerText;
       const to = document.getElementById('receiptDrop').innerText;
-      const time = document.getElementById('receiptDateTime').innerText;
-      const vehicle = document.getElementById('receiptVehicle').innerText;
       const total = document.getElementById('receiptTotalFare').innerText;
-
-      const message = `*MakeTripzy Booking* 🚖%0A*ID:* ${id}%0A*Route:* ${from} to ${to}%0A*Schedule:* ${time}%0A*Vehicle:* ${vehicle}%0A*Total:* ${total}`;
-      window.open(`https://wa.me/918889637244?text=${message}`, '_blank');
+      window.open(`https://wa.me/918889637244?text=Booking%20ID:%20${id}%20Route:%20${from}%20to%20${to}%20Total:%20${total}`, '_blank');
     }
 
     window.addEventListener("load", () => {
-      const menuBtn = document.getElementById('menuToggleBtn');
-      const drawerClose = document.getElementById('drawerCloseBtn');
-      const drawerOverlay = document.getElementById('drawerOverlay');
-      const drawerProfile = document.getElementById('drawerProfileTrigger');
-
-      if (menuBtn) menuBtn.addEventListener('click', () => toggleDrawer(true));
-      if (drawerClose) drawerClose.addEventListener('click', (e) => { e.stopPropagation(); toggleDrawer(false); });
-      if (drawerOverlay) drawerOverlay.addEventListener('click', () => toggleDrawer(false));
-      if (drawerProfile) drawerProfile.addEventListener('click', () => openModal('authModal'));
-
+      document.getElementById('menuToggleBtn').addEventListener('click', () => toggleDrawer(true));
+      document.getElementById('drawerCloseBtn').addEventListener('click', () => toggleDrawer(false));
+      document.getElementById('drawerOverlay').addEventListener('click', () => toggleDrawer(false));
+      document.getElementById('drawerProfileTrigger').addEventListener('click', () => openModal('authModal'));
       initializeSchedulingRestrictions();
+      updateDynamicVehicleFares(56);
     });
   </script>
 </body>
