@@ -22,7 +22,7 @@
       </div>
       <div>
         <div class="flex items-center gap-2">
-          <h1 class="text-base font-bold tracking-tight">MakeTripzy Operations Hub</h1>
+          <h1 class="text-base font-bold tracking-tight">Tripvyom Operations Hub</h1>
           <span id="roleBadge" class="text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider bg-slate-800 text-slate-400">Authenticating...</span>
         </div>
         <p class="text-[11px] text-slate-400">Bookings, KYC Audits, Fleet & Broadcast Engine</p>
@@ -605,7 +605,7 @@
       <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 shadow-md">
         <i class="fa-solid fa-user-shield"></i>
       </div>
-      <h3 class="text-base font-bold text-slate-900">MakeTripzy Operations Console</h3>
+      <h3 class="text-base font-bold text-slate-900">Tripvyom Operations Console</h3>
       <p class="text-xs text-slate-500">Super Admin & Authorized Staff Operators</p>
 
       <div class="pt-2">
@@ -614,7 +614,7 @@
           Continue with Google
         </button>
       </div>
-      <p class="text-[10px] text-slate-400">Authorized: mewada1995, admin@maketripzy & mewada95</p>
+      <p class="text-[10px] text-slate-400">Authorized: mewada1995, & mewada95</p>
     </div>
   </div>
 
@@ -641,7 +641,7 @@
     let allMasterBookings = [];
     let allVendorsCache = [];
 
-    const HARDCODED_SUPER_ADMINS = ["admin@maketripzy.com", "mewada1995@gmail.com"];
+    const HARDCODED_SUPER_ADMINS = ["admin@tripvyom.in", "mewada1995@gmail.com"];
     const HARDCODED_STAFF_ADMINS = ["mewada95@gmail.com"];
 
     function openModal(id) {
@@ -1090,7 +1090,7 @@
       const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
       const link = document.createElement("a");
       link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", `MakeTripzy_Bookings_${new Date().toISOString().slice(0,10)}.csv`);
+      link.setAttribute("download", `Tripvyom_Bookings_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
@@ -1114,7 +1114,7 @@
       const sample = "FARE ID,FARE NAME,CAB TYPE,SOURCE CITY,DESTINATION CITY,BASE FARE,INCLUDED KM,EXTRA KM CHARGE\n0001,BHOPAL TO INDORE ONE WAY,HATCHBACK,BHOPAL,INDORE,1800,196,11\n0002,BHOPAL TO INDORE ONE WAY,SEDAN,BHOPAL,INDORE,2400,196,12\n0003,BHOPAL TO INDORE ONE WAY,SUV,BHOPAL,INDORE,4000,196,20";
       const link = document.createElement("a");
       link.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(sample));
-      link.setAttribute("download", "MakeTripzy_Outstation_Sample.csv");
+      link.setAttribute("download", "Tripvyom_Outstation_Sample.csv");
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
@@ -1183,7 +1183,7 @@
       const sample = "FARE ID,FARE NAME,CAB TYPE,CITY,BASE FARE,INCLUDED KM,INCLUDED HOURS,EXTRA KM CHARGE,EXTRA HOURS CHARGE\n1001,BHOPAL LOCAL 4H/40KM,SEDAN,BHOPAL,1800,40,4,15,150\n1002,BHOPAL LOCAL 8H/80KM,SUV,BHOPAL,3500,80,8,20,250";
       const link = document.createElement("a");
       link.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(sample));
-      link.setAttribute("download", "MakeTripzy_LocalRental_Sample.csv");
+      link.setAttribute("download", "Tripvyom_LocalRental_Sample.csv");
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
