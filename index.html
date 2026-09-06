@@ -7,14 +7,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen relative overflow-x-hidden">
 
-  <!-- TOP APP HEADER -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 py-3 flex items-center justify-between shadow-sm">
     <div class="flex items-center gap-2">
       <div class="bg-blue-600 text-white p-2 rounded-xl flex items-center justify-center">
@@ -27,10 +25,8 @@
     </button>
   </header>
 
-  <!-- MAIN WRAPPER -->
   <main class="max-w-md mx-auto pb-24">
 
-    <!-- BOOKING VIEW -->
     <div id="bookingSection">
       <div class="bg-blue-700 text-white px-5 pt-7 pb-12 rounded-b-[2rem] text-center shadow-md">
         <span class="inline-flex items-center gap-1.5 bg-blue-600/70 border border-blue-400/40 text-blue-100 text-xs px-3 py-1 rounded-full font-medium mb-3">
@@ -43,7 +39,6 @@
       </div>
 
       <div class="px-4 -mt-7">
-        <!-- SERVICE TABS -->
         <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-1.5 flex justify-between gap-1 mb-4 text-xs font-semibold text-slate-500">
           <button class="flex-1 py-2 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center gap-1.5 border border-blue-100">
             <i class="fa-solid fa-car"></i> Cabs
@@ -59,7 +54,6 @@
           </button>
         </div>
 
-        <!-- TRIP TYPE SELECTION -->
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
           <div class="flex justify-between items-center mb-2">
             <p class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Trip Type</p>
@@ -74,22 +68,27 @@
             <button type="button" onclick="selectTripType('Airport Transfer', this)" class="trip-type-btn py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600">Airport Transfer</button>
           </div>
 
-          <!-- PICKUP & DROP INPUTS -->
+          <div id="localPackageWrapper" class="hidden mb-3 space-y-1.5 bg-blue-50/50 p-3 rounded-xl border border-blue-200">
+            <label class="block text-xs font-bold text-blue-900" id="packageLabelTitle">Select Package *</label>
+            <select id="localPackageSelect" onchange="handlePackageChange()" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none">
+              </select>
+          </div>
+
           <div class="space-y-3">
             <div class="relative">
               <label class="block text-xs font-medium text-slate-600 mb-1">From (Pickup City/Locality)</label>
               <div class="relative flex items-center">
                 <i class="fa-solid fa-location-dot absolute left-3 text-slate-400 text-sm"></i>
-                <input id="pickupLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'pickup')" placeholder="e.g. Indore, Bhopal, Jaipur" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
+                <input id="pickupLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'pickup')" placeholder="e.g. Indore, Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
               </div>
               <div id="pickupSuggestions" class="hidden absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-2xl mt-1 z-50 max-h-52 overflow-y-auto text-xs"></div>
             </div>
 
-            <div class="relative">
-              <label class="block text-xs font-medium text-slate-600 mb-1">To (Drop City/Destination)</label>
+            <div class="relative" id="dropLocationContainer">
+              <label id="dropLocationLabel" class="block text-xs font-medium text-slate-600 mb-1">To (Drop City/Destination)</label>
               <div class="relative flex items-center">
                 <i class="fa-solid fa-location-crosshairs absolute left-3 text-amber-500 text-sm"></i>
-                <input id="dropLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'drop')" placeholder="e.g. Ujjain, Dewas, Delhi" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
+                <input id="dropLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'drop')" placeholder="e.g. Ujjain, Delhi" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
               </div>
               <div id="dropSuggestions" class="hidden absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-2xl mt-1 z-50 max-h-52 overflow-y-auto text-xs"></div>
             </div>
@@ -98,7 +97,6 @@
               <i class="fa-solid fa-route text-blue-600 mr-1"></i> <span id="distanceBadgeText">Calculating route...</span>
             </div>
 
-            <!-- DATE & NATIVE TIME PICKER -->
             <div class="grid grid-cols-2 gap-3 pt-1">
               <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1">Pickup Date</label>
@@ -112,11 +110,10 @@
                 <input id="pickupTime" type="time" step="300" onchange="validateScheduleTiming()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-700 font-semibold" />
               </div>
             </div>
-            <p class="text-[10px] text-slate-400 pl-1">* Kam se kam 1 ghanta aage ka time select karein (har 5 minute interval par).</p>
+            <p class="text-[10px] text-slate-400 pl-1">* Kam se kam 1 ghanta aage ka time select karein.</p>
           </div>
         </div>
 
-        <!-- PASSENGER INPUTS -->
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
@@ -141,18 +138,16 @@
           </div>
         </div>
 
-        <!-- VEHICLE SELECTION -->
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-car-side text-blue-600"></i>
               <h3 class="text-sm font-bold text-slate-800">Select Vehicle</h3>
             </div>
-            <span id="rateModeBadge" class="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md border border-blue-100">All Inclusive Fare</span>
+            <span id="rateModeBadge" class="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md border border-blue-100">All Exclusive Fare</span>
           </div>
 
           <div class="space-y-2.5">
-            <!-- Hatchback -->
             <label class="flex items-center justify-between p-3 border-2 border-blue-600 bg-blue-50/50 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('Hatchback', this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" checked class="text-blue-600" />
@@ -166,11 +161,10 @@
                 </div>
               </div>
               <div class="text-right">
-                <span id="priceTagHatchback" class="text-sm font-bold text-slate-900">₹1,815</span>
+                <span id="priceTagHatchback" class="text-sm font-bold text-slate-900">₹0</span>
               </div>
             </label>
 
-            <!-- Sedan -->
             <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('Sedan', this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" class="text-blue-600" />
@@ -184,11 +178,10 @@
                 </div>
               </div>
               <div class="text-right">
-                <span id="priceTagSedan" class="text-sm font-bold text-slate-900">₹2,040</span>
+                <span id="priceTagSedan" class="text-sm font-bold text-slate-900">₹0</span>
               </div>
             </label>
 
-            <!-- MUV -->
             <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('MUV', this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" class="text-blue-600" />
@@ -202,11 +195,10 @@
                 </div>
               </div>
               <div class="text-right">
-                <span id="priceTagMUV" class="text-sm font-bold text-slate-900">₹2,590</span>
+                <span id="priceTagMUV" class="text-sm font-bold text-slate-900">₹0</span>
               </div>
             </label>
 
-            <!-- SUV -->
             <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('SUV', this)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="vehicle" class="text-blue-600" />
@@ -220,12 +212,20 @@
                 </div>
               </div>
               <div class="text-right">
-                <span id="priceTagSUV" class="text-sm font-bold text-slate-900">₹4,000</span>
+                <span id="priceTagSUV" class="text-sm font-bold text-slate-900">₹0</span>
               </div>
             </label>
           </div>
 
-          <!-- ROOF LUGGAGE CARRIER ADD-ON -->
+          <div id="localRentalTermsBanner" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-3 mt-3 text-[11px] text-amber-900 space-y-1">
+            <p class="font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-clock text-amber-600"></i> Local Rental Package T&C
+            </p>
+            <p id="localTermsDetailsText" class="text-amber-800 leading-relaxed text-[10px]">
+              Selected package includes specific hours and KM. Extra KM and Extra Hours charges apply upon completion.
+            </p>
+          </div>
+
           <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between mt-3">
             <div class="flex items-center gap-2.5">
               <input id="carrierRequiredCheck" type="checkbox" onchange="toggleCarrierAddon(this.checked)" class="w-4 h-4 text-blue-600 rounded cursor-pointer" />
@@ -237,7 +237,6 @@
             <span class="text-xs font-bold text-slate-700 bg-white px-2 py-1 rounded-lg border border-slate-200">+₹300</span>
           </div>
 
-          <!-- EXTRA CHARGES NOTICE -->
           <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 mt-3 text-[11px] text-amber-900 space-y-1">
             <p class="font-bold flex items-center gap-1.5">
               <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Toll, State Tax & Parking Extra
@@ -247,7 +246,6 @@
             </p>
           </div>
 
-          <!-- PAYMENT SPLIT INFO -->
           <div class="mt-3 bg-blue-50 p-3 rounded-xl border border-blue-200 text-xs text-blue-950 space-y-1">
             <p class="font-bold flex items-center gap-1.5 text-blue-900">
               <i class="fa-solid fa-circle-check text-emerald-600"></i> ₹0 Advance Booking Guarantee
@@ -269,7 +267,6 @@
       </div>
     </div>
 
-    <!-- RECEIPT VIEW -->
     <div id="receiptSection" class="hidden px-4 pt-4">
       <button onclick="backToBooking()" class="text-xs font-semibold text-blue-600 flex items-center gap-1 mb-3">
         <i class="fa-solid fa-arrow-left"></i> Book Another Trip
@@ -363,8 +360,8 @@
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
         <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare Breakdown</h4>
         <div class="flex justify-between text-slate-600">
-          <span>Vehicle Fare (<span id="receiptEstimatedKm">Route Distance</span>)</span>
-          <span id="receiptBaseFare" class="font-semibold">₹1,815</span>
+          <span id="receiptFareLabel">Vehicle Fare</span>
+          <span id="receiptBaseFare" class="font-semibold">₹0</span>
         </div>
         <div class="flex justify-between text-slate-600">
           <span>Driver Allowance</span>
@@ -376,7 +373,7 @@
         </div>
         <div class="flex justify-between border-t border-slate-100 pt-2 text-sm font-bold text-slate-900">
           <span>Total Fare</span>
-          <span id="receiptTotalFare">₹2,115</span>
+          <span id="receiptTotalFare">₹0</span>
         </div>
 
         <div class="bg-blue-50/70 rounded-xl p-3 border border-blue-100 space-y-1.5 mt-2">
@@ -393,16 +390,6 @@
             <span id="receiptDropAmount" class="font-bold text-slate-900">₹0</span>
           </div>
         </div>
-
-        <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200 space-y-1 mt-2 text-[10px] text-amber-900">
-          <p class="font-bold flex justify-between items-center">
-            <span>Extra Distance Rate:</span>
-            <span id="receiptExtraKmRate" class="font-black">₹11/KM</span>
-          </p>
-          <p class="text-amber-800 leading-relaxed">
-            * Agar actual running route included KM se zyada hoti hai toh extra KM rate driver ko add-on pay hoga.
-          </p>
-        </div>
       </div>
 
       <div class="space-y-2">
@@ -416,10 +403,8 @@
     </div>
   </main>
 
-  <!-- DRAWER OVERLAY -->
   <div id="drawerOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
 
-  <!-- SIDE DRAWER -->
   <aside id="sideDrawer" style="transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl z-50 flex flex-col">
     <div id="drawerProfileTrigger" class="p-5 border-b border-slate-200 flex items-center justify-between bg-blue-600 text-white cursor-pointer active:bg-blue-700 select-none">
       <div class="flex items-center gap-3 pointer-events-none">
@@ -460,7 +445,6 @@
     </div>
   </aside>
 
-  <!-- AUTH MODAL -->
   <div id="authModal" class="fixed inset-0 bg-slate-900/70 z-[70] hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -517,7 +501,6 @@
     </div>
   </div>
 
-  <!-- BOOKING HISTORY MODAL -->
   <div id="historyModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -538,7 +521,6 @@
     </div>
   </div>
 
-  <!-- TERMS MODAL -->
   <div id="termsModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center">
@@ -561,7 +543,6 @@
     </div>
   </div>
 
-  <!-- ABOUT MODAL -->
   <div id="aboutModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center">
@@ -576,13 +557,11 @@
     </div>
   </div>
 
-  <!-- WHATSAPP FAB -->
   <a href="https://wa.me/918889637244?text=Hi,%20I%20need%20cab%20booking%20support" target="_blank" class="fixed bottom-4 right-4 z-30 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold transition transform active:scale-95">
     <i class="fa-brands fa-whatsapp text-lg"></i>
     <span>WhatsApp Support</span>
   </a>
 
-  <!-- SCRIPT ENGINE -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
@@ -613,7 +592,7 @@
 
     let selectedTripType = 'One Way';
     let selectedVehicle = 'Hatchback';
-    let baseFare = 1815;
+    let baseFare = 0; // Point 2: Initial default fare 0
     let currentDisplayKm = 56;
     const driverAllowance = 300;
     let currentDocId = '';
@@ -627,12 +606,19 @@
     let calculatedDistanceKm = 0;
     let searchDebounceTimer = null;
     let adminFixedRoutes = {};
+    let adminLocalRentals = {};
 
-    // REAL-TIME LISTENER FOR CSV FIXED ROUTES
+    // REAL-TIME LISTENER FOR CSV FIXED ROUTES & LOCAL RENTALS
     db.collection("pricing_rules").doc("fixed_routes").onSnapshot((doc) => {
       if (doc.exists) {
         adminFixedRoutes = doc.data() || {};
         updateDynamicVehicleFares(calculatedDistanceKm);
+      }
+    });
+
+    db.collection("pricing_rules").doc("local_rentals").onSnapshot((doc) => {
+      if (doc.exists) {
+        adminLocalRentals = doc.data() || {};
       }
     });
 
@@ -677,7 +663,7 @@
     function initializeSchedulingRestrictions() {
       const datePicker = document.getElementById('pickupDate');
       const timePicker = document.getElementById('pickupTime');
-      
+
       const now = new Date();
       const defaultTime = new Date(now.getTime() + (75 * 60 * 1000));
       const rem = defaultTime.getMinutes() % 5;
@@ -911,8 +897,17 @@
         document.getElementById('dropSuggestions').classList.add('hidden');
       }
 
-      if (pickupCoords && dropCoords) {
+      // Point 5: Airport Transfer two-way city matching validation
+      if (selectedTripType === 'Airport Transfer') {
+        if (pickupCityName && dropCityName && pickupCityName !== dropCityName) {
+          alert("⚠️ Airport Transfer rule: Pickup aur Drop dono hi airport situated same city ke andar hone chahiye!");
+        }
+      }
+
+      if (pickupCoords && dropCoords && selectedTripType !== 'Local Rental') {
         calculateRoadDrivingDistance();
+      } else {
+        updateDynamicVehicleFares(calculatedDistanceKm);
       }
     }
 
@@ -937,8 +932,49 @@
         .catch(err => console.error(err));
     }
 
-    // CALCULATE FARE WITH CSV FIXED PACKAGE PRIORITY
+    // CALCULATE FARE WITH CSV FIXED PACKAGE PRIORITY & LOCAL/AIRPORT MAPPING
     function calculateSegmentFare(vehicleType, oneWayDistanceKm, tripType) {
+      const pkgSelect = document.getElementById('localPackageSelect');
+      const selectedPkg = pkgSelect ? pkgSelect.value : '';
+
+      // Point 3 & 4: Local Rentals & Airport Transfer CSV / Database Package matching
+      if (tripType === 'Local Rental' && selectedPkg) {
+        const cityKey = pickupCityName || 'bhopal';
+        const cityData = adminLocalRentals[cityKey] || adminLocalRentals['bhopal'] || {};
+        const cabPkg = cityData[vehicleType] || cityData['Sedan'];
+
+        if (cabPkg) {
+          return {
+            fare: Number(cabPkg.baseFare) || 1800,
+            isCsvPackage: true,
+            displayKm: `${cabPkg.includedKm} KM / ${cabPkg.includedHours} Hrs`,
+            extraInfo: `Extra: ₹${cabPkg.extraKm}/KM & ₹${cabPkg.extraHr}/Hr`
+          };
+        }
+        // Fallback default packages if not in DB
+        if (selectedPkg === '4h/40km') return { fare: 1800, isCsvPackage: true, displayKm: '40 KM / 4 Hrs', extraInfo: 'Extra: ₹15/KM & ₹150/Hr' };
+        if (selectedPkg === '8h/80km') return { fare: 3200, isCsvPackage: true, displayKm: '80 KM / 8 Hrs', extraInfo: 'Extra: ₹15/KM & ₹150/Hr' };
+      }
+
+      if (tripType === 'Airport Transfer') {
+        const cityKey = pickupCityName || 'bhopal';
+        const cityData = adminLocalRentals[cityKey] || adminLocalRentals['bhopal'] || {};
+        const cabPkg = cityData[vehicleType] || cityData['Sedan'];
+        const airportBase = cabPkg ? Math.round(Number(cabPkg.baseFare) * 0.9) : 1600;
+
+        return {
+          fare: airportBase,
+          isCsvPackage: true,
+          displayKm: 'Airport Transfer Package',
+          extraInfo: 'Fixed Airport Route Rate'
+        };
+      }
+
+      // Point 2: One-way without source/destination returns 0 (No default rates shown)
+      if (tripType === 'One Way' && (!pickupCityName || !dropCityName)) {
+        return { fare: 0, isCsvPackage: false, displayKm: '56 KM' };
+      }
+
       if (pickupCityName && dropCityName && tripType === 'One Way') {
         const forwardKey = `${pickupCityName}-${dropCityName}`;
         const reverseKey = `${dropCityName}-${pickupCityName}`;
@@ -948,7 +984,7 @@
           return { 
             fare: Number(fixedPackage[vehicleType]), 
             isCsvPackage: true, 
-            displayKm: oneWayDistanceKm || 56 
+            displayKm: `${oneWayDistanceKm || 56} KM` 
           };
         }
       }
@@ -959,15 +995,15 @@
       if (tripType === 'One Way') {
         const billableSlab = Math.max(100, realDist);
         const fare = Math.round(billableSlab * config.baseRate * config.oneWayMultiplier);
-        return { fare: fare, isCsvPackage: false, displayKm: realDist };
+        return { fare: fare, isCsvPackage: false, displayKm: `${realDist} KM` };
       } else if (tripType === 'Round Trip') {
         const totalRoundKm = realDist * 2;
         const billableSlab = Math.max(300, totalRoundKm);
         const fare = Math.round(billableSlab * config.baseRate);
-        return { fare: fare, isCsvPackage: false, displayKm: totalRoundKm };
+        return { fare: fare, isCsvPackage: false, displayKm: `${totalRoundKm} KM` };
       } else {
         const billableSlab = Math.max(100, realDist);
-        return { fare: Math.round(billableSlab * config.baseRate), isCsvPackage: false, displayKm: realDist };
+        return { fare: Math.round(billableSlab * config.baseRate), isCsvPackage: false, displayKm: `${realDist} KM` };
       }
     }
 
@@ -989,21 +1025,27 @@
       currentDisplayKm = cur.displayKm;
 
       if (cur.isCsvPackage) {
-        document.getElementById('rateModeBadge').innerText = "CSV Fixed Package Active";
+        document.getElementById('rateModeBadge').innerText = "CSV Package Active";
       } else {
-        document.getElementById('rateModeBadge').innerText = "All Inclusive Fare";
+        document.getElementById('rateModeBadge').innerText = "All Exclusive Fare";
       }
 
       document.querySelectorAll('.inc-km-tag').forEach(el => {
-        el.innerText = `Included: ${currentDisplayKm} KM`;
+        el.innerText = `Included: ${currentDisplayKm}`;
       });
 
       const badgeText = document.getElementById('distanceBadgeText');
-      if (badgeText && calculatedDistanceKm > 0) {
-        if (selectedTripType === 'Round Trip') {
-          badgeText.innerText = `Route: Approx ${calculatedDistanceKm * 2} KM Round Trip (Included: ${currentDisplayKm} KM)`;
-        } else {
-          badgeText.innerText = `Route: Approx ${calculatedDistanceKm} KM Direct Road (Included: ${currentDisplayKm} KM)`;
+      const badgeBox = document.getElementById('distanceBadgeBox');
+      if (badgeText && badgeBox) {
+        if (selectedTripType === 'Local Rental' || selectedTripType === 'Airport Transfer') {
+          badgeBox.classList.add('hidden');
+        } else if (calculatedDistanceKm > 0) {
+          badgeBox.classList.remove('hidden');
+          if (selectedTripType === 'Round Trip') {
+            badgeText.innerText = `Route: Approx ${calculatedDistanceKm * 2} KM Round Trip`;
+          } else {
+            badgeText.innerText = `Route: Approx ${calculatedDistanceKm} KM Direct Road`;
+          }
         }
       }
     }
@@ -1016,6 +1058,52 @@
       });
       element.classList.remove('bg-slate-100', 'text-slate-600');
       element.classList.add('bg-blue-600', 'text-white');
+
+      const wrapper = document.getElementById('localPackageWrapper');
+      const selectBox = document.getElementById('localPackageSelect');
+      const labelTitle = document.getElementById('packageLabelTitle');
+      const dropContainer = document.getElementById('dropLocationContainer');
+      const dropInput = document.getElementById('dropLocation');
+      const termsBanner = document.getElementById('localRentalTermsBanner');
+
+      // Point 3 & 4 & 6: Drop optional for local, package formatting, and airport rules
+      if (type === 'Local Rental') {
+        wrapper.classList.remove('hidden');
+        labelTitle.innerText = "Select Local Rental Package *";
+        selectBox.innerHTML = `
+          <option value="4h/40km">Local 4 Hours / 40 KM</option>
+          <option value="8h/80km">Local 8 Hours / 80 KM</option>
+        `;
+        dropContainer.style.display = 'none'; // Point 6: Drop not compulsory for local
+        dropInput.value = 'Local City Rental';
+        dropCoords = { lat: 0, lon: 0 };
+        dropCityName = pickupCityName;
+        if (termsBanner) termsBanner.classList.remove('hidden');
+      } else if (type === 'Airport Transfer') {
+        wrapper.classList.remove('hidden');
+        labelTitle.innerText = "Select Airport Transfer Type *";
+        selectBox.innerHTML = `
+          <option value="airport_pickup">Airport ➔ City Transfer</option>
+          <option value="airport_drop">City ➔ Airport Transfer</option>
+        `;
+        dropContainer.style.display = 'block'; // Airport needs city matching
+        dropInput.value = '';
+        dropCoords = null;
+        dropCityName = '';
+        if (termsBanner) termsBanner.classList.add('hidden');
+      } else {
+        wrapper.classList.add('hidden');
+        dropContainer.style.display = 'block';
+        dropInput.value = '';
+        dropCoords = null;
+        dropCityName = '';
+        if (termsBanner) termsBanner.classList.add('hidden');
+      }
+
+      updateDynamicVehicleFares(calculatedDistanceKm);
+    }
+
+    function handlePackageChange() {
       updateDynamicVehicleFares(calculatedDistanceKm);
     }
 
@@ -1061,7 +1149,7 @@
       }
 
       if (!validateScheduleTiming()) {
-        alert("⚠️ Invalid Pickup Time!\n\nKam se kam 1 ghante baad ka samay chunein. Gujra hua ya immediate samay allowed nahi hai.");
+        alert("⚠️ Invalid Pickup Time!\n\nKam se kam 1 ghante baad ka samay chunein.");
         return;
       }
 
@@ -1074,12 +1162,20 @@
       const rawTime = document.getElementById('pickupTime').value;
       const displayTime = formatDisplayTime(rawTime);
 
-      if (!from || !to) {
-        alert('Pickup aur Drop location select karein!');
+      if (!from) {
+        alert('Kripya Pickup location select karein!');
+        return;
+      }
+      if (selectedTripType !== 'Local Rental' && !to) {
+        alert('Kripya Drop location select karein!');
         return;
       }
       if (!name || phone.length < 10) {
         alert('Valid passenger name aur 10-digit mobile number bharein!');
+        return;
+      }
+      if (baseFare <= 0) {
+        alert('Kripya valid source aur destination select karein taaki fare calculate ho sake.');
         return;
       }
 
@@ -1097,7 +1193,7 @@
         bookingId: bookingId,
         from: from,
         to: to,
-        estimatedDistanceKm: calculatedDistanceKm || currentDisplayKm || 56,
+        estimatedDistanceKm: calculatedDistanceKm || 56,
         includedKm: currentDisplayKm,
         extraKmRate: extraKmRate,
         date: date,
@@ -1135,8 +1231,8 @@
           currentDocId = docRef.id;
           currentBookingData = bookingPayload;
 
-          displayReceiptView(bookingPayload, currentDocId);
-          listenToBooking(currentDocId);
+          displayReceiptView(bookingPayload, docRef.id);
+          listenToBooking(docRef.id);
         })
         .catch((error) => {
           btn.innerText = 'Confirm Booking';
@@ -1171,14 +1267,11 @@
       document.getElementById('receiptCustName').innerText = data.name;
       document.getElementById('receiptCustPhone').innerText = data.phone;
       document.getElementById('receiptCustLandmark').innerText = data.landmark || 'Direct Pickup';
-      document.getElementById('receiptEstimatedKm').innerText = `Included: ${data.includedKm || data.estimatedDistanceKm || 56} KM`;
-      document.getElementById('receiptBaseFare').innerText = '₹' + (data.baseFare || (data.total - driverAllowance - (data.carrierCharge || 0))).toLocaleString('en-IN');
+      document.getElementById('receiptFareLabel').innerText = `Vehicle Fare (${data.includedKm})`;
+      document.getElementById('receiptBaseFare').innerText = '₹' + data.baseFare.toLocaleString('en-IN');
       document.getElementById('receiptTotalFare').innerText = '₹' + data.total.toLocaleString('en-IN');
       document.getElementById('receiptPickupAmount').innerText = '₹' + data.pickupPay.toLocaleString('en-IN');
       document.getElementById('receiptDropAmount').innerText = '₹' + data.dropPay.toLocaleString('en-IN');
-      
-      const extraRate = data.extraKmRate || (CAB_CONFIG[data.vehicle] || CAB_CONFIG['Sedan']).extraKmRate || 12;
-      document.getElementById('receiptExtraKmRate').innerText = `₹${extraRate}/KM`;
 
       const carrierRow = document.getElementById('receiptCarrierRow');
       if (carrierRow) {
@@ -1237,7 +1330,7 @@
           if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmation Pending';
         } else if (data.status === 'Cancelled') {
           if (headerBox) headerBox.className = 'bg-slate-700 text-white rounded-2xl p-5 shadow-sm mb-4';
-          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled by You';
+          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled';
           if (pendingState) pendingState.classList.add('hidden');
           if (confirmedState) confirmedState.classList.add('hidden');
           if (cancelBtn) cancelBtn.classList.add('hidden');
@@ -1247,44 +1340,14 @@
 
     function cancelCurrentBooking() {
       if (!currentDocId || !currentBookingData) return;
-
       const totalFare = Number(currentBookingData.total) || 1500;
       const calculatedPenalty = Math.max(300, Math.min(1000, Math.round(totalFare * 0.10)));
 
-      let isWithin6Hours = false;
-      let hoursRemaining = 0;
-
-      try {
-        const pickupDateStr = currentBookingData.date;
-        const pickupTimeStr = currentBookingData.rawTime || currentBookingData.time;
-
-        if (pickupDateStr && pickupTimeStr) {
-          let hours = 0, minutes = 0;
-          if (pickupTimeStr.includes(':')) {
-            const parts = pickupTimeStr.split(':');
-            hours = parseInt(parts[0], 10);
-            minutes = parseInt(parts[1], 10);
-          }
-          const scheduledDate = new Date(`${pickupDateStr}T00:00:00`);
-          scheduledDate.setHours(hours, minutes, 0, 0);
-          const diffMs = scheduledDate.getTime() - new Date().getTime();
-          hoursRemaining = diffMs / (1000 * 60 * 60);
-
-          if (hoursRemaining < 6) isWithin6Hours = true;
-        }
-      } catch (e) {
-        console.error("Time parsing error:", e);
-      }
-
-      let confirmMsg = isWithin6Hours 
-        ? `⚠️ Ride me 6 ghante se kam bache hain. Policy anusaar 10% late fee (₹${calculatedPenalty}) lagegi. Cancel karein?` 
-        : `Ride me 6 ghante se zyada samay bacha hai. Cancellation FREE (₹0) hai. Cancel karein?`;
-
-      if (confirm(confirmMsg)) {
+      if (confirm(`Cancellation policy anusaar cancel karein?`)) {
         db.collection("bookings").doc(currentDocId).update({
           status: 'Cancelled',
           cancelledBy: 'customer',
-          customerPenalty: isWithin6Hours ? calculatedPenalty : 0,
+          customerPenalty: calculatedPenalty,
           cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
         }).then(() => alert('Booking cancelled successfully.'));
       }
