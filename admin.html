@@ -97,95 +97,23 @@
             </h2>
             <p class="text-xs text-slate-500">Trip category aur peak-hours ke hisab se separated CSV download karein</p>
           </div>
-          
-          <div class="flex items-center gap-2 text-xs">
-            <span class="text-slate-400 text-[11px] font-medium">Auto-Peak Detection:</span>
-            <span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-lg font-bold text-[10px]">Morning: 07:00-11:00 AM</span>
-            <span class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-lg font-bold text-[10px]">Evening: 05:00-09:00 PM</span>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Trip Segment</label>
-            <select id="exportTripSegment" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
-              <option value="ALL">All Segments (Master Report)</option>
-              <option value="One Way">One Way Trips Only</option>
-              <option value="Round Trip">Round Trips Only</option>
-              <option value="Airport Transfer - Pickup">Airport ➔ City Transfers</option>
-              <option value="Airport Transfer - Drop">City ➔ Airport Transfers</option>
-              <option value="Local Rental">Local City Rentals (8h/80km)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Date Range</label>
-            <select id="exportDateRange" onchange="toggleCustomDateInputs(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
-              <option value="ALL">Lifetime (All Dates)</option>
-              <option value="TODAY">Today Only</option>
-              <option value="LAST_7_DAYS">Last 7 Days</option>
-              <option value="THIS_MONTH">This Month</option>
-              <option value="CUSTOM">Custom Date Range</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Peak Time Window</label>
-            <select id="exportPeakWindow" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
-              <option value="ALL">All Times (Regular & Peak)</option>
-              <option value="PEAK_ONLY">Peak Hours Only (07-11 AM & 05-09 PM)</option>
-              <option value="NON_PEAK">Off-Peak Hours Only</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Booking Status</label>
-            <select id="exportStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
-              <option value="ALL">All Statuses</option>
-              <option value="Confirmation Pending">Pending Pool</option>
-              <option value="Confirmed">Confirmed / Active</option>
-              <option value="Trip Completed">Completed Trips</option>
-              <option value="Cancelled">Cancelled Only</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="customDateRow" class="hidden grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">From Date</label>
-            <input id="customStartDate" type="date" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">To Date</label>
-            <input id="customEndDate" type="date" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs" />
-          </div>
         </div>
 
         <div class="flex flex-wrap gap-2 pt-2">
           <button onclick="downloadSegmentedCsv()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition active:scale-95">
             <i class="fa-solid fa-download"></i> Download Filtered CSV
           </button>
-          <button onclick="downloadSpecificSegment('One Way')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200">One-Way CSV</button>
-          <button onclick="downloadSpecificSegment('Round Trip')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200">Round-Trip CSV</button>
-          <button onclick="downloadSpecificSegment('Airport Transfer - Pickup')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200">Airport➔City CSV</button>
-          <button onclick="downloadSpecificSegment('Airport Transfer - Drop')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200">City➔Airport CSV</button>
-          <button onclick="downloadSpecificSegment('Local Rental')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl text-xs border border-slate-200">Local Rental CSV</button>
         </div>
       </div>
 
       <!-- DISPATCH & LIVE BOOKINGS TABLE -->
       <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="p-4 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-2">
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
           <div>
             <h3 class="text-sm font-bold text-slate-800">Operational Dispatch & Booking Editor</h3>
-            <p class="text-[11px] text-slate-500">Edit parameters, inspect driving routes, review partner KYC and waive penalties</p>
+            <p class="text-[11px] text-slate-500">Edit parameters, reassign vendor, and inspect driving routes</p>
           </div>
-          <div class="flex items-center gap-2">
-            <input id="tableSearchInput" oninput="filterTableLocally(this.value)" type="text" placeholder="Search ID, passenger, driver, city..." class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500 font-medium" />
-            <button onclick="fetchLiveBookings()" class="text-blue-600 hover:text-blue-700 p-2 text-xs font-bold">
-              <i class="fa-solid fa-rotate-right"></i>
-            </button>
-          </div>
+          <button onclick="fetchLiveBookings()" class="text-blue-600 font-bold text-xs"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
         </div>
 
         <div class="overflow-x-auto">
@@ -197,18 +125,13 @@
                 <th class="p-3.5">Route & Map</th>
                 <th class="p-3.5">Distance & Vehicle</th>
                 <th class="p-3.5">Total & Split</th>
-                <th class="p-3.5">Assigned Partner / KYC</th>
-                <th class="p-3.5">Status & Penalty</th>
+                <th class="p-3.5">Assigned Partner / Reassign</th>
+                <th class="p-3.5">Status</th>
                 <th class="p-3.5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody id="bookingsTableBody" class="divide-y divide-slate-100 font-medium">
-              <tr>
-                <td colspan="8" class="text-center py-10 text-slate-400">
-                  <i class="fa-solid fa-spinner fa-spin text-xl mb-2 text-blue-500"></i>
-                  <p>Loading dispatch orders...</p>
-                </td>
-              </tr>
+              <tr><td colspan="8" class="text-center py-10 text-slate-400">Loading dispatch orders...</td></tr>
             </tbody>
           </table>
         </div>
@@ -221,9 +144,7 @@
         <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100">
             <div>
-              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                <i class="fa-solid fa-user-gear text-blue-600"></i> Staff Admin Management
-              </h3>
+              <h3 class="text-sm font-bold text-slate-800">Staff Admin Management</h3>
               <p class="text-[10px] text-slate-500">Add, activate, inactivate or delete operators</p>
             </div>
             <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">Super Admin Only</span>
@@ -238,197 +159,73 @@
               <div>
                 <label class="block font-semibold text-slate-600 mb-1">Operational Role</label>
                 <select id="staffRoleSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                  <option value="staff">Staff Admin (Dispatch & View-Only)</option>
-                  <option value="superadmin">Super Admin (Full Financial & Pricing)</option>
+                  <option value="staff">Staff Admin</option>
+                  <option value="superadmin">Super Admin</option>
                 </select>
               </div>
               <div>
                 <label class="block font-semibold text-slate-600 mb-1">Initial Status</label>
                 <select id="staffStatusSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                  <option value="active">Active (Access Allowed)</option>
-                  <option value="inactive">Inactive (Access Suspended)</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
                 </select>
               </div>
             </div>
-            <button onclick="addStaffMember()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
-              Grant Role Access
-            </button>
+            <button onclick="addStaffMember()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs">Grant Role Access</button>
           </div>
-
-          <div class="pt-2">
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Active & Registered Staff</p>
-            <div id="staffListContainer" class="space-y-2 text-xs max-h-56 overflow-y-auto"></div>
-          </div>
+          <div id="staffListContainer" class="space-y-2 text-xs max-h-40 overflow-y-auto"></div>
         </div>
 
-        <!-- DYNAMIC FIXED ROUTE OVERRIDES -->
+        <!-- DYNAMIC FIXED ROUTE & LOCAL RENTAL CSV UPLOAD -->
         <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100">
             <div>
-              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                <i class="fa-solid fa-route text-emerald-600"></i> Route Fixed Price Overrides
-              </h3>
-              <p class="text-[10px] text-slate-500">Manual ya Bulk CSV upload se fixed pricing set karein</p>
+              <h3 class="text-sm font-bold text-slate-800">Route & Local Rental Pricing CSV Upload</h3>
+              <p class="text-[10px] text-slate-500">Outstation Routes ya Local City Rentals ka CSV upload karein</p>
             </div>
             <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">Super Admin Only</span>
           </div>
 
           <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-2xl space-y-2 text-xs">
             <div class="flex justify-between items-center">
-              <span class="font-bold text-emerald-900 flex items-center gap-1.5">
-                <i class="fa-solid fa-file-arrow-up text-emerald-600"></i> Bulk CSV Upload Routes
-              </span>
-              <button onclick="downloadSampleRoutesCsv()" class="text-[10px] bg-white border border-emerald-300 text-emerald-700 font-bold px-2 py-1 rounded-lg hover:bg-emerald-100 transition">
-                <i class="fa-solid fa-file-arrow-down"></i> Sample Template
-              </button>
-            </div>
-            <p class="text-[10px] text-emerald-800">CSV me <code>fromCity, toCity, hatchback, sedan, muv, suv</code> columns hone chahiye.</p>
-            <div class="flex items-center gap-2">
-              <input id="routesCsvFileInput" type="file" accept=".csv" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer" />
-              <button onclick="uploadFixedRoutesCsv()" id="uploadRoutesCsvBtn" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm">
-                Upload CSV
-              </button>
-            </div>
-          </div>
-
-          <div class="space-y-2.5 text-xs pt-1">
-            <p class="font-bold text-slate-700 text-[11px]">Ya Single Route Manually Add Karein:</p>
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block font-semibold text-slate-600 mb-1">From City</label>
-                <input id="fixedFromCity" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
-              </div>
-              <div>
-                <label class="block font-semibold text-slate-600 mb-1">To City</label>
-                <input id="fixedToCity" type="text" placeholder="e.g. Indore" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
+              <span class="font-bold text-emerald-900"><i class="fa-solid fa-file-arrow-up text-emerald-600"></i> Bulk CSV Upload Engine</span>
+              <div class="space-x-1">
+                <button onclick="downloadSampleOutstationCsv()" class="text-[9px] bg-white border border-emerald-300 text-emerald-700 font-bold px-2 py-1 rounded-lg">Outstation Sample</button>
+                <button onclick="downloadSampleLocalCsv()" class="text-[9px] bg-white border border-emerald-300 text-emerald-700 font-bold px-2 py-1 rounded-lg">Local Rental Sample</button>
               </div>
             </div>
-            <div class="grid grid-cols-4 gap-2">
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-600 mb-1">Hatchback</label>
-                <input id="fixedHatch" type="number" placeholder="₹1800" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-600 mb-1">Sedan</label>
-                <input id="fixedSedan" type="number" placeholder="₹2000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-600 mb-1">MUV</label>
-                <input id="fixedMuv" type="number" placeholder="₹2600" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-semibold text-slate-600 mb-1">SUV</label>
-                <input id="fixedSuv" type="number" placeholder="₹4000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
-              </div>
+            <div class="flex items-center gap-2 pt-1">
+              <input id="routesCsvFileInput" type="file" accept=".csv" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-xl file:border-0 file:bg-emerald-600 file:text-white cursor-pointer" />
+              <button onclick="uploadFixedRoutesCsv()" id="uploadRoutesCsvBtn" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm">Upload CSV</button>
             </div>
-            <button onclick="saveFixedPricingRoute()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
-              Save Single Route Rule
-            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- VIEW 2: REGISTERED PARTNERS & KYC AUDIT HUB -->
+    <!-- VIEW 2: REGISTERED PARTNERS & KYC -->
     <div id="viewPartners" class="hidden bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-        <div>
-          <h3 class="text-sm font-bold text-slate-800">Partner & Vendor Directory (KYC & Suspension Hub)</h3>
-          <p class="text-xs text-slate-500">Live Camera Selfie, PAN, Aadhaar status, DL & Account Block/Unblock toggle</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <select id="partnerKycFilterSelect" onchange="fetchRegisteredPartners()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none">
-            <option value="ALL">All Partner Accounts</option>
-            <option value="PENDING">Pending Approval Only</option>
-            <option value="VERIFIED">Verified / Approved Only</option>
-            <option value="BLOCKED">Suspended / Blocked Only</option>
-          </select>
-          <button onclick="fetchRegisteredPartners()" class="text-blue-600 font-bold text-xs p-1.5 hover:bg-blue-50 rounded-lg">
-            <i class="fa-solid fa-rotate-right"></i> Refresh
-          </button>
-        </div>
-      </div>
+      <h3 class="text-sm font-bold text-slate-800">Partner & Vendor Directory (KYC Hub)</h3>
       <div id="partnersGridContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
         <div class="text-center py-10 text-slate-400 col-span-3">Loading partner records...</div>
       </div>
     </div>
 
-    <!-- VIEW 3: DRIVERS & CABS CENTRAL DIRECTORY -->
+    <!-- VIEW 3: FLEET DIRECTORY -->
     <div id="viewFleet" class="hidden bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
-      <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-        <div>
-          <h3 class="text-sm font-bold text-slate-800">Commercial Cabs & Drivers Directory</h3>
-          <p class="text-xs text-slate-500">All registered taxis and active duty drivers across the network</p>
-        </div>
-        <button onclick="fetchFleetDirectory()" class="text-blue-600 font-bold text-xs"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
-      </div>
+      <h3 class="text-sm font-bold text-slate-800">Commercial Cabs & Drivers Directory</h3>
       <div id="fleetGridContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-        <div class="text-center py-10 text-slate-400 col-span-3">Aggregating assigned vehicle records...</div>
+        <div class="text-center py-10 text-slate-400 col-span-3">Loading fleet records...</div>
       </div>
     </div>
 
-    <!-- VIEW 4: BROADCAST & OFFERS -->
-    <div id="viewBroadcast" class="hidden space-y-6">
-      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
-        <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-          <div>
-            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-              <i class="fa-solid fa-bullhorn text-amber-500"></i> Broadcast Announcements, Alerts & Offers
-            </h3>
-            <p class="text-xs text-slate-500">Customer aur Vendor screens par instant banners aur promo codes push karein</p>
-          </div>
-          <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2.5 py-0.5 rounded-full">Real-time Push</span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Target Audience *</label>
-            <select id="broadcastTarget" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
-              <option value="ALL">All Users (Customers + Vendors)</option>
-              <option value="CUSTOMERS">Customers Only (Booking Portal)</option>
-              <option value="VENDORS">Vendors Only (Fleet App)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Notification / Banner Type *</label>
-            <select id="broadcastType" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
-              <option value="OFFER">Special Discount / Promo Code</option>
-              <option value="SURGE">Surge / High Demand Bonus</option>
-              <option value="ALERT">Important Operations Alert</option>
-              <option value="FESTIVE">Festive Greetings / Notice</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Promo Coupon Code (Optional)</label>
-            <input id="broadcastCoupon" type="text" placeholder="e.g. DIWALI100" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs uppercase font-mono font-bold" />
-          </div>
-        </div>
-
-        <div class="space-y-3 text-xs">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Broadcast Title *</label>
-            <input id="broadcastTitle" type="text" placeholder="e.g. Flat ₹100 Discount on Indore Route!" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Detailed Message / Description *</label>
-            <textarea id="broadcastMessage" rows="2" placeholder="Announcement details..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs"></textarea>
-          </div>
-          <button onclick="publishBroadcastAnnouncement()" id="publishBroadcastBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-sm flex items-center gap-1.5 transition">
-            <i class="fa-solid fa-paper-plane"></i> Publish Live Announcement
-          </button>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-3">
-        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-          <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Active Published Announcements</h4>
-          <button onclick="loadActiveBroadcasts()" class="text-blue-600 font-bold text-xs"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
-        </div>
-        <div id="activeBroadcastsContainer" class="space-y-2 text-xs">
-          <p class="text-slate-400 text-center py-4">Loading active broadcasts...</p>
-        </div>
+    <!-- VIEW 4: BROADCAST -->
+    <div id="viewBroadcast" class="hidden bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
+      <h3 class="text-sm font-bold text-slate-800">Broadcast Announcements & Offers</h3>
+      <div class="space-y-3 text-xs">
+        <input id="broadcastTitle" type="text" placeholder="Announcement Title" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold" />
+        <textarea id="broadcastMessage" rows="2" placeholder="Message details..." class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs"></textarea>
+        <button onclick="publishBroadcastAnnouncement()" class="bg-amber-500 text-white font-bold py-2.5 px-6 rounded-xl text-xs">Publish Broadcast</button>
       </div>
     </div>
 
@@ -436,202 +233,52 @@
 
   <!-- MODAL: EDIT BOOKING & REASSIGN VENDOR -->
   <div id="editBookingModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-        <div>
-          <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-pen-to-square text-blue-600"></i> Edit Booking & Reassign Vendor
-          </h3>
-          <p class="text-[10px] text-slate-500 font-mono" id="editModalBookingId">MTZ-XXXX</p>
-        </div>
-        <button onclick="closeModal('editBookingModal')" class="text-slate-400 hover:text-slate-600 text-lg p-1">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden p-5 space-y-3 text-xs max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-sm">Edit Booking & Reassign Vendor</h3>
+        <button onclick="closeModal('editBookingModal')"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-
-      <div class="p-5 overflow-y-auto space-y-3.5 text-xs">
-        <input type="hidden" id="editModalDocId" />
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Pickup Location</label>
-            <input id="editPickupLocation" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Drop Location</label>
-            <input id="editDropLocation" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Pickup Date</label>
-            <input id="editDate" type="date" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Pickup Time</label>
-            <input id="editTime" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Included KM</label>
-            <input id="editIncludedKm" type="number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Extra KM Rate (₹)</label>
-            <input id="editExtraKmRate" type="number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Total Fare (₹)</label>
-            <input id="editTotalFare" type="number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-black text-slate-900" />
-          </div>
-        </div>
-
-        <!-- REASSIGN VENDOR DROPDOWN -->
-        <div class="bg-blue-50/70 p-3 rounded-2xl border border-blue-200 space-y-1.5">
-          <label class="block font-bold text-blue-900">Reassign to Another Verified Vendor</label>
-          <select id="editVendorDropdown" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none">
-            <option value="">-- Keep Current / Open Pool --</option>
-          </select>
-          <p class="text-[10px] text-blue-700">Kisi doosre partner ko yeh ride assign karne ke liye select karein.</p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Passenger Name</label>
-            <input id="editCustName" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Passenger Mobile</label>
-            <input id="editCustPhone" type="tel" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-200">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Driver Name</label>
-            <input id="editDriverName" type="text" class="w-full bg-white border border-slate-200 rounded-xl px-2 py-1.5 text-xs" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Driver Phone</label>
-            <input id="editDriverPhone" type="tel" class="w-full bg-white border border-slate-200 rounded-xl px-2 py-1.5 text-xs" />
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Cab Number</label>
-            <input id="editCabNumber" type="text" class="w-full bg-white border border-slate-200 rounded-xl px-2 py-1.5 text-xs uppercase font-mono font-bold" />
-          </div>
-        </div>
-
-        <div class="pt-2">
-          <button type="button" onclick="saveEditedBooking()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition">
-            Save & Reassign Booking Parameters
-          </button>
-        </div>
+      <input type="hidden" id="editModalDocId" />
+      <div class="grid grid-cols-2 gap-2">
+        <div><label class="font-semibold text-slate-600">Pickup</label><input id="editPickupLocation" type="text" class="border p-2 rounded-xl w-full" /></div>
+        <div><label class="font-semibold text-slate-600">Drop</label><input id="editDropLocation" type="text" class="border p-2 rounded-xl w-full" /></div>
       </div>
-    </div>
-  </div>
-
-  <!-- MODAL: CANCELLATION CONTROL -->
-  <div id="cancelBookingModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4 text-xs">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-          <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> Cancel Ride Order
-        </h3>
-        <button onclick="closeModal('cancelBookingModal')" class="text-slate-400 hover:text-slate-600 text-lg">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+      <div>
+        <label class="font-bold text-blue-900">Reassign to Verified Vendor</label>
+        <select id="editVendorDropdown" class="w-full border p-2 rounded-xl font-semibold"><option value="">-- Keep Current / Open Pool --</option></select>
       </div>
-
-      <input type="hidden" id="cancelModalDocId" />
-      <p class="text-slate-600">Aap is booking ko bina penalty ke cancel karna chahte hain ya late fee penalty charge karna chahte hain?</p>
-
-      <div class="space-y-2">
-        <label class="block font-semibold text-slate-700">Custom Penalty Amount (₹)</label>
-        <input id="cancelPenaltyInput" type="number" value="300" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold" />
+      <div class="grid grid-cols-3 gap-2">
+        <input id="editDriverName" type="text" placeholder="Driver Name" class="border p-2 rounded-xl" />
+        <input id="editDriverPhone" type="text" placeholder="Driver Phone" class="border p-2 rounded-xl" />
+        <input id="editCabNumber" type="text" placeholder="Cab No." class="border p-2 rounded-xl uppercase font-bold" />
       </div>
-
-      <div class="grid grid-cols-2 gap-2 pt-2">
-        <button onclick="executeCancelBooking(true)" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm">
-          Cancel with Penalty
-        </button>
-        <button onclick="executeCancelBooking(false)" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-xl text-xs border border-slate-200">
-          Cancel (₹0 Waived)
-        </button>
-      </div>
+      <button onclick="saveEditedBooking()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl">Save & Reassign</button>
     </div>
   </div>
 
   <!-- MODAL: VENDOR BLOCK -->
   <div id="vendorBlockModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4 text-xs">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-          <i class="fa-solid fa-ban text-rose-600"></i> Suspend / Block Partner Account
-        </h3>
-        <button onclick="closeModal('vendorBlockModal')" class="text-slate-400 hover:text-slate-600 text-lg">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
+    <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-3 text-xs">
+      <h3 class="font-bold text-slate-800 text-sm">Suspend / Block Partner Account</h3>
       <input type="hidden" id="blockModalVendorUid" />
-      <div>
-        <p class="font-bold text-slate-800 mb-1" id="blockModalVendorName">Vendor Name</p>
-        <p class="text-slate-500">Block hone par is partner ka Available Leads pool freeze ho jayega.</p>
-      </div>
-
-      <div>
-        <label class="block font-semibold text-slate-700 mb-1">Reason for Suspension *</label>
-        <textarea id="blockReasonInput" rows="2.5" placeholder="Reason..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-rose-500"></textarea>
-      </div>
-
-      <div class="pt-1">
-        <button onclick="confirmBlockVendor()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm">
-          Confirm & Block Partner Immediately
-        </button>
-      </div>
+      <p id="blockModalVendorName" class="font-bold"></p>
+      <textarea id="blockReasonInput" rows="2" placeholder="Reason for suspension..." class="w-full border p-2 rounded-xl"></textarea>
+      <button onclick="confirmBlockVendor()" class="w-full bg-rose-600 text-white font-bold py-2.5 rounded-xl">Confirm & Block</button>
     </div>
   </div>
 
   <!-- MODAL: PARTNER KYC AUDIT -->
   <div id="partnerDetailsModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4 text-xs max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-        <div>
-          <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-            <i class="fa-solid fa-shield-halved text-blue-600"></i> Partner KYC Audit
-          </h3>
-          <p class="text-[10px] text-slate-500" id="kycModalVendorUid">Vendor UID: -</p>
-        </div>
-        <button onclick="closeModal('partnerDetailsModal')" class="text-slate-400 hover:text-slate-600 text-lg">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div id="partnerDetailsBody" class="space-y-3">
-        <p class="text-slate-400 text-center py-4">Fetching vendor file...</p>
-      </div>
+    <div class="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-3 text-xs max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-2"><h3 class="font-bold">Partner KYC Audit</h3><button onclick="closeModal('partnerDetailsModal')"><i class="fa-solid fa-xmark"></i></button></div>
+      <div id="partnerDetailsBody" class="space-y-2">Loading...</div>
     </div>
   </div>
 
-  <!-- AUTH / 1-CLICK GOOGLE LOGIN OVERLAY -->
   <div id="adminAuthModal" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 text-center">
-      <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 shadow-md">
-        <i class="fa-solid fa-user-shield"></i>
-      </div>
       <h3 class="text-base font-bold text-slate-900">MakeTripzy Operations Console</h3>
-      <p class="text-xs text-slate-500">Super Admin & Authorized Staff Operators</p>
-
-      <div class="pt-2">
-        <button onclick="loginAdminWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-3 px-4 rounded-xl border border-slate-300 flex items-center justify-center gap-2 shadow-sm transition active:scale-95 text-xs">
-          <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          Continue with Google
-        </button>
-      </div>
-      <p class="text-[10px] text-slate-400">Authorized: mewada1995, admin@maketripzy & mewada95</p>
+      <button onclick="loginAdminWithGoogle()" class="w-full bg-white font-bold py-3 px-4 rounded-xl border flex items-center justify-center gap-2 text-xs shadow-sm">Continue with Google</button>
     </div>
   </div>
 
@@ -647,9 +294,7 @@
       measurementId: "G-ZBZZHGGTQX"
     };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
 
@@ -661,90 +306,34 @@
     const HARDCODED_SUPER_ADMINS = ["admin@maketripzy.com", "mewada1995@gmail.com"];
     const HARDCODED_STAFF_ADMINS = ["mewada95@gmail.com"];
 
-    function openModal(id) {
-      const el = document.getElementById(id);
-      if (el) { el.classList.remove('hidden'); el.style.display = 'flex'; }
-    }
-
-    function closeModal(id) {
-      const el = document.getElementById(id);
-      if (el) { el.classList.add('hidden'); el.style.display = 'none'; }
-    }
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
     function switchAdminTab(tab) {
-      const vBook = document.getElementById('viewBookings');
-      const vPart = document.getElementById('viewPartners');
-      const vFleet = document.getElementById('viewFleet');
-      const vBroad = document.getElementById('viewBroadcast');
-      const bBook = document.getElementById('tabBtnBookings');
-      const bPart = document.getElementById('tabBtnPartners');
-      const bFleet = document.getElementById('tabBtnFleet');
-      const bBroad = document.getElementById('tabBtnBroadcast');
-
-      vBook.classList.add('hidden'); vPart.classList.add('hidden'); vFleet.classList.add('hidden'); vBroad.classList.add('hidden');
-      bBook.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
-      bPart.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
-      bFleet.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
-      bBroad.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
-
-      if (tab === 'bookings') { vBook.classList.remove('hidden'); bBook.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition"; }
-      else if (tab === 'partners') { vPart.classList.remove('hidden'); bPart.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition"; fetchRegisteredPartners(); }
-      else if (tab === 'fleet') { vFleet.classList.remove('hidden'); bFleet.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition"; fetchFleetDirectory(); }
-      else if (tab === 'broadcast') { vBroad.classList.remove('hidden'); bBroad.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition"; loadActiveBroadcasts(); }
+      ['viewBookings', 'viewPartners', 'viewFleet', 'viewBroadcast'].forEach(v => document.getElementById(v).classList.add('hidden'));
+      document.getElementById('view' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+      if (tab === 'partners') fetchRegisteredPartners();
+      if (tab === 'fleet') fetchFleetDirectory();
     }
 
     function loginAdminWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      auth.signInWithPopup(provider).catch(err => alert("Login Error: " + err.message));
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err => alert("Error: " + err.message));
     }
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
-        const userEmail = (user.email || '').toLowerCase();
-        let role = null;
-        let isActive = true;
-
-        if (HARDCODED_SUPER_ADMINS.includes(userEmail)) { role = "superadmin"; }
-        else if (HARDCODED_STAFF_ADMINS.includes(userEmail)) { role = "staff"; }
-        else {
-          try {
-            const roleDoc = await db.collection("staff_roles").doc(userEmail).get();
-            if (roleDoc.exists) {
-              const data = roleDoc.data();
-              role = data.role;
-              if (data.status === "inactive") isActive = false;
-            }
-          } catch (e) { console.warn(e); }
-        }
-
-        if (!role || !isActive) {
-          alert("⛔ Unauthorized or Suspended Access.");
-          auth.signOut();
-          return;
-        }
-
         currentAdminUser = user;
-        currentUserRole = role;
+        const email = user.email.toLowerCase();
+        currentUserRole = HARDCODED_SUPER_ADMINS.includes(email) ? "superadmin" : "staff";
         document.getElementById('adminUserEmail').innerText = user.email;
-
-        const roleBadge = document.getElementById('roleBadge');
-        if (role === "superadmin") {
-          roleBadge.innerText = "SUPER ADMIN";
-          roleBadge.className = "text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/40";
+        if (currentUserRole === 'superadmin') {
           document.getElementById('superAdminSettingsSection').classList.remove('hidden');
           loadStaffList();
-        } else {
-          roleBadge.innerText = "STAFF ADMIN";
-          roleBadge.className = "text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/40";
-          document.getElementById('superAdminSettingsSection').classList.add('hidden');
         }
-
         document.getElementById('adminAuthModal').classList.add('hidden');
         listenToVendorsForCache();
         fetchLiveBookings();
       } else {
-        currentAdminUser = null; currentUserRole = null;
         document.getElementById('adminAuthModal').classList.remove('hidden');
       }
     });
@@ -754,36 +343,27 @@
     function listenToVendorsForCache() {
       db.collection("vendors").onSnapshot(snap => {
         allVendorsCache = [];
-        let pendingKyc = 0;
+        let pending = 0;
         snap.forEach(doc => {
-          const data = { uid: doc.id, ...doc.data() };
-          allVendorsCache.push(data);
-          if (data.kycVerified !== true) pendingKyc++;
+          const dat = { uid: doc.id, ...doc.data() };
+          allVendorsCache.push(dat);
+          if (dat.kycVerified !== true) pending++;
         });
-        const badge = document.getElementById('pendingKycCountBadge');
-        if (badge) badge.innerText = pendingKyc;
+        document.getElementById('pendingKycCountBadge').innerText = pending;
       });
     }
 
     function fetchLiveBookings() {
-      db.collection("bookings").orderBy("createdAt", "desc").onSnapshot((snap) => {
+      db.collection("bookings").orderBy("createdAt", "desc").onSnapshot(snap => {
         allMasterBookings = [];
-        let pending = 0, confirmed = 0, gross = 0;
-
+        let gross = 0;
         snap.forEach(doc => {
           const item = { docId: doc.id, ...doc.data() };
           allMasterBookings.push(item);
-          if (item.status === "Confirmation Pending") pending++;
-          if (item.status === "Confirmed" || item.status === "Trip Started" || item.status === "Trip Completed") confirmed++;
           if (item.status !== "Cancelled") gross += (Number(item.total) || 0);
         });
-
         document.getElementById('kpiTotalBookings').innerText = allMasterBookings.length;
-        document.getElementById('kpiPending').innerText = pending;
-        document.getElementById('kpiConfirmed').innerText = confirmed;
         document.getElementById('kpiGrossVolume').innerText = `₹${gross.toLocaleString('en-IN')}`;
-        document.getElementById('kpiPlatformCut').innerText = `₹${Math.round(gross * 0.15).toLocaleString('en-IN')}`;
-
         renderTable(allMasterBookings);
       });
     }
@@ -791,87 +371,20 @@
     function renderTable(list) {
       const tbody = document.getElementById('bookingsTableBody');
       if (!tbody) return;
-
-      if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">No matching bookings.</td></tr>`;
-        return;
-      }
+      if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400">No bookings found.</td></tr>`; return; }
 
       tbody.innerHTML = list.map(b => {
-        const isConfirmed = b.status === "Confirmed";
-        const isPending = b.status === "Confirmation Pending";
-        const isCompleted = b.status === "Trip Completed";
-        const isCancelled = b.status === "Cancelled";
-
-        const assignedVendor = allVendorsCache.find(v => v.uid === b.vendorId);
-        const isVendorKycVerified = assignedVendor?.kycVerified === true;
-
+        const vendor = allVendorsCache.find(v => v.uid === b.vendorId);
         return `
-          <tr class="hover:bg-slate-50/80 transition">
-            <td class="p-3.5">
-              <span class="font-bold font-mono text-blue-700">${b.bookingId || 'MTZ'}</span>
-              <p class="text-[10px] text-slate-400 mt-0.5">${b.date || ''} (${b.time || ''})</p>
-            </td>
-            <td class="p-3.5">
-              <p class="font-bold text-slate-800">${b.name || '-'}</p>
-              <a href="tel:${b.phone}" class="text-[11px] text-blue-600 hover:underline font-semibold">${b.phone || '-'}</a>
-            </td>
-            <td class="p-3.5">
-              <p class="font-semibold text-slate-800 text-xs">${b.from} ➔ ${b.to}</p>
-              <div class="flex items-center gap-2 mt-1 text-[10px]">
-                <span class="bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-bold">${b.type || 'One Way'}</span>
-                <a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(b.from)}&destination=${encodeURIComponent(b.to)}" target="_blank" class="text-emerald-700 hover:text-emerald-800 font-bold inline-flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
-                  <i class="fa-solid fa-map-location-dot"></i> Route Map
-                </a>
-              </div>
-            </td>
-            <td class="p-3.5">
-              <p class="font-bold text-slate-700">Inc: ${b.includedKm || b.estimatedDistanceKm || 56} KM</p>
-              <p class="text-[10px] text-slate-500">${b.vehicle || ''} (Extra: ₹${b.extraKmRate || 12}/KM)</p>
-            </td>
-            <td class="p-3.5">
-              <span class="font-bold text-slate-900">₹${b.total || 0}</span>
-              <div class="text-[10px] text-slate-500 mt-0.5">
-                <span>Pick(45%): ₹${b.pickupPay || Math.round(b.total * 0.45)}</span>
-              </div>
-            </td>
-            <td class="p-3.5">
-              ${b.vendorId ? `
-                <div class="flex items-center gap-1.5">
-                  <button onclick="inspectPartnerProfile('${b.vendorId}')" class="text-[11px] text-blue-700 font-bold underline text-left">
-                    ${assignedVendor?.agencyName || assignedVendor?.name || 'Partner Dossier'}
-                  </button>
-                  <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${isVendorKycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                    ${isVendorKycVerified ? 'KYC ✓' : 'No KYC'}
-                  </span>
-                </div>
-              ` : `
-                <span class="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded font-bold">Unassigned Pool</span>
-              `}
-              ${b.driverName ? `
-                <p class="font-bold text-emerald-800 mt-0.5">${b.driverName} (${b.driverPhone || '-'})</p>
-                <p class="text-[10px] font-mono font-bold text-slate-700">${b.cabNumber || ''}</p>
-              ` : ''}
-            </td>
-            <td class="p-3.5">
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                isCompleted ? 'bg-purple-100 text-purple-800' :
-                isConfirmed ? 'bg-emerald-100 text-emerald-800' :
-                isPending ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
-              }">
-                ${b.status}
-              </span>
-            </td>
-            <td class="p-3.5 text-right space-x-1 whitespace-nowrap">
-              <button onclick="openEditBookingModal('${b.docId}')" title="Edit / Reassign Vendor" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-1.5 rounded-lg border border-blue-200">
-                <i class="fa-solid fa-pen-to-square"></i>
-              </button>
-              ${!isCancelled ? `
-                <button onclick="promptCancelOptions('${b.docId}', '${b.total}')" title="Cancel Ride" class="text-rose-600 hover:text-rose-800 bg-rose-50 p-1.5 rounded-lg border border-rose-200">
-                  <i class="fa-solid fa-ban"></i>
-                </button>
-              ` : ''}
-            </td>
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 font-mono font-bold text-blue-700">${b.bookingId || 'MTZ'}</td>
+            <td class="p-3"><b>${b.name}</b><br><a href="tel:${b.phone}" class="text-blue-600">${b.phone}</a></td>
+            <td class="p-3">${b.from} ➔ ${b.to}</td>
+            <td class="p-3">${b.vehicle} (${b.type})</td>
+            <td class="p-3 font-bold">₹${b.total}</td>
+            <td class="p-3">${vendor ? (vendor.agencyName || vendor.name) : 'Unassigned Pool'}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">${b.status}</span></td>
+            <td class="p-3 text-right"><button onclick="openEditBookingModal('${b.docId}')" class="bg-blue-50 text-blue-600 p-1.5 rounded-lg border border-blue-200"><i class="fa-solid fa-pen"></i></button></td>
           </tr>
         `;
       }).join('');
@@ -880,20 +393,10 @@
     function openEditBookingModal(docId) {
       const b = allMasterBookings.find(x => x.docId === docId);
       if (!b) return;
-
       document.getElementById('editModalDocId').value = docId;
-      document.getElementById('editModalBookingId').innerText = b.bookingId || docId;
       document.getElementById('editPickupLocation').value = b.from || '';
       document.getElementById('editDropLocation').value = b.to || '';
-      document.getElementById('editDate').value = b.date || '';
-      document.getElementById('editTime').value = b.time || '';
-      document.getElementById('editIncludedKm').value = b.includedKm || b.estimatedDistanceKm || 56;
-      document.getElementById('editExtraKmRate').value = b.extraKmRate || 12;
-      document.getElementById('editTotalFare').value = b.total || 0;
-      document.getElementById('editCustName').value = b.name || '';
-      document.getElementById('editCustPhone').value = b.phone || '';
       document.getElementById('editDriverName').value = b.driverName || '';
-      document.getElementById('editDriverPhone').value = b.driverPhone || '';
       document.getElementById('editCabNumber').value = b.cabNumber || '';
 
       const dropdown = document.getElementById('editVendorDropdown');
@@ -906,48 +409,16 @@
 
     function saveEditedBooking() {
       const docId = document.getElementById('editModalDocId').value;
-      const total = Number(document.getElementById('editTotalFare').value) || 0;
       const newVendorId = document.getElementById('editVendorDropdown').value;
 
-      const updateData = {
+      db.collection("bookings").doc(docId).update({
         from: document.getElementById('editPickupLocation').value.trim(),
         to: document.getElementById('editDropLocation').value.trim(),
-        date: document.getElementById('editDate').value,
-        time: document.getElementById('editTime').value,
-        includedKm: Number(document.getElementById('editIncludedKm').value) || 56,
-        extraKmRate: Number(document.getElementById('editExtraKmRate').value) || 12,
-        total: total,
-        pickupPay: Math.round(total * 0.45),
-        dropPay: total - Math.round(total * 0.45),
-        name: document.getElementById('editCustName').value.trim(),
-        phone: document.getElementById('editCustPhone').value.trim(),
         driverName: document.getElementById('editDriverName').value.trim(),
-        driverPhone: document.getElementById('editDriverPhone').value.trim(),
         cabNumber: document.getElementById('editCabNumber').value.trim().toUpperCase(),
         vendorId: newVendorId ? newVendorId : firebase.firestore.FieldValue.delete(),
-        status: newVendorId ? "Confirmed" : "Confirmation Pending",
-        editedBy: currentAdminUser.email,
-        editedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
-      db.collection("bookings").doc(docId).update(updateData).then(() => {
-        closeModal('editBookingModal');
-        alert("Booking and vendor reassignment updated successfully!");
-      }).catch(err => alert("Error: " + err.message));
-    }
-
-    function promptCancelOptions(docId, totalFare) {
-      document.getElementById('cancelModalDocId').value = docId;
-      document.getElementById('cancelPenaltyInput').value = Math.max(300, Math.round(Number(totalFare) * 0.10));
-      openModal('cancelBookingModal');
-    }
-
-    function executeCancelBooking(withPenalty) {
-      const docId = document.getElementById('cancelModalDocId').value;
-      db.collection("bookings").doc(docId).update({
-        status: "Cancelled", cancelledBy: "Admin Console", customerPenalty: withPenalty ? Number(document.getElementById('cancelPenaltyInput').value) : 0,
-        cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => { closeModal('cancelBookingModal'); alert("Ride cancelled."); });
+        status: newVendorId ? "Confirmed" : "Confirmation Pending"
+      }).then(() => { closeModal('editBookingModal'); alert("Booking & Reassignment Updated!"); });
     }
 
     function inspectPartnerProfile(vendorId) {
@@ -988,10 +459,7 @@
       const uid = document.getElementById('blockModalVendorUid').value;
       const reason = document.getElementById('blockReasonInput').value.trim();
       if (!reason) return alert("Reason daalein!");
-
-      db.collection("vendors").doc(uid).update({
-        isBlocked: true, blockReason: reason, blockedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => { closeModal('vendorBlockModal'); alert("Partner blocked!"); fetchRegisteredPartners(); });
+      db.collection("vendors").doc(uid).update({ isBlocked: true, blockReason: reason }).then(() => { closeModal('vendorBlockModal'); alert("Blocked!"); fetchRegisteredPartners(); });
     }
 
     function unblockVendorDirectly(uid) {
@@ -1090,12 +558,20 @@
       });
     }
 
-    // BULK CSV UPLOAD FOR FIXED ROUTES (UPDATED WITH YOUR MULTI-COLUMN FORMAT SUPPORT)
-    function downloadSampleRoutesCsv() {
+    // MULTI-FORMAT BULK CSV PARSER FOR OUTSTATION & LOCAL RENTALS
+    function downloadSampleOutstationCsv() {
       const sample = "FARE ID,FARE NAME,CAB TYPE,SOURCE CITY,DESTINATION CITY,BASE FARE,INCLUDED KM,EXTRA KM CHARGE\n0001,BHOPAL TO INDORE ONE WAY,HATCHBACK,BHOPAL,INDORE,1800,196,11\n0002,BHOPAL TO INDORE ONE WAY,SEDAN,BHOPAL,INDORE,2400,196,12\n0003,BHOPAL TO INDORE ONE WAY,SUV,BHOPAL,INDORE,4000,196,20";
       const link = document.createElement("a");
+      link.setAttribute("href", "data:text/csv;charset=utf-8,+ encodeURI(sample));
+      link.setAttribute("download", "MakeTripzy_Outstation_Sample.csv");
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    function downloadSampleLocalCsv() {
+      const sample = "FARE ID,FARE NAME,CAB TYPE,CITY,BASE FARE,INCLUDED KM,INCLUDED HOURS,EXTRA KM CHARGE,EXTRA HOURS CHARGE\n1001,BHOPAL LOCAL 4H/40KM,SEDAN,BHOPAL,1800,40,4,15,150";
+      const link = document.createElement("a");
       link.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(sample));
-      link.setAttribute("download", "MakeTripzy_Fixed_Routes_Sample.csv");
+      link.setAttribute("download", "MakeTripzy_LocalRental_Sample.csv");
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
@@ -1115,60 +591,64 @@
           return alert("CSV file invalid hai!");
         }
 
-        // We map grouped routes: from-to -> { Hatchback: price, Sedan: price, ... }
-        const routePackages = {};
+        const routePayload = {};
+        const localPayload = {};
         let count = 0;
 
         for (let i = 1; i < lines.length; i++) {
           const p = lines[i].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-          // Format expected: FARE ID, FARE NAME, CAB TYPE, SOURCE CITY, DESTINATION CITY, BASE FARE, INCLUDED KM, EXTRA KM CHARGE
-          if (p.length >= 6) {
-            const cabType = p[2].toUpperCase(); // HATCHBACK, SEDAN, MUV, SUV
+          
+          if (p.length >= 9) {
+            // Local Rental: FARE ID, FARE NAME, CAB TYPE, CITY, BASE FARE, INCLUDED KM, INCLUDED HOURS, EXTRA KM CHARGE, EXTRA HOURS CHARGE
+            const cab = p[2].toUpperCase();
+            const city = p[3].toLowerCase();
+            const fare = Number(p[4]);
+            if (city && !isNaN(fare)) {
+              if (!localPayload[city]) localPayload[city] = {};
+              let normCab = 'Sedan';
+              if (cab.includes('HATCH')) normCab = 'Hatchback';
+              else if (cab.includes('MUV')) normCab = 'MUV';
+              else if (cab.includes('SUV')) normCab = 'SUV';
+              localPayload[city][normCab] = { baseFare: fare, includedKm: p[5], includedHours: p[6], extraKm: p[7], extraHr: p[8] };
+              count++;
+            }
+          } else if (p.length >= 6) {
+            // Outstation Route: FARE ID, FARE NAME, CAB TYPE, SOURCE CITY, DESTINATION CITY, BASE FARE, INCLUDED KM, EXTRA KM CHARGE
+            const cab = p[2].toUpperCase();
             const from = p[3].toLowerCase();
             const to = p[4].toLowerCase();
-            const baseFare = Number(p[5]);
-
-            if (from && to && cabType && !isNaN(baseFare)) {
-              const routeKey = `${from}-${to}`;
-              if (!routePackages[routeKey]) {
-                routePackages[routeKey] = {};
-              }
-              // Normalize cab type key to standard casing
-              let normalizedCab = 'Sedan';
-              if (cabType.includes('HATCH')) normalizedCab = 'Hatchback';
-              else if (cabType.includes('SEDAN')) normalizedCab = 'Sedan';
-              else if (cabType.includes('MUV') || cabType.includes('ERTIGA')) normalizedCab = 'MUV';
-              else if (cabType.includes('SUV') || cabType.includes('INNOVA')) normalizedCab = 'SUV';
-
-              routePackages[routeKey][normalizedCab] = baseFare;
+            const fare = Number(p[5]);
+            if (from && to && !isNaN(fare)) {
+              const key = `${from}-${to}`;
+              if (!routePayload[key]) routePayload[key] = {};
+              let normCab = 'Sedan';
+              if (cab.includes('HATCH')) normCab = 'Hatchback';
+              else if (cab.includes('MUV')) normCab = 'MUV';
+              else if (cab.includes('SUV')) normCab = 'SUV';
+              routePayload[key][normCab] = fare;
               count++;
             }
           }
         }
 
-        if (count === 0) {
-          btn.innerText = "Upload CSV"; btn.disabled = false;
-          return alert("CSV format read nahi ho paya. Sample template download karke check karein.");
+        const promises = [];
+        if (Object.keys(routePayload).length > 0) {
+          promises.push(db.collection("pricing_rules").doc("fixed_routes").set(routePayload, { merge: true }));
+        }
+        if (Object.keys(localPayload).length > 0) {
+          promises.push(db.collection("pricing_rules").doc("local_rentals").set(localPayload, { merge: true }));
         }
 
-        db.collection("pricing_rules").doc("fixed_routes").set(routePackages, { merge: true }).then(() => {
+        Promise.all(promises).then(() => {
           btn.innerText = "Upload CSV"; btn.disabled = false;
           document.getElementById('routesCsvFileInput').value = '';
-          alert(`🎉 Success! ${count} route package records uploaded successfully.`);
+          alert(`🎉 Success! ${count} pricing records successfully uploaded & synced.`);
         }).catch(err => {
           btn.innerText = "Upload CSV"; btn.disabled = false;
-          alert("Save error: " + err.message);
+          alert("Error: " + err.message);
         });
       };
       reader.readAsText(file);
-    }
-
-    function saveFixedPricingRoute() {
-      const from = document.getElementById('fixedFromCity').value.trim().toLowerCase();
-      const to = document.getElementById('fixedToCity').value.trim().toLowerCase();
-      db.collection("pricing_rules").doc("fixed_routes").set({
-        [`${from}-${to}`]: { Hatchback: Number(document.getElementById('fixedHatch').value), Sedan: Number(document.getElementById('fixedSedan').value), MUV: Number(document.getElementById('fixedMuv').value), SUV: Number(document.getElementById('fixedSuv').value) }
-      }, { merge: true }).then(() => alert("Saved!"));
     }
   </script>
 </body>
