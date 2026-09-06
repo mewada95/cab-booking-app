@@ -211,8 +211,9 @@
         </div>
       </div>
 
-      <!-- SUPER ADMIN CONFIG: STAFF & PRICING (HIDDEN FOR STAFF) -->
+      <!-- SUPER ADMIN CONFIG: STAFF & PRICING -->
       <div id="superAdminSettingsSection" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+        
         <!-- STAFF OPERATOR MANAGEMENT -->
         <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100">
@@ -220,7 +221,7 @@
               <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
                 <i class="fa-solid fa-user-gear text-blue-600"></i> Staff Admin Management
               </h3>
-              <p class="text-[10px] text-slate-500">Add dispatchers and operational operators</p>
+              <p class="text-[10px] text-slate-500">Add, activate, inactivate or delete operators</p>
             </div>
             <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">Super Admin Only</span>
           </div>
@@ -230,12 +231,21 @@
               <label class="block font-semibold text-slate-600 mb-1">Staff Google Email Address</label>
               <input id="staffEmailInput" type="email" placeholder="operator@gmail.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
             </div>
-            <div>
-              <label class="block font-semibold text-slate-600 mb-1">Assign Operational Role</label>
-              <select id="staffRoleSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                <option value="staff">Staff Admin (Dispatch, Edit & View-Only Reports)</option>
-                <option value="superadmin">Super Admin (Full Financial & Pricing Control)</option>
-              </select>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Operational Role</label>
+                <select id="staffRoleSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                  <option value="staff">Staff Admin (Dispatch & View-Only)</option>
+                  <option value="superadmin">Super Admin (Full Financial & Pricing)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 mb-1">Initial Status</label>
+                <select id="staffStatusSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                  <option value="active">Active (Access Allowed)</option>
+                  <option value="inactive">Inactive (Access Suspended)</option>
+                </select>
+              </div>
             </div>
             <button onclick="addStaffMember()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
               Grant Role Access
@@ -243,24 +253,45 @@
           </div>
 
           <div class="pt-2">
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Active Authorized Staff</p>
-            <div id="staffListContainer" class="space-y-1.5 text-xs max-h-40 overflow-y-auto"></div>
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Active & Registered Staff</p>
+            <div id="staffListContainer" class="space-y-2 text-xs max-h-56 overflow-y-auto"></div>
           </div>
         </div>
 
-        <!-- DYNAMIC FIXED ROUTE OVERRIDES -->
+        <!-- DYNAMIC FIXED ROUTE OVERRIDES (MANUAL + CSV BULK UPLOAD) -->
         <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100">
             <div>
               <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
                 <i class="fa-solid fa-route text-emerald-600"></i> Route Fixed Price Overrides
               </h3>
-              <p class="text-[10px] text-slate-500">Specific corridors ke liye manual fixed packages</p>
+              <p class="text-[10px] text-slate-500">Manual ya Bulk CSV upload se fixed pricing set karein</p>
             </div>
             <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">Super Admin Only</span>
           </div>
 
-          <div class="space-y-2.5 text-xs">
+          <!-- BULK CSV UPLOAD STRIP -->
+          <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-2xl space-y-2 text-xs">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-emerald-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-file-arrow-up text-emerald-600"></i> Bulk CSV Upload Routes
+              </span>
+              <button onclick="downloadSampleRoutesCsv()" class="text-[10px] bg-white border border-emerald-300 text-emerald-700 font-bold px-2 py-1 rounded-lg hover:bg-emerald-100 transition">
+                <i class="fa-solid fa-file-arrow-down"></i> Sample Template
+              </button>
+            </div>
+            <p class="text-[10px] text-emerald-800">CSV me <code>fromCity, toCity, hatchback, sedan, muv, suv</code> columns hone chahiye.</p>
+            <div class="flex items-center gap-2">
+              <input id="routesCsvFileInput" type="file" accept=".csv" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700" />
+              <button onclick="uploadFixedRoutesCsv()" id="uploadRoutesCsvBtn" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm">
+                Upload CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- MANUAL FORM -->
+          <div class="space-y-2.5 text-xs pt-1">
+            <p class="font-bold text-slate-700 text-[11px]">Ya Single Route Manually Add Karein:</p>
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <label class="block font-semibold text-slate-600 mb-1">From City</label>
@@ -289,8 +320,8 @@
                 <input id="fixedSuv" type="number" placeholder="₹4000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 text-xs font-bold" />
               </div>
             </div>
-            <button onclick="saveFixedPricingRoute()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
-              Save Route Package Rule
+            <button onclick="saveFixedPricingRoute()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
+              Save Single Route Rule
             </button>
           </div>
         </div>
@@ -336,7 +367,7 @@
 
   </main>
 
-  <!-- MODAL: EDIT BOOKING (FOR ADMIN & STAFF) -->
+  <!-- MODAL: EDIT BOOKING -->
   <div id="editBookingModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
       <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
@@ -426,7 +457,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CANCELLATION & PENALTY CONTROL -->
+  <!-- MODAL: CANCELLATION CONTROL -->
   <div id="cancelBookingModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4 text-xs">
       <div class="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -458,7 +489,7 @@
     </div>
   </div>
 
-  <!-- MODAL: PARTNER KYC DOSSIER & VERIFICATION DECISION -->
+  <!-- MODAL: PARTNER KYC AUDIT & APPROVAL -->
   <div id="partnerDetailsModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4 text-xs max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -521,7 +552,7 @@
     let allMasterBookings = [];
     let allVendorsCache = [];
 
-    // ROLES CONFIGURATION
+    // HARDCODED PROTECTED ROLES
     const HARDCODED_SUPER_ADMINS = [
       "admin@maketripzy.com",
       "mewada1995@gmail.com"
@@ -584,21 +615,28 @@
       });
     }
 
-    // AUTH STATE & ROLE LISTENER
+    // AUTH STATE & ACTIVE/INACTIVE STATUS VERIFICATION
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         const userEmail = (user.email || '').toLowerCase();
         let role = null;
+        let isActive = true;
 
         if (HARDCODED_SUPER_ADMINS.includes(userEmail)) {
           role = "superadmin";
+          isActive = true;
         } else if (HARDCODED_STAFF_ADMINS.includes(userEmail)) {
           role = "staff";
+          isActive = true;
         } else {
           try {
             const roleDoc = await db.collection("staff_roles").doc(userEmail).get();
-            if (roleDoc.exists && roleDoc.data().role) {
-              role = roleDoc.data().role;
+            if (roleDoc.exists) {
+              const data = roleDoc.data();
+              role = data.role;
+              if (data.status === "inactive") {
+                isActive = false;
+              }
             }
           } catch (e) {
             console.warn("Role fetch error:", e);
@@ -606,7 +644,13 @@
         }
 
         if (!role) {
-          alert(`⛔ Unauthorized Access!\n\nEmail ${user.email} is not permitted.`);
+          alert(`⛔ Unauthorized Access!\n\nEmail ${user.email} is not registered in MakeTripzy console.`);
+          auth.signOut();
+          return;
+        }
+
+        if (!isActive) {
+          alert(`⚠️ Account Inactive / Suspended!\n\nAapka staff access Super Admin dwara suspend (Inactive) kar diya gaya hai.`);
           auth.signOut();
           return;
         }
@@ -643,7 +687,7 @@
       auth.signOut().then(() => location.reload());
     }
 
-    // LISTEN TO VENDORS IN REAL-TIME FOR KYC BADGES
+    // REAL-TIME KYC BADGE SYNC
     function listenToVendorsForBadges() {
       db.collection("vendors").onSnapshot(snap => {
         allVendorsCache = [];
@@ -685,7 +729,7 @@
       }, (err) => console.error("Bookings sync error:", err));
     }
 
-    // RENDER TABLE WITH KYC BADGE & ROUTE LINK
+    // RENDER DISPATCH TABLE WITH KYC BADGE & ROUTE LINK
     function renderTable(list) {
       const tbody = document.getElementById('bookingsTableBody');
       if (!tbody) return;
@@ -702,8 +746,6 @@
         const isCancelled = b.status === "Cancelled";
 
         const mapSearchUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(b.from)}&destination=${encodeURIComponent(b.to)}`;
-        
-        // Find assigned vendor KYC status from cache
         const assignedVendor = allVendorsCache.find(v => v.uid === b.vendorId);
         const isVendorKycVerified = assignedVendor?.kycVerified === true;
 
@@ -722,7 +764,7 @@
               <div class="flex items-center gap-2 mt-1 text-[10px]">
                 <span class="bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-bold">${b.type || 'One Way'}</span>
                 <a href="${mapSearchUrl}" target="_blank" class="text-emerald-700 hover:text-emerald-800 font-bold inline-flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
-                  <i class="fa-solid fa-map-location-dot"></i> Live Route Map
+                  <i class="fa-solid fa-map-location-dot"></i> Route Map
                 </a>
               </div>
             </td>
@@ -957,7 +999,7 @@
               </div>
             </div>
 
-            <!-- ADMIN ACTION BUTTONS: APPROVE / REJECT -->
+            <!-- ADMIN DECISION BUTTONS -->
             <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
               <button onclick="setPartnerKycStatus('${vendorId}', true)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-1">
                 <i class="fa-solid fa-circle-check"></i> Approve KYC
@@ -971,7 +1013,6 @@
       });
     }
 
-    // UPDATE PARTNER KYC IN DATABASE
     function setPartnerKycStatus(vendorId, isApproved) {
       const statusText = isApproved ? "Auto-Approved" : "Rejected/Review-Needed";
       db.collection("vendors").doc(vendorId).update({
@@ -980,13 +1021,13 @@
         kycAuditedBy: currentAdminUser.email,
         kycAuditedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        alert(`Partner KYC status successfully updated to: ${statusText}`);
+        alert(`Partner KYC status updated to: ${statusText}`);
         closeModal('partnerDetailsModal');
         fetchRegisteredPartners();
       }).catch(err => alert("Error updating KYC: " + err.message));
     }
 
-    // 5. FETCH REGISTERED PARTNERS TAB (WITH FILTER)
+    // 5. FETCH REGISTERED PARTNERS (WITH FILTER)
     function fetchRegisteredPartners() {
       const container = document.getElementById('partnersGridContainer');
       const filter = document.getElementById('partnerKycFilterSelect')?.value || "ALL";
@@ -1037,7 +1078,7 @@
       });
     }
 
-    // 6. FETCH DRIVERS & CABS DIRECTORY TAB
+    // 6. FETCH DRIVERS & CABS DIRECTORY
     function fetchFleetDirectory() {
       const container = document.getElementById('fleetGridContainer');
       const activeCabs = allMasterBookings.filter(b => b.driverName && b.cabNumber);
@@ -1193,7 +1234,87 @@
       }
     }
 
-    // SUPER ADMIN: FIXED PRICING OVERRIDE
+    // SUPER ADMIN: BULK CSV UPLOAD & SINGLE OVERRIDES
+    function downloadSampleRoutesCsv() {
+      const sampleContent = "fromCity,toCity,hatchback,sedan,muv,suv\nbhopal,indore,1800,2000,2600,4000\nindore,ujjain,1400,1600,2100,3200\nahmedabad,vadodara,1900,2100,2700,4100\njaipur,delhi,3200,3500,4500,6500";
+      const link = document.createElement("a");
+      link.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(sampleContent));
+      link.setAttribute("download", "MakeTripzy_Fixed_Routes_Sample.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function uploadFixedRoutesCsv() {
+      if (currentUserRole !== "superadmin") return alert("Super Admin access required!");
+      const fileInput = document.getElementById('routesCsvFileInput');
+      const file = fileInput.files[0];
+
+      if (!file) return alert("Kripya upload karne ke liye CSV file chunein!");
+
+      const reader = new FileReader();
+      const btn = document.getElementById('uploadRoutesCsvBtn');
+      btn.innerText = "Parsing...";
+      btn.disabled = true;
+
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split(/\r\n|\n/).filter(line => line.trim().length > 0);
+
+        if (lines.length < 2) {
+          btn.innerText = "Upload CSV";
+          btn.disabled = false;
+          return alert("CSV file khali ya invalid hai!");
+        }
+
+        const updatePayload = {};
+        let successCount = 0;
+
+        // Start from line 1 (skipping header)
+        for (let i = 1; i < lines.length; i++) {
+          const parts = lines[i].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+          if (parts.length >= 6) {
+            const from = parts[0].toLowerCase();
+            const to = parts[1].toLowerCase();
+            const h = Number(parts[2]);
+            const s = Number(parts[3]);
+            const m = Number(parts[4]);
+            const suv = Number(parts[5]);
+
+            if (from && to && !isNaN(h) && !isNaN(s) && !isNaN(m) && !isNaN(suv)) {
+              const key = `${from}-${to}`;
+              updatePayload[key] = {
+                Hatchback: h,
+                Sedan: s,
+                MUV: m,
+                SUV: suv
+              };
+              successCount++;
+            }
+          }
+        }
+
+        if (successCount === 0) {
+          btn.innerText = "Upload CSV";
+          btn.disabled = false;
+          return alert("CSV format sahi nahi hai! Sample template download karke check karein.");
+        }
+
+        db.collection("pricing_rules").doc("fixed_routes").set(updatePayload, { merge: true }).then(() => {
+          btn.innerText = "Upload CSV";
+          btn.disabled = false;
+          fileInput.value = '';
+          alert(`🎉 Success! ${successCount} fixed pricing routes CSV se successfully save aur update ho gaye.`);
+        }).catch(err => {
+          btn.innerText = "Upload CSV";
+          btn.disabled = false;
+          alert("Database save error: " + err.message);
+        });
+      };
+
+      reader.readAsText(file);
+    }
+
     function saveFixedPricingRoute() {
       if (currentUserRole !== "superadmin") return alert("Super Admin access required!");
 
@@ -1216,18 +1337,23 @@
       });
     }
 
+    // STAFF MANAGEMENT
     function addStaffMember() {
       if (currentUserRole !== "superadmin") return alert("Access denied!");
       const email = document.getElementById('staffEmailInput').value.trim().toLowerCase();
       const role = document.getElementById('staffRoleSelect').value;
+      const status = document.getElementById('staffStatusSelect').value;
 
       if (!email || !email.includes('@')) return alert("Valid Google email daalein!");
 
       db.collection("staff_roles").doc(email).set({
-        email: email, role: role, addedBy: currentAdminUser.email,
+        email: email,
+        role: role,
+        status: status,
+        addedBy: currentAdminUser.email,
         assignedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        alert(`Role '${role}' assigned to ${email}`);
+        alert(`Staff ${email} assigned as '${role}' with status '${status}'.`);
         document.getElementById('staffEmailInput').value = '';
         loadStaffList();
       });
@@ -1239,41 +1365,52 @@
         if (!container) return;
 
         let staffHtml = `
-          <div class="flex justify-between items-center bg-purple-50 p-2 rounded-xl border border-purple-200">
+          <div class="flex justify-between items-center bg-purple-50 p-2.5 rounded-2xl border border-purple-200">
             <div>
               <p class="font-bold text-slate-800">admin@maketripzy.com</p>
               <span class="text-[9px] uppercase font-bold text-purple-700">SUPER ADMIN (ROOT)</span>
             </div>
-            <span class="text-[10px] text-slate-400 font-semibold">Protected</span>
+            <span class="text-[10px] text-emerald-700 bg-emerald-100 font-bold px-2 py-0.5 rounded-md">Permanent Active</span>
           </div>
-          <div class="flex justify-between items-center bg-purple-50 p-2 rounded-xl border border-purple-200">
+          <div class="flex justify-between items-center bg-purple-50 p-2.5 rounded-xl border border-purple-200">
             <div>
               <p class="font-bold text-slate-800">mewada1995@gmail.com</p>
               <span class="text-[9px] uppercase font-bold text-purple-700">SUPER ADMIN (ROOT)</span>
             </div>
-            <span class="text-[10px] text-slate-400 font-semibold">Protected</span>
+            <span class="text-[10px] text-emerald-700 bg-emerald-100 font-bold px-2 py-0.5 rounded-md">Permanent Active</span>
           </div>
-          <div class="flex justify-between items-center bg-blue-50 p-2 rounded-xl border border-blue-200">
+          <div class="flex justify-between items-center bg-blue-50 p-2.5 rounded-xl border border-blue-200">
             <div>
               <p class="font-bold text-slate-800">mewada95@gmail.com</p>
               <span class="text-[9px] uppercase font-bold text-blue-700">STAFF ADMIN (DISPATCHER)</span>
             </div>
-            <span class="text-[10px] text-slate-400 font-semibold">Protected</span>
+            <span class="text-[10px] text-emerald-700 bg-emerald-100 font-bold px-2 py-0.5 rounded-md">Permanent Active</span>
           </div>
         `;
 
         if (!snap.empty) {
           staffHtml += snap.docs.map(doc => {
             const s = doc.data();
+            const isActive = s.status !== "inactive";
             return `
-              <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-200">
+              <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-2xl border ${isActive ? 'border-slate-200' : 'border-rose-200 bg-rose-50/40'}">
                 <div>
                   <p class="font-bold text-slate-800">${s.email}</p>
-                  <span class="text-[9px] uppercase font-bold text-slate-400">${s.role}</span>
+                  <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="text-[9px] uppercase font-bold text-slate-400">${s.role}</span>
+                    <span class="text-[9px] font-bold px-1.5 rounded ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                      ${isActive ? 'ACTIVE' : 'INACTIVE'}
+                    </span>
+                  </div>
                 </div>
-                <button onclick="removeStaffMember('${s.email}')" class="text-rose-600 hover:text-rose-700 text-xs p-1">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
+                <div class="flex items-center gap-1">
+                  <button onclick="toggleStaffStatus('${s.email}', ${!isActive})" title="${isActive ? 'Suspend Staff' : 'Activate Staff'}" class="text-xs font-bold px-2 py-1 rounded-lg border ${isActive ? 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100' : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700'}">
+                    ${isActive ? 'Suspend' : 'Activate'}
+                  </button>
+                  <button onclick="removeStaffMember('${s.email}')" title="Delete Staff Permanently" class="text-rose-600 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
               </div>
             `;
           }).join('');
@@ -1282,9 +1419,22 @@
       });
     }
 
+    function toggleStaffStatus(email, newStatusActive) {
+      const statusText = newStatusActive ? "active" : "inactive";
+      db.collection("staff_roles").doc(email).update({
+        status: statusText,
+        statusUpdatedBy: currentAdminUser.email,
+        statusUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert(`Staff account ${email} status changed to '${statusText}'.`);
+      });
+    }
+
     function removeStaffMember(email) {
-      if (confirm(`Remove staff access for ${email}?`)) {
-        db.collection("staff_roles").doc(email).delete();
+      if (confirm(`Are you sure you want to permanently delete staff access for ${email}?`)) {
+        db.collection("staff_roles").doc(email).delete().then(() => {
+          alert(`Staff ${email} deleted successfully.`);
+        });
       }
     }
   </script>
