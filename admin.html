@@ -25,7 +25,7 @@
           <h1 class="text-base font-bold tracking-tight">MakeTripzy Operations Hub</h1>
           <span id="roleBadge" class="text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider bg-slate-800 text-slate-400">Authenticating...</span>
         </div>
-        <p class="text-[11px] text-slate-400">Bookings, KYC Audits & Fleet Management</p>
+        <p class="text-[11px] text-slate-400">Bookings, KYC Audits, Fleet & Broadcast Engine</p>
       </div>
     </div>
     
@@ -75,10 +75,13 @@
         <i class="fa-solid fa-list-check"></i> Bookings & Dispatch Hub
       </button>
       <button onclick="switchAdminTab('partners')" id="tabBtnPartners" class="flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition">
-        <i class="fa-solid fa-id-badge"></i> Partner & Vendor KYC Hub (<span id="pendingKycCountBadge">0</span>)
+        <i class="fa-solid fa-id-badge"></i> Vendors & KYC Hub (<span id="pendingKycCountBadge">0</span>)
       </button>
       <button onclick="switchAdminTab('fleet')" id="tabBtnFleet" class="flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition">
         <i class="fa-solid fa-taxi"></i> Drivers & Cabs Directory
+      </button>
+      <button onclick="switchAdminTab('broadcast')" id="tabBtnBroadcast" class="flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition">
+        <i class="fa-solid fa-bullhorn text-amber-500"></i> Broadcast & Offers
       </button>
     </div>
 
@@ -258,7 +261,7 @@
           </div>
         </div>
 
-        <!-- DYNAMIC FIXED ROUTE OVERRIDES (MANUAL + CSV BULK UPLOAD) -->
+        <!-- DYNAMIC FIXED ROUTE OVERRIDES -->
         <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100">
             <div>
@@ -270,7 +273,6 @@
             <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">Super Admin Only</span>
           </div>
 
-          <!-- BULK CSV UPLOAD STRIP -->
           <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-2xl space-y-2 text-xs">
             <div class="flex justify-between items-center">
               <span class="font-bold text-emerald-900 flex items-center gap-1.5">
@@ -289,7 +291,6 @@
             </div>
           </div>
 
-          <!-- MANUAL FORM -->
           <div class="space-y-2.5 text-xs pt-1">
             <p class="font-bold text-slate-700 text-[11px]">Ya Single Route Manually Add Karein:</p>
             <div class="grid grid-cols-2 gap-2">
@@ -328,18 +329,19 @@
       </div>
     </div>
 
-    <!-- VIEW 2: REGISTERED PARTNERS & KYC AUDIT HUB -->
+    <!-- VIEW 2: REGISTERED PARTNERS & KYC AUDIT HUB (WITH BLOCK/UNBLOCK) -->
     <div id="viewPartners" class="hidden bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100">
         <div>
-          <h3 class="text-sm font-bold text-slate-800">Partner & Vendor KYC Verification Console</h3>
-          <p class="text-xs text-slate-500">Live Camera Selfie, PAN, Aadhaar front photo & Driving License audits</p>
+          <h3 class="text-sm font-bold text-slate-800">Partner & Vendor Directory (KYC & Suspension Hub)</h3>
+          <p class="text-xs text-slate-500">Live Camera Selfie, PAN, Aadhaar status, DL & Account Block/Unblock toggle</p>
         </div>
         <div class="flex items-center gap-2">
           <select id="partnerKycFilterSelect" onchange="fetchRegisteredPartners()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none">
             <option value="ALL">All Partner Accounts</option>
             <option value="PENDING">Pending Approval Only</option>
             <option value="VERIFIED">Verified / Approved Only</option>
+            <option value="BLOCKED">Suspended / Blocked Only</option>
           </select>
           <button onclick="fetchRegisteredPartners()" class="text-blue-600 font-bold text-xs p-1.5 hover:bg-blue-50 rounded-lg">
             <i class="fa-solid fa-rotate-right"></i> Refresh
@@ -362,6 +364,72 @@
       </div>
       <div id="fleetGridContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
         <div class="text-center py-10 text-slate-400 col-span-3">Aggregating assigned vehicle records...</div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: BROADCAST OFFERS & ANNOUNCEMENTS ENGINE -->
+    <div id="viewBroadcast" class="hidden space-y-6">
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
+        <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+          <div>
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-bullhorn text-amber-500"></i> Broadcast Announcements, Alerts & Offers
+            </h3>
+            <p class="text-xs text-slate-500">Customer aur Vendor screens par instant banners aur promo codes push karein</p>
+          </div>
+          <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2.5 py-0.5 rounded-full">Real-time Push</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Target Audience *</label>
+            <select id="broadcastTarget" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
+              <option value="ALL">All Users (Customers + Vendors)</option>
+              <option value="CUSTOMERS">Customers Only (Booking Portal)</option>
+              <option value="VENDORS">Vendors Only (Fleet App)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Notification / Banner Type *</label>
+            <select id="broadcastType" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-500">
+              <option value="OFFER">Special Discount / Promo Code</option>
+              <option value="SURGE">Surge / High Demand Bonus</option>
+              <option value="ALERT">Important Operations Alert</option>
+              <option value="FESTIVE">Festive Greetings / Notice</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Promo Coupon Code (Optional)</label>
+            <input id="broadcastCoupon" type="text" placeholder="e.g. DIWALI100, RIDE50" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs uppercase font-mono font-bold" />
+          </div>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Broadcast Title *</label>
+            <input id="broadcastTitle" type="text" placeholder="e.g. Flat ₹100 Discount on Indore-Bhopal Route!" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Detailed Message / Description *</label>
+            <textarea id="broadcastMessage" rows="2" placeholder="Announcement ya offer terms yahan type karein..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs"></textarea>
+          </div>
+          <button onclick="publishBroadcastAnnouncement()" id="publishBroadcastBtn" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-sm flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-paper-plane"></i> Publish Live Announcement
+          </button>
+        </div>
+      </div>
+
+      <!-- RECENT ACTIVE BROADCASTS LIST -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-3">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+          <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Active Published Announcements</h4>
+          <button onclick="loadActiveBroadcasts()" class="text-blue-600 font-bold text-xs"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+        </div>
+        <div id="activeBroadcastsContainer" class="space-y-2 text-xs">
+          <p class="text-slate-400 text-center py-4">Loading active broadcasts...</p>
+        </div>
       </div>
     </div>
 
@@ -489,6 +557,37 @@
     </div>
   </div>
 
+  <!-- MODAL: VENDOR SUSPENSION & BLOCK CONTROLLER -->
+  <div id="vendorBlockModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4 text-xs">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+          <i class="fa-solid fa-ban text-rose-600"></i> Suspend / Block Partner Account
+        </h3>
+        <button onclick="closeModal('vendorBlockModal')" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <input type="hidden" id="blockModalVendorUid" />
+      <div>
+        <p class="font-bold text-slate-800 mb-1" id="blockModalVendorName">Vendor Name</p>
+        <p class="text-slate-500">Block hone par is partner ka Available Leads pool freeze ho jayega aur wo koi ride accept nahi kar sakega.</p>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-slate-700 mb-1">Reason for Suspension *</label>
+        <textarea id="blockReasonInput" rows="2.5" placeholder="e.g. Repeated duty drop, fake KYC, rash driving complaint..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-rose-500"></textarea>
+      </div>
+
+      <div class="pt-1">
+        <button onclick="confirmBlockVendor(true)" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm">
+          Confirm & Block Partner Immediately
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: PARTNER KYC AUDIT & APPROVAL -->
   <div id="partnerDetailsModal" class="fixed inset-0 bg-slate-900/70 z-50 hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-4 text-xs max-h-[90vh] overflow-y-auto">
@@ -576,16 +675,20 @@
       const vBook = document.getElementById('viewBookings');
       const vPart = document.getElementById('viewPartners');
       const vFleet = document.getElementById('viewFleet');
+      const vBroad = document.getElementById('viewBroadcast');
       const bBook = document.getElementById('tabBtnBookings');
       const bPart = document.getElementById('tabBtnPartners');
       const bFleet = document.getElementById('tabBtnFleet');
+      const bBroad = document.getElementById('tabBtnBroadcast');
 
       vBook.classList.add('hidden');
       vPart.classList.add('hidden');
       vFleet.classList.add('hidden');
+      vBroad.classList.add('hidden');
       bBook.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
       bPart.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
       bFleet.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
+      bBroad.className = "flex-1 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1.5 transition";
 
       if (tab === 'bookings') {
         vBook.classList.remove('hidden');
@@ -598,6 +701,10 @@
         vFleet.classList.remove('hidden');
         bFleet.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition";
         fetchFleetDirectory();
+      } else if (tab === 'broadcast') {
+        vBroad.classList.remove('hidden');
+        bBroad.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition";
+        loadActiveBroadcasts();
       }
     }
 
@@ -615,7 +722,7 @@
       });
     }
 
-    // AUTH STATE & ACTIVE/INACTIVE STATUS VERIFICATION
+    // AUTH STATE & ROLE LISTENER
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         const userEmail = (user.email || '').toLowerCase();
@@ -634,9 +741,7 @@
             if (roleDoc.exists) {
               const data = roleDoc.data();
               role = data.role;
-              if (data.status === "inactive") {
-                isActive = false;
-              }
+              if (data.status === "inactive") isActive = false;
             }
           } catch (e) {
             console.warn("Role fetch error:", e);
@@ -650,7 +755,7 @@
         }
 
         if (!isActive) {
-          alert(`⚠️ Account Inactive / Suspended!\n\nAapka staff access Super Admin dwara suspend (Inactive) kar diya gaya hai.`);
+          alert(`⚠️ Account Suspended!\n\nAapka staff access inactive kar diya gaya hai.`);
           auth.signOut();
           return;
         }
@@ -687,7 +792,7 @@
       auth.signOut().then(() => location.reload());
     }
 
-    // REAL-TIME KYC BADGE SYNC
+    // REAL-TIME KYC BADGE & VENDOR SYNC
     function listenToVendorsForBadges() {
       db.collection("vendors").onSnapshot(snap => {
         allVendorsCache = [];
@@ -729,7 +834,7 @@
       }, (err) => console.error("Bookings sync error:", err));
     }
 
-    // RENDER DISPATCH TABLE WITH KYC BADGE & ROUTE LINK
+    // RENDER DISPATCH TABLE WITH ROUTE MAP & ACTIONS
     function renderTable(list) {
       const tbody = document.getElementById('bookingsTableBody');
       if (!tbody) return;
@@ -748,6 +853,7 @@
         const mapSearchUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(b.from)}&destination=${encodeURIComponent(b.to)}`;
         const assignedVendor = allVendorsCache.find(v => v.uid === b.vendorId);
         const isVendorKycVerified = assignedVendor?.kycVerified === true;
+        const isVendorBlocked = assignedVendor?.isBlocked === true;
 
         return `
           <tr class="hover:bg-slate-50/80 transition">
@@ -784,8 +890,8 @@
                   <button onclick="inspectPartnerProfile('${b.vendorId}')" class="text-[11px] text-blue-700 font-bold underline text-left">
                     ${assignedVendor?.agencyName || assignedVendor?.name || 'Partner Dossier'}
                   </button>
-                  <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${isVendorKycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                    ${isVendorKycVerified ? 'KYC ✓' : 'No KYC'}
+                  <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${isVendorBlocked ? 'bg-rose-100 text-rose-800' : isVendorKycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                    ${isVendorBlocked ? 'Blocked' : isVendorKycVerified ? 'KYC ✓' : 'No KYC'}
                   </span>
                 </div>
               ` : `
@@ -838,7 +944,7 @@
       }).join('');
     }
 
-    // 1. EDIT BOOKING PARAMS (SUPER ADMIN & STAFF)
+    // 1. EDIT BOOKING PARAMS
     function openEditBookingModal(docId) {
       const b = allMasterBookings.find(x => x.docId === docId);
       if (!b) return;
@@ -892,7 +998,7 @@
       }).catch(err => alert("Error updating: " + err.message));
     }
 
-    // 2. CANCELLATION CONTROLS (WITH OR WITHOUT PENALTY)
+    // 2. CANCELLATION CONTROLS
     function promptCancelOptions(docId, totalFare) {
       document.getElementById('cancelModalDocId').value = docId;
       const penaltyCalc = Math.max(300, Math.min(1000, Math.round(Number(totalFare) * 0.10)));
@@ -930,7 +1036,49 @@
       }
     }
 
-    // 4. INSPECT PARTNER DOSSIER & TAKE KYC DECISION
+    // 4. VENDOR BLOCK / UNBLOCK CONTROLLERS
+    function promptBlockVendor(uid, name) {
+      document.getElementById('blockModalVendorUid').value = uid;
+      document.getElementById('blockModalVendorName').innerText = name || "Vendor Partner";
+      document.getElementById('blockReasonInput').value = '';
+      openModal('vendorBlockModal');
+    }
+
+    function confirmBlockVendor(isBlocking) {
+      const uid = document.getElementById('blockModalVendorUid').value;
+      const reason = document.getElementById('blockReasonInput').value.trim();
+
+      if (isBlocking && !reason) {
+        return alert("Kripya block karne ka specific reason daalein!");
+      }
+
+      db.collection("vendors").doc(uid).update({
+        isBlocked: isBlocking,
+        blockReason: isBlocking ? reason : '',
+        blockedBy: isBlocking ? currentAdminUser.email : '',
+        blockedAt: isBlocking ? firebase.firestore.FieldValue.serverTimestamp() : null
+      }).then(() => {
+        closeModal('vendorBlockModal');
+        alert(isBlocking ? "Vendor successfully suspended & blocked!" : "Vendor account unblocked & active!");
+        fetchRegisteredPartners();
+      }).catch(err => alert("Error: " + err.message));
+    }
+
+    function unblockVendorDirectly(uid) {
+      if (confirm("Kya aap is vendor ko unblock karke dispatch leads pool wapas unlock karna chahte hain?")) {
+        db.collection("vendors").doc(uid).update({
+          isBlocked: false,
+          blockReason: '',
+          unblockedBy: currentAdminUser.email,
+          unblockedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          alert("Partner account unblocked successfully!");
+          fetchRegisteredPartners();
+        });
+      }
+    }
+
+    // 5. INSPECT PARTNER DOSSIER
     function inspectPartnerProfile(vendorId) {
       openModal('partnerDetailsModal');
       const body = document.getElementById('partnerDetailsBody');
@@ -943,20 +1091,23 @@
           return;
         }
         const v = doc.data();
+        const isBlocked = v.isBlocked === true;
+
         body.innerHTML = `
           <div class="space-y-3">
-            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5">
+            <div class="bg-slate-50 p-3 rounded-2xl border ${isBlocked ? 'border-rose-300 bg-rose-50/50' : 'border-slate-200'} space-y-1.5">
               <div class="flex justify-between items-center">
                 <span class="font-bold text-slate-800 text-sm">${v.agencyName || v.name || 'Fleet Partner'}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${v.kycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                  ${v.kycVerified ? 'KYC Approved ✓' : 'KYC Under Review ⏳'}
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isBlocked ? 'bg-rose-600 text-white' : v.kycVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${isBlocked ? 'SUSPENDED / BLOCKED' : v.kycVerified ? 'KYC Approved ✓' : 'KYC Under Review ⏳'}
                 </span>
               </div>
               <p class="text-blue-600">${v.email || '-'}</p>
               <p class="text-slate-500">${v.address || 'Address not updated'}</p>
+              ${isBlocked ? `<p class="text-rose-700 font-semibold text-[11px] pt-1">Suspension Reason: ${v.blockReason || 'Policy Violation'}</p>` : ''}
             </div>
 
-            <!-- KYC DOCUMENT NUMBERS -->
+            <!-- KYC DOCUMENT STATUS -->
             <div class="grid grid-cols-2 gap-2 text-[11px]">
               <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
                 <span class="text-slate-400 font-bold block text-[9px] uppercase">PAN (TDS)</span>
@@ -989,13 +1140,6 @@
                     <img src="${v.panUrl}" class="w-full h-28 object-cover rounded-lg border border-slate-300 cursor-pointer" onclick="window.open('${v.panUrl}', '_blank')" />
                   </div>
                 ` : `<div class="p-4 text-center bg-slate-50 rounded-xl text-slate-400">No PAN Photo</div>`}
-
-                ${v.aadhaarUrl ? `
-                  <div class="text-center bg-slate-50 p-2 rounded-xl border border-slate-200 col-span-2">
-                    <p class="text-slate-400 text-[9px] mb-1 font-bold uppercase">Aadhaar Card Photo</p>
-                    <img src="${v.aadhaarUrl}" class="w-full h-28 object-cover rounded-lg border border-slate-300 cursor-pointer" onclick="window.open('${v.aadhaarUrl}', '_blank')" />
-                  </div>
-                ` : ''}
               </div>
             </div>
 
@@ -1005,7 +1149,7 @@
                 <i class="fa-solid fa-circle-check"></i> Approve KYC
               </button>
               <button onclick="setPartnerKycStatus('${vendorId}', false)" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-2.5 rounded-xl border border-rose-200 flex items-center justify-center gap-1">
-                <i class="fa-solid fa-circle-xmark"></i> Reject / Re-Audit
+                <i class="fa-solid fa-circle-xmark"></i> Reject KYC
               </button>
             </div>
           </div>
@@ -1027,7 +1171,7 @@
       }).catch(err => alert("Error updating KYC: " + err.message));
     }
 
-    // 5. FETCH REGISTERED PARTNERS (WITH FILTER)
+    // 6. FETCH REGISTERED PARTNERS WITH BLOCK / UNBLOCK BUTTONS
     function fetchRegisteredPartners() {
       const container = document.getElementById('partnersGridContainer');
       const filter = document.getElementById('partnerKycFilterSelect')?.value || "ALL";
@@ -1041,8 +1185,9 @@
 
         let partners = snap.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
 
-        if (filter === "PENDING") partners = partners.filter(p => p.kycVerified !== true);
-        else if (filter === "VERIFIED") partners = partners.filter(p => p.kycVerified === true);
+        if (filter === "PENDING") partners = partners.filter(p => p.kycVerified !== true && !p.isBlocked);
+        else if (filter === "VERIFIED") partners = partners.filter(p => p.kycVerified === true && !p.isBlocked);
+        else if (filter === "BLOCKED") partners = partners.filter(p => p.isBlocked === true);
 
         if (partners.length === 0) {
           container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">No partners matched the selected filter.</div>`;
@@ -1051,15 +1196,17 @@
 
         container.innerHTML = partners.map(v => {
           const isKyc = v.kycVerified === true;
+          const isBlocked = v.isBlocked === true;
+
           return `
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 hover:border-blue-400 transition">
+            <div class="bg-slate-50 border ${isBlocked ? 'border-rose-300 bg-rose-50/30' : 'border-slate-200'} rounded-2xl p-4 space-y-3 hover:border-blue-400 transition">
               <div class="flex justify-between items-start">
                 <div>
                   <h4 class="font-bold text-slate-800 text-sm">${v.agencyName || v.name || 'Fleet Partner'}</h4>
                   <p class="text-[11px] text-blue-600">${v.email || '-'}</p>
                 </div>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isKyc ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                  ${isKyc ? 'Verified ✓' : 'Pending ⏳'}
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isBlocked ? 'bg-rose-600 text-white' : isKyc ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${isBlocked ? 'Blocked ⛔' : isKyc ? 'Verified ✓' : 'Pending ⏳'}
                 </span>
               </div>
               <p class="text-[11px] text-slate-500 line-clamp-1">Address: ${v.address || 'Not filled'}</p>
@@ -1069,8 +1216,92 @@
                 <span>DL: <b>${v.dlNumber || 'N/A'}</b></span>
               </div>
 
-              <button onclick="inspectPartnerProfile('${v.uid}')" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-2 rounded-xl text-xs border border-blue-200 flex items-center justify-center gap-1.5 transition">
-                <i class="fa-solid fa-file-shield"></i> Review & Audit KYC
+              <div class="grid grid-cols-2 gap-1.5 pt-1">
+                <button onclick="inspectPartnerProfile('${v.uid}')" class="bg-white hover:bg-slate-100 text-slate-700 font-bold py-1.5 rounded-xl text-[11px] border border-slate-300 flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-file-shield text-blue-600"></i> Audit KYC
+                </button>
+                
+                ${isBlocked ? `
+                  <button onclick="unblockVendorDirectly('${v.uid}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded-xl text-[11px] flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-lock-open"></i> Unblock
+                  </button>
+                ` : `
+                  <button onclick="promptBlockVendor('${v.uid}', '${(v.agencyName || v.name || '').replace(/'/g, "\\'")}')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-1.5 rounded-xl text-[11px] border border-rose-200 flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-ban"></i> Block
+                  </button>
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+      });
+    }
+
+    // 7. BROADCAST ENGINE CONTROLLER
+    function publishBroadcastAnnouncement() {
+      const target = document.getElementById('broadcastTarget').value;
+      const type = document.getElementById('broadcastType').value;
+      const coupon = document.getElementById('broadcastCoupon').value.trim().toUpperCase();
+      const title = document.getElementById('broadcastTitle').value.trim();
+      const message = document.getElementById('broadcastMessage').value.trim();
+
+      if (!title || !message) return alert("Title aur Detailed Message bharna compulsory hai!");
+
+      const btn = document.getElementById('publishBroadcastBtn');
+      btn.innerText = "Publishing...";
+      btn.disabled = true;
+
+      db.collection("broadcast_announcements").add({
+        target: target,
+        type: type,
+        coupon: coupon || '',
+        title: title,
+        message: message,
+        publishedBy: currentAdminUser.email,
+        isActive: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Publish Live Announcement`;
+        btn.disabled = false;
+        document.getElementById('broadcastTitle').value = '';
+        document.getElementById('broadcastMessage').value = '';
+        document.getElementById('broadcastCoupon').value = '';
+        alert("🎉 Announcement published successfully across target devices!");
+        loadActiveBroadcasts();
+      }).catch(err => {
+        btn.innerText = "Publish Live Announcement";
+        btn.disabled = false;
+        alert("Publish Error: " + err.message);
+      });
+    }
+
+    function loadActiveBroadcasts() {
+      const container = document.getElementById('activeBroadcastsContainer');
+      container.innerHTML = `<p class="text-slate-400 text-center py-4">Syncing broadcasts...</p>`;
+
+      db.collection("broadcast_announcements").orderBy("createdAt", "desc").limit(10).get().then(snap => {
+        if (snap.empty) {
+          container.innerHTML = `<p class="text-slate-400 text-center py-4">No active broadcasts found.</p>`;
+          return;
+        }
+
+        container.innerHTML = snap.docs.map(doc => {
+          const a = doc.data();
+          return `
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex justify-between items-start gap-2">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${a.target === 'CUSTOMERS' ? 'bg-blue-100 text-blue-800' : a.target === 'VENDORS' ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'}">
+                    Target: ${a.target}
+                  </span>
+                  <span class="text-[9px] font-bold text-slate-400">${a.type}</span>
+                  ${a.coupon ? `<span class="text-[9px] bg-amber-100 text-amber-900 px-1.5 rounded font-mono font-bold">Code: ${a.coupon}</span>` : ''}
+                </div>
+                <p class="font-bold text-slate-800">${a.title}</p>
+                <p class="text-slate-500 text-[11px]">${a.message}</p>
+              </div>
+              <button onclick="deleteBroadcast('${doc.id}')" title="Delete Broadcast" class="text-slate-400 hover:text-rose-600 p-1">
+                <i class="fa-regular fa-trash-can"></i>
               </button>
             </div>
           `;
@@ -1078,7 +1309,13 @@
       });
     }
 
-    // 6. FETCH DRIVERS & CABS DIRECTORY
+    function deleteBroadcast(docId) {
+      if (confirm("Is announcement ko remove karein?")) {
+        db.collection("broadcast_announcements").doc(docId).delete().then(() => loadActiveBroadcasts());
+      }
+    }
+
+    // 8. FETCH DRIVERS & CABS DIRECTORY
     function fetchFleetDirectory() {
       const container = document.getElementById('fleetGridContainer');
       const activeCabs = allMasterBookings.filter(b => b.driverName && b.cabNumber);
@@ -1114,7 +1351,7 @@
       }).join('');
     }
 
-    // CSV & EXPORT ENGINE
+    // CSV EXPORT ENGINE
     function toggleCustomDateInputs(val) {
       const row = document.getElementById('customDateRow');
       if (val === 'CUSTOM') { row.classList.remove('hidden'); row.classList.add('grid'); }
@@ -1234,9 +1471,9 @@
       }
     }
 
-    // SUPER ADMIN: BULK CSV UPLOAD & SINGLE OVERRIDES
+    // FIXED PRICING CSV ENGINE
     function downloadSampleRoutesCsv() {
-      const sampleContent = "fromCity,toCity,hatchback,sedan,muv,suv\nbhopal,indore,1800,2000,2600,4000\nindore,ujjain,1400,1600,2100,3200\nahmedabad,vadodara,1900,2100,2700,4100\njaipur,delhi,3200,3500,4500,6500";
+      const sampleContent = "fromCity,toCity,hatchback,sedan,muv,suv\nbhopal,indore,1800,2000,2600,4000\nindore,ujjain,1400,1600,2100,3200\nahmedabad,vadodara,1900,2100,2700,4100";
       const link = document.createElement("a");
       link.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(sampleContent));
       link.setAttribute("download", "MakeTripzy_Fixed_Routes_Sample.csv");
@@ -1270,7 +1507,6 @@
         const updatePayload = {};
         let successCount = 0;
 
-        // Start from line 1 (skipping header)
         for (let i = 1; i < lines.length; i++) {
           const parts = lines[i].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
           if (parts.length >= 6) {
@@ -1282,13 +1518,7 @@
             const suv = Number(parts[5]);
 
             if (from && to && !isNaN(h) && !isNaN(s) && !isNaN(m) && !isNaN(suv)) {
-              const key = `${from}-${to}`;
-              updatePayload[key] = {
-                Hatchback: h,
-                Sedan: s,
-                MUV: m,
-                SUV: suv
-              };
+              updatePayload[`${from}-${to}`] = { Hatchback: h, Sedan: s, MUV: m, SUV: suv };
               successCount++;
             }
           }
@@ -1297,18 +1527,18 @@
         if (successCount === 0) {
           btn.innerText = "Upload CSV";
           btn.disabled = false;
-          return alert("CSV format sahi nahi hai! Sample template download karke check karein.");
+          return alert("CSV format invalid hai!");
         }
 
         db.collection("pricing_rules").doc("fixed_routes").set(updatePayload, { merge: true }).then(() => {
           btn.innerText = "Upload CSV";
           btn.disabled = false;
           fileInput.value = '';
-          alert(`🎉 Success! ${successCount} fixed pricing routes CSV se successfully save aur update ho gaye.`);
+          alert(`🎉 ${successCount} fixed routes CSV se successfully update ho gaye.`);
         }).catch(err => {
           btn.innerText = "Upload CSV";
           btn.disabled = false;
-          alert("Database save error: " + err.message);
+          alert("Save error: " + err.message);
         });
       };
 
@@ -1327,9 +1557,8 @@
 
       if (!from || !to || !h || !s || !m || !suv) return alert("Dono cities aur 4 categories ke package rate bharein!");
 
-      const key = `${from}-${to}`;
       db.collection("pricing_rules").doc("fixed_routes").set({
-        [key]: { Hatchback: h, Sedan: s, MUV: m, SUV: suv }
+        [`${from}-${to}`]: { Hatchback: h, Sedan: s, MUV: m, SUV: suv }
       }, { merge: true }).then(() => {
         alert(`Fixed Package for ${from.toUpperCase()} ➔ ${to.toUpperCase()} saved!`);
         document.getElementById('fixedFromCity').value = '';
@@ -1347,10 +1576,7 @@
       if (!email || !email.includes('@')) return alert("Valid Google email daalein!");
 
       db.collection("staff_roles").doc(email).set({
-        email: email,
-        role: role,
-        status: status,
-        addedBy: currentAdminUser.email,
+        email: email, role: role, status: status, addedBy: currentAdminUser.email,
         assignedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
         alert(`Staff ${email} assigned as '${role}' with status '${status}'.`);
@@ -1407,7 +1633,7 @@
                   <button onclick="toggleStaffStatus('${s.email}', ${!isActive})" title="${isActive ? 'Suspend Staff' : 'Activate Staff'}" class="text-xs font-bold px-2 py-1 rounded-lg border ${isActive ? 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100' : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700'}">
                     ${isActive ? 'Suspend' : 'Activate'}
                   </button>
-                  <button onclick="removeStaffMember('${s.email}')" title="Delete Staff Permanently" class="text-rose-600 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50">
+                  <button onclick="removeStaffMember('${s.email}')" title="Delete Staff" class="text-rose-600 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
                 </div>
@@ -1431,9 +1657,9 @@
     }
 
     function removeStaffMember(email) {
-      if (confirm(`Are you sure you want to permanently delete staff access for ${email}?`)) {
+      if (confirm(`Delete staff access for ${email}?`)) {
         db.collection("staff_roles").doc(email).delete().then(() => {
-          alert(`Staff ${email} deleted successfully.`);
+          alert(`Staff ${email} deleted.`);
         });
       }
     }
