@@ -28,7 +28,7 @@
         <p class="text-[11px] text-slate-400">Bookings, KYC Audits, Fleet & Broadcast Engine</p>
       </div>
     </div>
-   
+    
     <div class="flex items-center gap-3">
       <span id="adminUserEmail" class="text-xs text-slate-300 hidden md:inline"></span>
       <button onclick="handleAdminLogout()" class="text-xs bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/40 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1.5">
@@ -87,7 +87,7 @@
 
     <!-- VIEW 1: BOOKINGS & DISPATCH HUB -->
     <div id="viewBookings" class="space-y-6">
-     
+      
       <!-- MODULAR CSV EXPORT & FILTER HUB -->
       <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100">
@@ -97,7 +97,7 @@
             </h2>
             <p class="text-xs text-slate-500">Trip category aur peak-hours ke hisab se separated CSV download karein</p>
           </div>
-         
+          
           <div class="flex items-center gap-2 text-xs">
             <span class="text-slate-400 text-[11px] font-medium">Auto-Peak Detection:</span>
             <span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-lg font-bold text-[10px]">Morning: 07:00-11:00 AM</span>
@@ -216,7 +216,7 @@
 
       <!-- SUPER ADMIN CONFIG: STAFF & PRICING -->
       <div id="superAdminSettingsSection" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
-       
+        
         <!-- STAFF OPERATOR MANAGEMENT -->
         <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-100">
@@ -284,7 +284,7 @@
             </div>
             <p class="text-[10px] text-emerald-800">CSV me <code>fromCity, toCity, hatchback, sedan, muv, suv</code> columns hone chahiye.</p>
             <div class="flex items-center gap-2">
-              <input id="routesCsvFileInput" type="file" accept=".csv" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700" />
+              <input id="routesCsvFileInput" type="file" accept=".csv" class="w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer" />
               <button onclick="uploadFixedRoutesCsv()" id="uploadRoutesCsvBtn" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-sm">
                 Upload CSV
               </button>
@@ -1033,7 +1033,7 @@
         if (snap.empty) { container.innerHTML = `<div class="text-center py-6 text-slate-400 col-span-3">No active cabs.</div>`; return; }
         const unique = []; const seen = new Set();
         snap.forEach(d => { const b = d.data(); if (b.cabNumber && !seen.has(b.cabNumber)) { seen.add(b.cabNumber); unique.push(b); } });
-       
+        
         container.innerHTML = unique.map(f => `
           <div class="bg-slate-50 border rounded-2xl p-4 space-y-1">
             <p class="font-mono font-bold text-slate-900">${f.cabNumber}</p>
@@ -1090,9 +1090,9 @@
       });
     }
 
-    // BULK CSV UPLOAD FOR FIXED ROUTES
+    // BULK CSV UPLOAD FOR FIXED ROUTES (UPDATED WITH YOUR MULTI-COLUMN FORMAT SUPPORT)
     function downloadSampleRoutesCsv() {
-      const sample = "fromCity,toCity,hatchback,sedan,muv,suv\nbhopal,indore,1800,2000,2600,4000\nindore,ujjain,1400,1600,2100,3200";
+      const sample = "FARE ID,FARE NAME,CAB TYPE,SOURCE CITY,DESTINATION CITY,BASE FARE,INCLUDED KM,EXTRA KM CHARGE\n0001,BHOPAL TO INDORE ONE WAY,HATCHBACK,BHOPAL,INDORE,1800,196,11\n0002,BHOPAL TO INDORE ONE WAY,SEDAN,BHOPAL,INDORE,2400,196,12\n0003,BHOPAL TO INDORE ONE WAY,SUV,BHOPAL,INDORE,4000,196,20";
       const link = document.createElement("a");
       link.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURI(sample));
       link.setAttribute("download", "MakeTripzy_Fixed_Routes_Sample.csv");
@@ -1104,26 +1104,60 @@
       if (!file) return alert("Kripya CSV file select karein!");
 
       const reader = new FileReader();
+      const btn = document.getElementById('uploadRoutesCsvBtn');
+      btn.innerText = "Parsing...";
+      btn.disabled = true;
+
       reader.onload = function(e) {
         const lines = e.target.result.split(/\r\n|\n/).filter(l => l.trim().length > 0);
-        if (lines.length < 2) return alert("CSV file invalid hai!");
+        if (lines.length < 2) {
+          btn.innerText = "Upload CSV"; btn.disabled = false;
+          return alert("CSV file invalid hai!");
+        }
 
-        const payload = {};
+        // We map grouped routes: from-to -> { Hatchback: price, Sedan: price, ... }
+        const routePackages = {};
         let count = 0;
+
         for (let i = 1; i < lines.length; i++) {
           const p = lines[i].split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+          // Format expected: FARE ID, FARE NAME, CAB TYPE, SOURCE CITY, DESTINATION CITY, BASE FARE, INCLUDED KM, EXTRA KM CHARGE
           if (p.length >= 6) {
-            const from = p[0].toLowerCase(), to = p[1].toLowerCase();
-            const h = Number(p[2]), s = Number(p[3]), m = Number(p[4]), suv = Number(p[5]);
-            if (from && to && !isNaN(h)) {
-              payload[`${from}-${to}`] = { Hatchback: h, Sedan: s, MUV: m, SUV: suv };
+            const cabType = p[2].toUpperCase(); // HATCHBACK, SEDAN, MUV, SUV
+            const from = p[3].toLowerCase();
+            const to = p[4].toLowerCase();
+            const baseFare = Number(p[5]);
+
+            if (from && to && cabType && !isNaN(baseFare)) {
+              const routeKey = `${from}-${to}`;
+              if (!routePackages[routeKey]) {
+                routePackages[routeKey] = {};
+              }
+              // Normalize cab type key to standard casing
+              let normalizedCab = 'Sedan';
+              if (cabType.includes('HATCH')) normalizedCab = 'Hatchback';
+              else if (cabType.includes('SEDAN')) normalizedCab = 'Sedan';
+              else if (cabType.includes('MUV') || cabType.includes('ERTIGA')) normalizedCab = 'MUV';
+              else if (cabType.includes('SUV') || cabType.includes('INNOVA')) normalizedCab = 'SUV';
+
+              routePackages[routeKey][normalizedCab] = baseFare;
               count++;
             }
           }
         }
 
-        db.collection("pricing_rules").doc("fixed_routes").set(payload, { merge: true }).then(() => {
-          alert(`🎉 Success! ${count} fixed routes uploaded and live now.`);
+        if (count === 0) {
+          btn.innerText = "Upload CSV"; btn.disabled = false;
+          return alert("CSV format read nahi ho paya. Sample template download karke check karein.");
+        }
+
+        db.collection("pricing_rules").doc("fixed_routes").set(routePackages, { merge: true }).then(() => {
+          btn.innerText = "Upload CSV"; btn.disabled = false;
+          document.getElementById('routesCsvFileInput').value = '';
+          alert(`🎉 Success! ${count} route package records uploaded successfully.`);
+        }).catch(err => {
+          btn.innerText = "Upload CSV"; btn.disabled = false;
+          alert("Save error: " + err.message);
         });
       };
       reader.readAsText(file);
@@ -1138,4 +1172,4 @@
     }
   </script>
 </body>
-</html> 
+</html>
