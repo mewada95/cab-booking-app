@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live WhatsApp Leads - Tripvyom Partner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase App & Firestore SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans pb-20">
+    <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm sticky top-0 z-40">
+        <div class="flex items-center gap-2">
+            <span class="text-xl font-bold text-green-700"><i class="fa-brands fa-whatsapp"></i> Smart WhatsApp Leads</span>
+        </div>
+        <a href="/" class="text-sm font-medium text-blue-600 hover:underline"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-4 md:p-6 mt-2">
+        <!-- Tabs -->
+        <div class="flex border-b border-slate-200 mb-6 gap-6">
+            <button onclick="switchTab('active')" id="tabActive" class="pb-3 font-bold text-green-700 border-b-2 border-green-600 text-sm">Active Leads (<span id="activeCount">0</span>)</button>
+            <button onclick="switchTab('history')" id="tabHistory" class="pb-3 font-medium text-slate-500 hover:text-slate-800 text-sm">Expired / History</button>
+        </div>
+
+        <!-- Active Section -->
+        <div id="sectionActive" class="space-y-4">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                <h3 class="text-sm font-bold text-slate-800 mb-3">Verified Travel Leads (Auto-Expire in 30 mins)</h3>
+                <div id="activeLeadsContainer" class="space-y-3">
+                    <p class="text-sm text-slate-400">Loading verified leads...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div id="sectionHistory" class="space-y-4 hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                <h3 class="text-sm font-bold text-slate-800 mb-3">Expired & Old Leads History</h3>
+                <div id="historyLeadsContainer" class="space-y-3 text-slate-400 text-sm">
+                    <p>No expired leads in history.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Quick Access Button with Badge -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button onclick="toggleFloatingModal()" class="relative bg-green-600 hover:bg-green-700 text-white rounded-full p-4 shadow-2xl flex items-center gap-2 transition transform hover:scale-105">
+            <i class="fa-brands fa-whatsapp text-2xl"></i>
+            <span id="floatingBadge" class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow">0</span>
+            <span class="text-sm font-bold pr-2 hidden md:inline">Leads Feed</span>
+        </button>
+    </div>
+
+    <!-- Floating Leads Popup Modal -->
+    <div id="floatingModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+        <div class="bg-white w-full md:max-w-lg rounded-t-2xl md:rounded-2xl shadow-2xl max-h-[80vh] flex flex-col overflow-hidden">
+            <div class="bg-green-700 text-white px-5 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-base flex items-center gap-2"><i class="fa-brands fa-whatsapp"></i> Quick Leads Popup</h3>
+                <button onclick="toggleFloatingModal()" class="text-white text-lg font-bold px-2">&times;</button>
+            </div>
+            <div id="modalLeadsContainer" class="p-4 overflow-y-auto space-y-3 flex-1 bg-slate-50">
+                <p class="text-sm text-slate-500 text-center py-4">No active leads right now.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            projectId: "maketripzy"
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        } else {
+            firebase.app();
+        }
+
+        const db = firebase.firestore();
+
+        function parseLeadData(lead) {
+            let rawText = lead.route || lead.text || lead.message || "";
+            let lowerText = rawText.toLowerCase();
+
+            // Strict Filter: Hide spam, group links, or missing routes
+            let isSpam = false;
+            if (
+                !lead.route || 
+                lead.route === "Not Specified" || 
+                lowerText.includes("chat.whatsapp.com") || 
+                lowerText.includes("join my whatsapp group") || 
+                lowerText.includes("http://") || 
+                lowerText.includes("https://") ||
+                lowerText.includes("group link") ||
+                rawText.trim().length < 5
+            ) {
+                isSpam = true;
+            }
+
+            let route = lead.route;
+            if (!route || route === "Not Specified") {
+                isSpam = true;
+            }
+
+            let tripType = "One-Way";
+            if (lowerText.includes("round") || lowerText.includes("return") || lowerText.includes("roundtrip") || lowerText.includes("aana jana") || lowerText.includes("both side")) {
+                tripType = "Round Trip";
+            }
+
+            let dateStr = "Today (08 Sep 2026)";
+            let isTomorrow = false;
+            if (lowerText.includes("kal") || lowerText.includes("tomorrow")) {
+                dateStr = "Tomorrow (09 Sep 2026)";
+                isTomorrow = true;
+            } else if (lowerText.includes("aaj") || lowerText.includes("today")) {
+                dateStr = "Today (08 Sep 2026)";
+            }
+
+            let timeStr = "As soon as possible";
+            let targetHour = null;
+            let targetMinute = 0;
+
+            // Smart Time Extractor (e.g., "3 baje", "10 am", "14:30")
+            let timeMatch = rawText.match(/(\d{1,2})[:.](\d{2})\s*(am|pm)?/i);
+            let simpleHourMatch = rawText.match(/(\d{1,2})\s*(?:am|pm|baje|o'clock)/i);
+            let hindiTimeMatch = rawText.match(/(?:subah|sham|raat ke|dophar)\s*(\d{1,2})/i);
+
+            if (timeMatch) {
+                targetHour = parseInt(timeMatch[1]);
+                targetMinute = parseInt(timeMatch[2]);
+                if (timeMatch[3] && timeMatch[3].toLowerCase() === 'pm' && targetHour < 12) targetHour += 12;
+                timeStr = `${targetHour}:${targetMinute < 10 ? '0' : ''}${targetMinute}`;
+            } else if (simpleHourMatch) {
+                targetHour = parseInt(simpleHourMatch[1]);
+                if (rawText.toLowerCase().includes('pm') && targetHour < 12) targetHour += 12;
+                timeStr = `${targetHour}:00`;
+            } else if (hindiTimeMatch) {
+                targetHour = parseInt(hindiTimeMatch[1]);
+                if ((rawText.toLowerCase().includes('sham') || rawText.toLowerCase().includes('raat')) && targetHour < 12) targetHour += 12;
+                timeStr = `${targetHour}:00`;
+            }
+
+            return {
+                isSpam: isSpam,
+                route: route,
+                tripType: tripType,
+                date: dateStr,
+                time: timeStr,
+                targetHour: targetHour,
+                targetMinute: targetMinute,
+                isTomorrow: isTomorrow,
+                raw: rawText
+            };
+        }
+
+        db.collection('whatsapp_leads').onSnapshot((snapshot) => {
+            const activeContainer = document.getElementById('activeLeadsContainer');
+            const historyContainer = document.getElementById('historyLeadsContainer');
+            const modalContainer = document.getElementById('modalLeadsContainer');
+            
+            activeContainer.innerHTML = '';
+            historyContainer.innerHTML = '';
+            modalContainer.innerHTML = '';
+            
+            if (snapshot.empty) {
+                activeContainer.innerHTML = '<p class="text-sm text-slate-400">No leads found in database yet.</p>';
+                historyContainer.innerHTML = '<p class="text-sm text-slate-400">No expired leads in history.</p>';
+                modalContainer.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">No active leads right now.</p>';
+                document.getElementById('activeCount').innerText = '0';
+                document.getElementById('floatingBadge').innerText = '0';
+                return;
+            }
+
+            let activeCount = 0;
+            let expiredCount = 0;
+            const now = new Date(); // Current time: Sep 8, 2026, 11:43 AM
+
+            snapshot.forEach(doc => {
+                const lead = doc.data();
+                const key = doc.id;
+                const parsed = parseLeadData(lead);
+
+                if (parsed.isSpam) {
+                    return; 
+                }
+
+                let isManuallyExpired = lead.status && lead.status === 'expired';
+                let isTimeExpired = false;
+
+                // 30 Minutes Auto-Expiry Logic
+                let leadCreationTime = lead.timestamp ? (lead.timestamp.seconds ? lead.timestamp.seconds * 1000 : lead.timestamp) : now.getTime();
+                let ageInMinutes = (now.getTime() - leadCreationTime) / (1000 * 60);
+
+                if (parsed.targetHour !== null) {
+                    // If specific time is given (e.g. 3 PM -> 15:00)
+                    let leadTripTime = new Date(now);
+                    if (parsed.isTomorrow) {
+                        leadTripTime.setDate(leadTripTime.getDate() + 1);
+                    }
+                    leadTripTime.setHours(parsed.targetHour, parsed.targetMinute, 0, 0);
+
+                    // If current time is 30 minutes past the scheduled travel time -> Expire
+                    let diffMinutes = (now.getTime() - leadTripTime.getTime()) / (1000 * 60);
+                    if (diffMinutes > 30) {
+                        isTimeExpired = true;
+                    }
+                } else {
+                    // If no specific time mentioned, auto-expire after 30 minutes from creation
+                    if (ageInMinutes > 30) {
+                        isTimeExpired = true;
+                    }
+                }
+
+                const isExpired = isManuallyExpired || isTimeExpired;
+
+                // If auto-expired by time, update Firestore silently in background
+                if (isTimeExpired && !isManuallyExpired) {
+                    db.collection('whatsapp_leads').doc(key).update({ status: 'expired' }).catch(() => {});
+                }
+
+                const phoneNum = lead.phone ? lead.phone : 'Not Available';
+                const hasValidPhone = lead.phone ? true : false;
+
+                const cardHTML = `
+                    <div class="border border-slate-200 rounded-xl p-4 bg-white shadow-sm flex flex-col gap-3">
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <span class="font-bold text-slate-900 text-base flex items-center gap-1.5">
+                                    <i class="fa-solid fa-route text-green-600"></i> ${parsed.route}
+                                </span>
+                            </div>
+                            <span class="${hasValidPhone ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'} text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap">${phoneNum}</span>
+                        </div>
+
+                        <!-- Structured Details Badges -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs pt-1">
+                            <div class="bg-slate-100 p-2 rounded-lg text-slate-700 font-medium">
+                                <i class="fa-solid fa-car text-blue-600 mr-1"></i> Type: <b>${parsed.tripType}</b>
+                            </div>
+                            <div class="bg-slate-100 p-2 rounded-lg text-slate-700 font-medium">
+                                <i class="fa-regular fa-calendar text-amber-600 mr-1"></i> Date: <b>${parsed.date}</b>
+                            </div>
+                            <div class="bg-slate-100 p-2 rounded-lg text-slate-700 font-medium col-span-2 md:col-span-1">
+                                <i class="fa-regular fa-clock text-purple-600 mr-1"></i> Time: <b>${parsed.time}</b>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-2 border-t border-slate-100 gap-2 flex-wrap">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                ${hasValidPhone ? `
+                                    <a href="tel:${phoneNum}" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-bold flex items-center gap-1.5 shadow-sm">
+                                        <i class="fa-solid fa-phone"></i> Call
+                                    </a>
+                                    <a href="https://wa.me/${phoneNum}?text=Hello,%20regarding%20cab%20requirement" target="_blank" class="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-2 rounded-lg font-bold flex items-center gap-1.5 shadow-sm">
+                                        <i class="fa-brands fa-whatsapp"></i> Chat
+                                    </a>
+                                ` : `
+                                    <span class="text-xs text-slate-400 italic">No contact number provided</span>
+                                `}
+                            </div>
+                            
+                            <div class="flex items-center gap-1.5">
+                                ${!isExpired ? `<button onclick="markExpired('${key}')" class="bg-amber-100 text-amber-800 hover:bg-amber-200 text-xs px-2.5 py-2 rounded-lg font-medium flex items-center gap-1"><i class="fa-solid fa-clock-rotate-left"></i> Expire</button>` : '<span class="text-xs text-red-500 font-bold px-2">Expired</span>'}
+                                <button onclick="deleteLead('${key}')" class="bg-red-100 text-red-700 hover:bg-red-200 text-xs px-2.5 py-2 rounded-lg font-medium flex items-center gap-1"><i class="fa-solid fa-trash"></i> Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (isExpired) {
+                    expiredCount++;
+                    historyContainer.insertAdjacentHTML('beforeend', cardHTML);
+                } else {
+                    activeCount++;
+                    activeContainer.insertAdjacentHTML('beforeend', cardHTML);
+                    modalContainer.insertAdjacentHTML('beforeend', cardHTML);
+                }
+            });
+
+            if(activeCount === 0) {
+                activeContainer.innerHTML = '<p class="text-sm text-slate-400">No active verified leads right now.</p>';
+                modalContainer.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">No active leads right now.</p>';
+            }
+            if(expiredCount === 0) {
+                historyContainer.innerHTML = '<p class="text-sm text-slate-400">No expired leads in history.</p>';
+            }
+
+            document.getElementById('activeCount').innerText = activeCount;
+            document.getElementById('floatingBadge').innerText = activeCount;
+        });
+
+        function switchTab(tab) {
+            if(tab === 'active') {
+                document.getElementById('sectionActive').classList.remove('hidden');
+                document.getElementById('sectionHistory').classList.add('hidden');
+                document.getElementById('tabActive').className = 'pb-3 font-bold text-green-700 border-b-2 border-green-600 text-sm';
+                document.getElementById('tabHistory').className = 'pb-3 font-medium text-slate-500 hover:text-slate-800 text-sm';
+            } else {
+                document.getElementById('sectionHistory').classList.remove('hidden');
+                document.getElementById('sectionActive').classList.add('hidden');
+                document.getElementById('tabHistory').className = 'pb-3 font-bold text-green-700 border-b-2 border-green-600 text-sm';
+                document.getElementById('tabActive').className = 'pb-3 font-medium text-slate-500 hover:text-slate-800 text-sm';
+            }
+        }
+
+        function toggleFloatingModal() {
+            const modal = document.getElementById('floatingModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function markExpired(docId) {
+            db.collection('whatsapp_leads').doc(docId).update({ status: 'expired' })
+              .catch(err => alert("Error updating lead: " + err.message));
+        }
+
+        function deleteLead(docId) {
+            if(confirm("Are you sure you want to delete this lead permanently?")) {
+                db.collection('whatsapp_leads').doc(docId).delete()
+                  .catch(err => alert("Error deleting lead: " + err.message));
+            }
+        }
+    </script>
+</body>
+</html>

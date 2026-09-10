@@ -1,0 +1,21 @@
+{
+  "projects": {
+    "default": "maketripzy"
+  },
+  "targets": {
+    "maketripzy": {
+      "hosting": {
+        "main": [
+          "maketripzy"
+        ],
+        "admin": [
+          "tripvyom-admin"
+        ],
+        "partner": [
+          "maketripzy-partner"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
