@@ -98,6 +98,14 @@
               <i class="fa-solid fa-route text-blue-600 mr-1"></i> <span id="distanceBadgeText">Calculating route...</span>
             </div>
 
+                        <!-- Flight / Terminal Notes -->
+            <div id="flightNotesContainer" class="mb-3">
+              <label class="block text-xs font-medium text-slate-600 mb-1">Flight Number / Terminal / Notes (Optional)</label>
+              <div class="relative flex items-center">
+                <i class="fa-solid fa-plane-departure absolute left-3 text-blue-500 text-sm"></i>
+                <input id="flightNotes" type="text" autocomplete="off" placeholder="e.g. Flight 6E-214, Terminal 1" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white text-slate-800 font-medium" />
+              </div>
+            </div>
             <div class="grid grid-cols-2 gap-3 pt-1">
               <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1">Pickup Date</label>
@@ -540,6 +548,48 @@
   </div>
 
   <script>
+const airports = [
+          { name: 'Indira Gandhi International Airport (DEL) - T1 / T2 / T3, Delhi', city: 'delhi', lat: 28.5562, lon: 77.1000 },
+          { name: 'Noida International Airport (Jewar Airport), Jewar / Noida', city: 'noida', lat: 28.1764, lon: 77.6536 },
+          { name: 'Chhatrapati Shivaji Maharaj International Airport (BOM) - T1 / T2, Mumbai', city: 'mumbai', lat: 19.0896, lon: 72.8656 },
+          { name: 'Navi Mumbai International Airport, Navi Mumbai', city: 'navi mumbai', lat: 18.9890, lon: 73.0650 },
+          { name: 'Kempegowda International Airport (BLR) - T1 / T2, Bengaluru', city: 'bengaluru', lat: 13.1986, lon: 77.7066 },
+          { name: 'Rajiv Gandhi International Airport (HYD), Hyderabad', city: 'hyderabad', lat: 17.2403, lon: 78.4294 },
+          { name: 'Chennai International Airport (MAA) - T1 / T4, Chennai', city: 'chennai', lat: 12.9941, lon: 80.1709 },
+          { name: 'Netaji Subhash Chandra Bose International Airport (CCU), Kolkata', city: 'kolkata', lat: 22.6547, lon: 88.4467 },
+          { name: 'Sardar Vallabhbhai Patel International Airport (AMD), Ahmedabad', city: 'ahmedabad', lat: 23.0772, lon: 72.6347 },
+          { name: 'Pune Airport (PNQ), Pune', city: 'pune', lat: 18.5822, lon: 73.9197 },
+          { name: 'Goa International Airport (GOI - Dabolim), Goa', city: 'goa', lat: 15.3803, lon: 73.8314 },
+          { name: 'Manohar International Airport (GOX - Mopa), Goa', city: 'goa', lat: 15.7258, lon: 73.8767 },
+          { name: 'Jaipur International Airport (JAI), Jaipur', city: 'jaipur', lat: 26.8242, lon: 75.8122 },
+          { name: 'Chaudhary Charan Singh International Airport (LKO) - T1 / T2, Lucknow', city: 'lucknow', lat: 26.7606, lon: 80.8893 },
+          { name: 'Devi Ahilya Bai Holkar Airport (IDR), Indore', city: 'indore', lat: 22.7218, lon: 75.8011 },
+          { name: 'Raja Bhoj Airport (BHO), Bhopal', city: 'bhopal', lat: 23.2875, lon: 77.3375 },
+          { name: 'Maharana Pratap Airport (UDR), Udaipur', city: 'udaipur', lat: 24.6178, lon: 73.8961 },
+          { name: 'Jaisalmer Airport (JSA), Jaisalmer', city: 'jaisalmer', lat: 26.8919, lon: 70.8647 },
+          { name: 'Bikaner Airport (Nal Airport - BKN), Bikaner', city: 'bikaner', lat: 28.0725, lon: 73.5486 },
+          { name: 'Chandigarh International Airport (IXC), Chandigarh', city: 'chandigarh', lat: 30.6735, lon: 76.7885 },
+          { name: 'Surat Airport (STV), Surat', city: 'surat', lat: 21.1167, lon: 72.7417 },
+          { name: 'Vadodara Airport (BDQ), Vadodara', city: 'vadodara', lat: 22.3364, lon: 73.2264 },
+          { name: 'Rajkot International Airport (Hirasar - RAJ), Rajkot', city: 'rajkot', lat: 22.2858, lon: 70.8022 },
+          { name: 'Dr. Babasaheb Ambedkar International Airport (NAG), Nagpur', city: 'nagpur', lat: 21.0922, lon: 79.0472 },
+          { name: 'Jay Prakash Narayan Airport (PAT), Patna', city: 'patna', lat: 25.5913, lon: 85.0877 },
+          { name: 'Lal Bahadur Shastri Airport (VNS), Varanasi', city: 'varanasi', lat: 25.4456, lon: 82.8576 },
+          { name: 'Sri Guru Ram Dass Jee International Airport (ATQ), Amritsar', city: 'amritsar', lat: 31.7094, lon: 74.7972 },
+          { name: 'Cochin International Airport (COK), Kochi', city: 'kochi', lat: 10.1520, lon: 76.3915 },
+          { name: 'Trivandrum International Airport (TRV), Thiruvananthapuram', city: 'thiruvananthapuram', lat: 8.4821, lon: 76.9200 },
+          { name: 'Lokapriya Gopinath Bordoloi International Airport (GAU), Guwahati', city: 'guwahati', lat: 26.1061, lon: 91.5859 },
+          { name: 'Biju Patnaik International Airport (BBI), Bhubaneswar', city: 'bhubaneswar', lat: 20.2444, lon: 85.8178 },
+          { name: 'Jolly Grant Airport (DED), Dehradun', city: 'dehradun', lat: 30.1897, lon: 78.1803 },
+          { name: 'Birsa Munda Airport (IXR), Ranchi', city: 'ranchi', lat: 23.3143, lon: 85.3216 },
+          { name: 'Srinagar Airport (SXR), Srinagar', city: 'srinagar', lat: 33.9871, lon: 74.7745 },
+          { name: 'Bagdogra Airport (IXB), Siliguri', city: 'bagdogra', lat: 26.6812, lon: 88.3285 },
+          { name: 'Coimbatore International Airport (CJB), Coimbatore', city: 'coimbatore', lat: 11.0294, lon: 77.0434 },
+          { name: 'Madurai Airport (IXM), Madurai', city: 'madurai', lat: 9.8344, lon: 78.0934 },
+          { name: 'Mangaluru International Airport (IXE), Mangalore', city: 'mangalore', lat: 12.9612, lon: 74.8901 },
+          { name: 'Jodhpur Airport (JDH), Jodhpur', city: 'jodhpur', lat: 26.2570, lon: 73.0487 },
+          { name: 'Visakhapatnam Airport (VTZ), Visakhapatnam', city: 'visakhapatnam', lat: 17.7211, lon: 83.2244 }
+        ];
     const firebaseConfig = {
       apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
       authDomain: "maketripzy.firebaseapp.com",
@@ -706,13 +756,19 @@
 
       if (selectedTripType === 'Airport Transfer') {
         const pkg = document.getElementById('localPackageSelect').value;
-        if (type === 'pickup' && pkg === 'airport_drop') {
-          listContainer.innerHTML = `<div onclick="selectAirportLocation('pickup', 'Raja Bhoj Airport, Bhopal', 'bhopal')" class="p-2.5 hover:bg-blue-50 border-b cursor-pointer font-bold text-blue-900"><i class="fa-solid fa-plane mr-1"></i> Raja Bhoj Airport, Bhopal</div>`;
-          listContainer.classList.remove('hidden'); return;
-        }
-        if (type === 'drop' && pkg === 'airport_pickup') {
-          listContainer.innerHTML = `<div onclick="selectAirportLocation('drop', 'Raja Bhoj Airport, Bhopal', 'bhopal')" class="p-2.5 hover:bg-blue-50 border-b cursor-pointer font-bold text-blue-900"><i class="fa-solid fa-plane mr-1"></i> Raja Bhoj Airport, Bhopal</div>`;
-          listContainer.classList.remove('hidden'); return;
+        const mustBeAirport = (type === 'pickup' && pkg === 'airport_pickup') || (type === 'drop' && pkg === 'airport_drop');
+
+        if (mustBeAirport) {
+          const qStr = query ? query.toLowerCase() : '';
+          const availableAirports = typeof airports !== 'undefined' ? airports : [];
+          const filtered = availableAirports.filter(a => a.name.toLowerCase().includes(qStr) || a.city.toLowerCase().includes(qStr));
+          const displayList = filtered.length > 0 ? filtered : availableAirports;
+
+          listContainer.innerHTML = displayList.map(a => 
+            `<div onclick="selectAirportLocation('${type}', '${a.name}', '${a.city}', ${a.lat}, ${a.lon})" class="p-2.5 hover:bg-blue-50 border-b cursor-pointer font-bold text-blue-900"><i class="fa-solid fa-plane mr-1"></i> ${a.name}</div>`
+          ).join('');
+          listContainer.classList.remove('hidden');
+          return;
         }
       }
 
@@ -722,13 +778,24 @@
         fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=6&addressdetails=1`, { headers: { 'Accept-Language': 'en' } })
           .then(res => res.json())
           .then(data => {
+            if (selectedTripType === 'Airport Transfer') {
+              const pkg = document.getElementById('localPackageSelect').value;
+              const mustBeAirport = (type === 'pickup' && pkg === 'airport_pickup') || (type === 'drop' && pkg === 'airport_drop');
+              if (!mustBeAirport && data) {
+                data = data.filter(item => {
+                  const nameLower = (item.name || '').toLowerCase();
+                  const dispLower = (item.display_name || '').toLowerCase();
+                  return !nameLower.includes('airport') && !dispLower.includes('airport');
+                });
+              }
+            }
             if (!data || data.length === 0) { listContainer.classList.add('hidden'); return; }
             listContainer.innerHTML = data.map(item => {
               const shortName = item.name || item.display_name.split(',')[0];
               const subDetails = item.display_name.split(',').slice(1, 4).join(',');
               const city = item.address?.city || item.address?.town || shortName;
               return `
-                <div onclick="selectLocation('${type}', '${item.lat}', '${item.lon}', '${shortName.replace(/'/g, "\\'")}, ${subDetails.replace(/'/g, "\\'")}', '${city.replace(/'/g, "\\'")}')" class="p-2.5 hover:bg-blue-50 border-b cursor-pointer flex items-start gap-2">
+                <div onclick="selectLocation('${type}', '${item.lat}', '${item.lon}', '${shortName.replace(/'/g, "\'")}, ${subDetails.replace(/'/g, "\'")}', '${city.replace(/'/g, "\'")}')" class="p-2.5 hover:bg-blue-50 border-b cursor-pointer flex items-start gap-2">
                   <i class="fa-solid fa-location-dot text-blue-500 text-xs mt-0.5"></i>
                   <div><p class="font-bold text-slate-800">${shortName}</p><p class="text-[10px] text-slate-400">${subDetails}</p></div>
                 </div>`;
@@ -738,19 +805,23 @@
       }, 300);
     }
 
-    function selectAirportLocation(type, name, city) {
+    function selectAirportLocation(type, name, city, lat = 23.2875, lon = 77.3375) {
       if (type === 'pickup') {
         document.getElementById('pickupLocation').value = name;
-        pickupCoords = { lat: 23.2875, lon: 77.3375 };
-        pickupCityName = city.trim().toLowerCase();
+        pickupCoords = { lat: lat, lon: lon };
+        pickupCityName = city ? city.trim().toLowerCase() : '';
         document.getElementById('pickupSuggestions').classList.add('hidden');
       } else {
         document.getElementById('dropLocation').value = name;
-        dropCoords = { lat: 23.2875, lon: 77.3375 };
-        dropCityName = city.trim().toLowerCase();
+        dropCoords = { lat: lat, lon: lon };
+        dropCityName = city ? city.trim().toLowerCase() : '';
         document.getElementById('dropSuggestions').classList.add('hidden');
       }
-      updateDynamicVehicleFares(calculatedDistanceKm);
+      if (typeof calculateRouteAndFare === 'function') {
+          calculateRouteAndFare();
+      } else {
+          updateDynamicVehicleFares(calculatedDistanceKm);
+      }
     }
 
     function selectLocation(type, lat, lon, fullAddress, city) {
@@ -898,6 +969,7 @@
       const to = document.getElementById('dropLocation').value.trim();
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
+      const flightNotes = document.getElementById('flightNotes') ? document.getElementById('flightNotes').value.trim() : '';
       const date = document.getElementById('pickupDate').value;
       const rawTime = document.getElementById('pickupTime').value;
 
