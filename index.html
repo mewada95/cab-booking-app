@@ -1125,5 +1125,78 @@ const airports = [
       updateDynamicVehicleFares(0);
     });
   </script>
+
+<!-- REDIRECT_PATCH_START -->
+<script>
+// Redirect Flights, Hotels, Buses to booking.tripvyom.in
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("a, button, div, span, li").forEach(el => {
+        const text = el.innerText ? el.innerText.trim().toLowerCase() : "";
+        if (text === "flights" || text === "hotels" || text === "buses") {
+            // Ensure it is a tab/nav item, not part of a long paragraph
+            if (el.tagName === "A" || el.tagName === "BUTTON" || el.className.includes("tab") || el.className.includes("nav") || el.innerText.trim().split(" ").length <= 2) {
+                el.style.cursor = "pointer";
+                el.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = "https://booking.tripvyom.in";
+                }, true);
+            }
+        }
+    });
+});
+</script>
+<!-- REDIRECT_PATCH_END -->
+
+
+<!-- RUNTIME_OVERRIDE_START -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof window.calculateSegmentFare === "function") {
+        const oldCalc = window.calculateSegmentFare;
+        window.calculateSegmentFare = function(vType, dist, tType) {
+            const tStr = String(tType || "").toLowerCase();
+            const isRound = tStr.includes("round") || tStr.includes("return");
+            
+            if (isRound) {
+                const dropVal = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value.toLowerCase() : "";
+                const s250 = ["madhya pradesh", "rajasthan", "uttar pradesh", "delhi", "chhattisgarh", "haryana", "punjab", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "chaksu"];
+                const s300 = ["maharashtra", "gujarat", "goa", "tamil nadu", "telangana", "andhra pradesh", "west bengal", "jharkhand", "odisha"];
+                let minKm = 0, mult = 1, matched = false;
+                for (let s of s250) { if (dropVal.includes(s)) { minKm = 250; matched = true; break; } }
+                if (!matched) { for (let s of s300) { if (dropVal.includes(s)) { minKm = 300; matched = true; break; } } }
+                if (!matched) { mult = 2; }
+                const rDist = Number(dist) || 0;
+                const effKm = Math.max(rDist * 2, minKm) * mult;
+                const cfg = (typeof CAB_CONFIG !== "undefined" && CAB_CONFIG[vType]) ? CAB_CONFIG[vType] : { baseRate: 11 };
+                return { fare: Math.round(effKm * cfg.baseRate), isCsvPackage: false, displayKm: effKm + " KM" };
+            }
+            return oldCalc(vType, dist, tType);
+        };
+    }
+
+    setInterval(() => {
+        const drop = document.getElementById("dropLocation");
+        if (!drop) return;
+        const val = drop.value.toLowerCase();
+        const rajKeys = ["rajasthan", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "bhilwara", "sikar", "pali", "chaksu"];
+        const isRaj = rajKeys.some(k => val.includes(k));
+        document.querySelectorAll("input[type='checkbox']").forEach(cb => {
+            const lbl = cb.closest("label") || cb.parentElement;
+            const txt = lbl ? lbl.innerText.toLowerCase() : "";
+            if (txt.includes("roof") || txt.includes("carrier") || txt.includes("luggage")) {
+                cb.checked = false;
+                cb.disabled = isRaj;
+                if (lbl) {
+                    lbl.style.opacity = isRaj ? "0.4" : "1";
+                    lbl.style.pointerEvents = isRaj ? "none" : "auto";
+                }
+            }
+        });
+    }, 400);
+});
+</script>
+<!-- RUNTIME_OVERRIDE_END -->
+
 </body>
 </html>
