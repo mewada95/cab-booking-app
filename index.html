@@ -1149,39 +1149,276 @@ document.addEventListener("DOMContentLoaded", () => {
 <!-- REDIRECT_PATCH_END -->
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- RUNTIME_OVERRIDE_START -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+    if (typeof window.activeTripType === "undefined") {
+        window.activeTripType = "oneway";
+    }
+
+    // 1. Precise click listener on Trip Type buttons
+    document.addEventListener("click", (e) => {
+        const btn = e.target.closest("button, div, span, a");
+        if (!btn) return;
+        const txt = btn.innerText ? btn.innerText.trim() : "";
+        if (txt === "Round Trip") {
+            window.activeTripType = "round";
+        } else if (txt === "One Way") {
+            window.activeTripType = "oneway";
+        } else if (txt === "Local Rental") {
+            window.activeTripType = "local";
+        } else if (txt === "Airport Transfer") {
+            window.activeTripType = "airport";
+        }
+    }, true);
+
+    // 2. Setup Drop Fields with Check Fare button matching exact native styling
+    function setupDropFields() {
+        if (document.getElementById("tripDropDateTimeBox")) return;
+        
+        const pickupDateInput = document.querySelector("input[type=\x27date\x27]");
+        if (!pickupDateInput) return;
+        
+        const nativeWrapper = pickupDateInput.closest(".mb-3, .form-group, div");
+        if (nativeWrapper && nativeWrapper.parentElement) {
+            const parentRow = nativeWrapper.parentElement;
+            const computed = window.getComputedStyle(pickupDateInput);
+            const cssText = `
+                width: 100%;
+                padding: ${computed.padding};
+                height: ${computed.height};
+                border: ${computed.border};
+                border-radius: ${computed.borderRadius};
+                font-size: ${computed.fontSize};
+                font-family: ${computed.fontFamily};
+                color: ${computed.color};
+                background: ${computed.backgroundColor};
+                box-sizing: border-box;
+                outline: none;
+            `;
+
+            const box = document.createElement("div");
+            box.id = "tripDropDateTimeBox";
+            box.style.cssText = "display: none !important; margin-top: 15px; width: 100%; box-sizing: border-box;";
+            
+            box.innerHTML = `
+                <div style="display: flex; gap: 15px; width: 100%;">
+                    <div style="flex: 1; min-width: 0;">
+                        <label style="font-size: 14px; font-weight: 500; color: #333; display: block; margin-bottom: 8px;">Drop Date (Return)</label>
+                        <input type="date" id="returnDropDate" style="${cssText}">
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <label style="font-size: 14px; font-weight: 500; color: #333; display: block; margin-bottom: 8px;">Drop Time (Return)</label>
+                        <input type="time" id="returnDropTime" value="18:00" style="${cssText}">
+                    </div>
+                </div>
+                <div style="margin-top: 10px; text-align: right;">
+                    <button type="button" id="checkFareBtn" style="background: #0056b3; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Check / Refresh Fare</button>
+                    <span id="fareRefreshMsg" style="margin-left: 10px; font-size: 12px; color: #28a745; font-weight: bold; display: none;">Fare Updated!</span>
+                </div>
+            `;
+            parentRow.after(box);
+
+            document.getElementById("checkFareBtn").onclick = () => {
+                const dropLoc = document.getElementById("dropLocation");
+                if (dropLoc) {
+                    dropLoc.dispatchEvent(new Event("change", { bubbles: true }));
+                    dropLoc.dispatchEvent(new Event("input", { bubbles: true }));
+                }
+
+                const calcBtn = Array.from(document.querySelectorAll("button, input[type=\x27button\x27]")).find(el => {
+                    const t = el.innerText ? el.innerText.toLowerCase() : "";
+                    return t.includes("calculate") || t.includes("search") || t.includes("fare") || t.includes("get") || t.includes("cabs");
+                });
+                if (calcBtn) calcBtn.click();
+
+                const duration = getTripDuration();
+                document.querySelectorAll(".card, .cab-item, div").forEach(card => {
+                    const priceTag = card.querySelector(".fare, .price, span, b");
+                    if (priceTag && priceTag.innerText && priceTag.innerText.includes("₹")) {
+                        const cardText = card.innerText.toLowerCase();
+                        
+                        // Fix: Ensure carrier item is never multiplied by distance/days
+                        if (cardText.includes("carrier") || cardText.includes("luggage") || cardText.includes("roof")) {
+                            priceTag.innerText = "+₹300";
+                            return;
+                        }
+
+                        let ratePerKm = 11;
+                        if (cardText.includes("innova")) ratePerKm = 18;
+                        else if (cardText.includes("ertiga")) ratePerKm = 14;
+                        else if (cardText.includes("etios") || cardText.includes("sedan")) ratePerKm = 12;
+                        
+                        const distVal = window.lastStoredDist || 200;
+                        const baseMinKm = 250 * duration.days;
+                        const eff = Math.max(distVal * 2, baseMinKm);
+                        const newTotal = Math.round((eff * ratePerKm) + (duration.days * 300));
+                        
+                        priceTag.innerText = "₹" + newTotal.toLocaleString("en-IN");
+                        window.lastSelectedFare = priceTag.innerText;
+                    }
+                });
+
+                const msg = document.getElementById("fareRefreshMsg");
+                if (msg) {
+                    msg.style.display = "inline";
+                    setTimeout(() => { msg.style.display = "none"; }, 2000);
+                }
+            };
+        }
+    }
+
+    setupDropFields();
+    setInterval(setupDropFields, 500);
+
+    // 3. Control Visibility & Strict Validation
+    setInterval(() => {
+        const box = document.getElementById("tripDropDateTimeBox");
+        if (!box) return;
+
+        if (window.activeTripType === "round") {
+            box.style.setProperty("display", "block", "important");
+
+            const pDateInp = document.querySelector("input[type=\x27date\x27]");
+            const dDateInp = document.getElementById("returnDropDate");
+            const pTimeInp = document.querySelector("input[type=\x27time\x27]");
+            const dTimeInp = document.getElementById("returnDropTime");
+
+            if (pDateInp && pDateInp.value && dDateInp) {
+                dDateInp.min = pDateInp.value;
+                if (!dDateInp.value || dDateInp.value < pDateInp.value) {
+                    dDateInp.value = pDateInp.value;
+                }
+
+                if (dDateInp.value === pDateInp.value && pTimeInp && pTimeInp.value && dTimeInp) {
+                    if (dTimeInp.value < pTimeInp.value) {
+                        dTimeInp.value = pTimeInp.value;
+                    }
+                }
+            }
+        } else {
+            box.style.setProperty("display", "none", "important");
+        }
+    }, 150);
+
+    // 4. Helper for Duration (Days & Nights)
+    function getTripDuration() {
+        const pDate = document.querySelector("input[type=\x27date\x27]");
+        const dDate = document.getElementById("returnDropDate");
+        const pTime = document.querySelector("input[type=\x27time\x27]");
+        const dTime = document.getElementById("returnDropTime");
+
+        const box = document.getElementById("tripDropDateTimeBox");
+        if (!pDate || !pDate.value || !dDate || !dDate.value || window.activeTripType !== "round") {
+            return { days: 1, nights: 0 };
+        }
+
+        const start = new Date(pDate.value + " " + (pTime ? pTime.value : "08:00"));
+        const end = new Date(dDate.value + " " + (dTime ? dTime.value : "18:00"));
+
+        if (isNaN(start) || isNaN(end) || end <= start) return { days: 1, nights: 0 };
+
+        const diffMs = end - start;
+        const diffDays = Math.max(Math.ceil(diffMs / (1000 * 60 * 60 * 24)), 1);
+
+        let nights = 0;
+        let curr = new Date(start);
+        while (curr < end) {
+            let nStart = new Date(curr);
+            nStart.setHours(22, 0, 0, 0);
+            let nEnd = new Date(curr);
+            nEnd.setDate(nEnd.getDate() + 1);
+            nEnd.setHours(6, 0, 0, 0);
+
+            if ((curr.getHours() >= 22 || curr.getHours() < 6) || (end >= nStart && start <= nEnd)) {
+                nights++;
+            }
+            curr.setDate(curr.getDate() + 1);
+            curr.setHours(0, 0, 0, 0);
+        }
+
+        return { days: diffDays, nights: Math.max(nights, 0) };
+    }
+
+    window.lastSelectedFare = "₹0";
+
+    // 5. Fare Calculation Override
     if (typeof window.calculateSegmentFare === "function") {
         const oldCalc = window.calculateSegmentFare;
         window.calculateSegmentFare = function(vType, dist, tType) {
-            const tStr = String(tType || "").toLowerCase();
-            const isRound = tStr.includes("round") || tStr.includes("return");
-            
+            const isRound = (window.activeTripType === "round");
+
             if (isRound) {
+                window.lastStoredDist = dist;
                 const dropVal = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value.toLowerCase() : "";
-                const s250 = ["madhya pradesh", "rajasthan", "uttar pradesh", "delhi", "chhattisgarh", "haryana", "punjab", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "chaksu"];
+                const s250 = ["madhya pradesh", "rajasthan", "uttar pradesh", "delhi", "chhattisgarh", "haryana", "punjab", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "chaksu", "ujjain", "indore"];
                 const s300 = ["maharashtra", "gujarat", "goa", "tamil nadu", "telangana", "andhra pradesh", "west bengal", "jharkhand", "odisha"];
-                let minKm = 0, mult = 1, matched = false;
-                for (let s of s250) { if (dropVal.includes(s)) { minKm = 250; matched = true; break; } }
-                if (!matched) { for (let s of s300) { if (dropVal.includes(s)) { minKm = 300; matched = true; break; } } }
-                if (!matched) { mult = 2; }
+                
+                let baseMinKmPerDay = 250;
+                let matched = false;
+                for (let s of s250) { if (dropVal.includes(s)) { baseMinKmPerDay = 250; matched = true; break; } }
+                if (!matched) { for (let s of s300) { if (dropVal.includes(s)) { baseMinKmPerDay = 300; matched = true; break; } } }
+                if (!matched) { baseMinKmPerDay = 250; }
+
+                const duration = getTripDuration();
+                const totalMinKm = baseMinKmPerDay * duration.days;
+                
                 const rDist = Number(dist) || 0;
-                const effKm = Math.max(rDist * 2, minKm) * mult;
+                const effKm = Math.max(rDist * 2, totalMinKm);
                 const cfg = (typeof CAB_CONFIG !== "undefined" && CAB_CONFIG[vType]) ? CAB_CONFIG[vType] : { baseRate: 11 };
-                return { fare: Math.round(effKm * cfg.baseRate), isCsvPackage: false, displayKm: effKm + " KM" };
+
+                let baseFare = effKm * cfg.baseRate;
+                let driverAllowance = duration.days * 300;
+
+                let totalFare = Math.round(baseFare + driverAllowance);
+                window.lastSelectedFare = "₹" + totalFare.toLocaleString("en-IN");
+
+                return {
+                    fare: totalFare,
+                    isCsvPackage: false,
+                    displayKm: effKm + " KM (" + duration.days + " Day(s))"
+                };
             }
             return oldCalc(vType, dist, tType);
         };
     }
 
+    document.addEventListener("click", (e) => {
+        const card = e.target.closest("div, label");
+        if (card) {
+            const txt = card.innerText.toLowerCase();
+            if (txt.includes("carrier") || txt.includes("luggage") || txt.includes("roof")) return;
+            const priceEl = card.querySelector(".fare, .price, span, b");
+            if (priceEl && priceEl.innerText && priceEl.innerText.includes("₹")) {
+                window.lastSelectedFare = priceEl.innerText.trim();
+            }
+        }
+    }, true);
+
+    // 6. Carrier Lock & Correct Pricing Display (+₹300 flat)
     setInterval(() => {
         const drop = document.getElementById("dropLocation");
         if (!drop) return;
         const val = drop.value.toLowerCase();
-        const rajKeys = ["rajasthan", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "bhilwara", "sikar", "pali", "chaksu"];
+        const rajKeys = ["rajasthan", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "bhilwara", "sikar", "pali", "chaksu", "ujjain", "indore", "madhya pradesh"];
         const isRaj = rajKeys.some(k => val.includes(k));
-        document.querySelectorAll("input[type='checkbox']").forEach(cb => {
+        
+        document.querySelectorAll("input[type=\x27checkbox\x27]").forEach(cb => {
             const lbl = cb.closest("label") || cb.parentElement;
             const txt = lbl ? lbl.innerText.toLowerCase() : "";
             if (txt.includes("roof") || txt.includes("carrier") || txt.includes("luggage")) {
@@ -1191,9 +1428,86 @@ document.addEventListener("DOMContentLoaded", () => {
                     lbl.style.opacity = isRaj ? "0.4" : "1";
                     lbl.style.pointerEvents = isRaj ? "none" : "auto";
                 }
+                const priceSpan = lbl.querySelector(".fare, .price, span, b") || lbl.nextElementSibling;
+                if (priceSpan && !priceSpan.innerText.includes("300")) {
+                    priceSpan.innerText = "+₹300";
+                }
             }
         });
     }, 400);
+
+    // 7. Booking Preview Modal
+    const bookBtns = document.querySelectorAll("button, input[type=\x27submit\x27]");
+    bookBtns.forEach(btn => {
+        const txt = btn.innerText ? btn.innerText.toLowerCase() : "";
+        if (txt.includes("book") || txt.includes("confirm") || txt.includes("proceed")) {
+            btn.addEventListener("click", function(e) {
+                if (!window.previewConfirmed && !document.getElementById("currentPreviewModal")) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const pickup = document.getElementById("pickupLocation") ? document.getElementById("pickupLocation").value : "Pickup";
+                    const drop = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value : "Drop";
+                    const duration = getTripDuration();
+                    const driverAmt = duration.days * 300;
+                    const nightAmt = duration.nights * 300;
+
+                    const nightText = nightAmt > 0 
+                        ? `₹300 × ${duration.nights} = ₹${nightAmt} (Direct Payment to Driver)` 
+                        : `₹300 (Not Included / Direct Payment to Driver if applicable)`;
+
+                    const modal = document.createElement("div");
+                    modal.id = "currentPreviewModal";
+                    modal.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; display:flex; align-items:center; justify-content:center;";
+                    modal.innerHTML = `
+                        <div style="background:#fff; padding:25px; border-radius:10px; width:90%; max-width:420px; box-shadow:0 4px 15px rgba(0,0,0,0.3); font-family:sans-serif;">
+                            <h3 style="margin-top:0; color:#333; border-bottom:1px solid #eee; padding-bottom:10px;">Booking Preview & Terms</h3>
+                            <p style="margin:5px 0;"><strong>From:</strong> ${pickup}</p>
+                            <p style="margin:5px 0;"><strong>To:</strong> ${drop}</p>
+                            <div style="background:#f8f9fa; padding:12px; border-radius:6px; margin:12px 0; font-size:13px; line-height:1.6;">
+                                <p style="margin:3px 0; font-size:15px; color:#0056b3; font-weight:bold;">Total Confirm Fare: ${window.lastSelectedFare}</p>
+                                <hr style="border:0; border-top:1px solid #dee2e6; margin:8px 0;">
+                                <p style="margin:3px 0;">Trip Duration: <strong>${duration.days} Day(s)</strong></p>
+                                <p style="margin:3px 0;">Driver Allowance: ₹300 × ${duration.days} = <strong>₹${driverAmt} (Included in Fare)</strong></p>
+                                <p style="margin:3px 0; color:#d9534f;">Night Allowance (10 PM - 6 AM): <strong>${nightText}</strong></p>
+                                <p style="margin:3px 0; color:#0056b3; font-weight:bold;">Toll, State Tax & Parking Extra (Paid directly)</p>
+                            </div>
+                            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+                                <button id="cancelPreview" style="padding:8px 15px; border:1px solid #ccc; background:#fff; border-radius:5px; cursor:pointer;">Edit</button>
+                                <button id="confirmBookingFinal" style="padding:8px 15px; background:#0056b3; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Confirm Booking</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+
+                    document.getElementById("cancelPreview").onclick = () => modal.remove();
+                    document.getElementById("confirmBookingFinal").onclick = () => {
+                        window.previewConfirmed = true;
+                        modal.remove();
+
+                        setTimeout(() => {
+                            const successBox = document.querySelector(".booking-error, .success-card, #bookingResult, .confirmation-details, form") || document.body;
+                            const termsCard = document.createElement("div");
+                            termsCard.style.cssText = "background:#eef9ff; border:1px solid #bce8f1; padding:15px; margin:15px 0; border-radius:8px; font-size:13px; color:#31708f; box-sizing:border-box;";
+                            termsCard.innerHTML = `
+                                <h4 style="margin:0 0 8px 0; color:#0056b3;">Booking Terms & Fare Breakdown</h4>
+                                <ul style="margin:0; padding-left:20px; line-height:1.5;">
+                                    <li>Total Fare: <strong>${window.lastSelectedFare}</strong></li>
+                                    <li>Trip Duration: <strong>${duration.days} Day(s)</strong></li>
+                                    <li>Driver Allowance: <strong>₹${driverAmt}</strong> (Included in online booking)</li>
+                                    <li>Night Allowance (10 PM - 6 AM): <strong>${nightText}</strong></li>
+                                    <li>Toll, State Tax & Parking: Extra as per actuals (Paid directly)</li>
+                                </ul>
+                            `;
+                            successBox.prepend(termsCard);
+                        }, 1200);
+
+                        btn.click();
+                    };
+                }
+            }, true);
+        }
+    });
 });
 </script>
 <!-- RUNTIME_OVERRIDE_END -->
