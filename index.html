@@ -1,1609 +1,472 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tripvyom - Your Complete Travel Partner</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <link rel="icon" type="image/png" href="favicon.png" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripVyom - Cab Booking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen relative overflow-x-hidden">
+<body class="bg-slate-100 font-sans text-slate-800 pb-28">
 
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 py-3 flex items-center justify-between shadow-sm">
-    <div class="flex items-center gap-2">
-      <div class="bg-blue-600 text-white p-2 rounded-xl flex items-center justify-center">
-        <i class="fa-solid fa-car text-lg"></i>
-      </div>
-      <span class="text-xl font-bold tracking-tight text-blue-900"><img src="full_logo.png" alt="Tripvyom" class="h-10 w-auto inline-block object-contain" /></span>
-    </div>
-    <button type="button" id="menuToggleBtn" class="text-slate-800 hover:text-blue-600 p-2.5 text-2xl focus:outline-none cursor-pointer relative z-50 active:scale-95 transition">
-      <i class="fa-solid fa-bars pointer-events-none"></i>
-    </button>
-  </header>
-
-  <main class="max-w-md mx-auto pb-24">
-
-    <div id="bookingSection">
-      <div class="bg-blue-700 text-white px-5 pt-7 pb-12 rounded-b-[2rem] text-center shadow-md">
-        <span class="inline-flex items-center gap-1.5 bg-blue-600/70 border border-blue-400/40 text-blue-100 text-xs px-3 py-1 rounded-full font-medium mb-3">
-          <i class="fa-solid fa-shield-halved text-amber-300"></i> Plains Corridor Network
-        </span>
-        <h1 class="text-2xl font-bold mb-2">Your Trusted Travel Companion</h1>
-        <p class="text-blue-100 text-xs leading-relaxed px-2">
-          ₹0 Advance Booking • 45% Fuel Allowance at Pickup • 55% at Drop
-        </p>
-      </div>
-
-      <div class="px-4 -mt-7">
-        <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-1.5 flex justify-between gap-1 mb-4 text-xs font-semibold text-slate-500">
-          <button class="flex-1 py-2 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center gap-1.5 border border-blue-100">
-            <i class="fa-solid fa-car"></i> Cabs
-          </button>
-          <button onclick="alert('Flights service starting soon!')" class="flex-1 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-plane"></i> Flights
-          </button>
-          <button onclick="alert('Buses service starting soon!')" class="flex-1 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-bus"></i> Buses
-          </button>
-          <button onclick="alert('Hotels service starting soon!')" class="flex-1 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-hotel"></i> Hotels
-          </button>
+    <header class="bg-white px-4 py-3 flex items-center justify-between shadow-sm sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="bg-blue-600 text-white font-extrabold px-2.5 py-0.5 rounded text-sm tracking-tight">TripVyom</div>
         </div>
+        <div class="flex items-center space-x-2 text-sm font-bold">
+            <button onclick="openSignupModal()" class="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-full">Signup</button>
+            <span class="text-slate-600 cursor-pointer text-xs" onclick="window.location.href='/partner.html'">Partner</span>
+            <span class="bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1 rounded-full text-xs font-extrabold cursor-pointer" onclick="window.location.href='/admin.html'">Admin</span>
+        </div>
+    </header>
 
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
-          <div class="flex justify-between items-center mb-2">
-            <p class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Trip Type</p>
-            <button type="button" onclick="resetBookingForm()" class="text-[11px] text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1">
-              <i class="fa-solid fa-rotate-right"></i> Reset Form
+    <div class="bg-white pb-6 pt-3 px-4 rounded-b-[35px] shadow-sm">
+        <div class="border border-blue-200 rounded-full py-2.5 px-4 flex items-center justify-between shadow-sm bg-slate-50/50">
+            <div class="flex items-center space-x-2 text-sm text-slate-500 truncate">
+                <span class="text-blue-500 text-xs">●</span>
+                <span class="truncate">Ask TripVyom about Cabs & Holidays</span>
+            </div>
+            <button class="border border-blue-300 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full flex items-center space-x-1 bg-white shrink-0">
+                <span>🎙️</span>
+                <span>Speak</span>
             </button>
-          </div>
-          <div class="grid grid-cols-2 gap-2 mb-4">
-            <button type="button" onclick="selectTripType('One Way', this)" class="trip-type-btn py-2 text-xs font-semibold rounded-xl bg-blue-600 text-white">One Way</button>
-            <button type="button" onclick="selectTripType('Round Trip', this)" class="trip-type-btn py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600">Round Trip</button>
-            <button type="button" onclick="selectTripType('Local Rental', this)" class="trip-type-btn py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600">Local Rental</button>
-            <button type="button" onclick="selectTripType('Airport Transfer', this)" class="trip-type-btn py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600">Airport Transfer</button>
-          </div>
-
-          <div id="localPackageWrapper" class="hidden mb-3 space-y-1.5 bg-blue-50/50 p-3 rounded-xl border border-blue-200">
-            <label class="block text-xs font-bold text-blue-900" id="packageLabelTitle">Select Package *</label>
-            <select id="localPackageSelect" onchange="handlePackageChange()" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none">
-            </select>
-          </div>
-
-          <div class="space-y-3">
-            <div class="relative">
-              <label class="block text-xs font-medium text-slate-600 mb-1" id="pickupLabelText">From (Pickup City/Locality)</label>
-              <div class="relative flex items-center">
-                <i class="fa-solid fa-location-dot absolute left-3 text-slate-400 text-sm"></i>
-                <input id="pickupLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'pickup')" placeholder="e.g. Indore, Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
-              </div>
-              <div id="pickupSuggestions" class="hidden absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-2xl mt-1 z-50 max-h-52 overflow-y-auto text-xs"></div>
-            </div>
-
-            <div class="relative" id="dropLocationContainer">
-              <label id="dropLocationLabel" class="block text-xs font-medium text-slate-600 mb-1">To (Drop City/Destination)</label>
-              <div class="relative flex items-center">
-                <i class="fa-solid fa-location-crosshairs absolute left-3 text-amber-500 text-sm"></i>
-                <input id="dropLocation" type="text" autocomplete="off" oninput="handleAddressSearch(this.value, 'drop')" placeholder="e.g. Ujjain, Delhi" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white" />
-              </div>
-              <div id="dropSuggestions" class="hidden absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-2xl mt-1 z-50 max-h-52 overflow-y-auto text-xs"></div>
-            </div>
-
-            <div id="distanceBadgeBox" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-2.5 text-center text-xs text-blue-800 font-semibold">
-              <i class="fa-solid fa-route text-blue-600 mr-1"></i> <span id="distanceBadgeText">Calculating route...</span>
-            </div>
-
-                        <!-- Flight / Terminal Notes -->
-            <div id="flightNotesContainer" class="mb-3">
-              <label class="block text-xs font-medium text-slate-600 mb-1">Flight Number / Terminal / Notes (Optional)</label>
-              <div class="relative flex items-center">
-                <i class="fa-solid fa-plane-departure absolute left-3 text-blue-500 text-sm"></i>
-                <input id="flightNotes" type="text" autocomplete="off" placeholder="e.g. Flight 6E-214, Terminal 1" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:bg-white text-slate-800 font-medium" />
-              </div>
-            </div>
-            <div class="grid grid-cols-2 gap-3 pt-1">
-              <div>
-                <label class="block text-xs font-medium text-slate-600 mb-1">Pickup Date</label>
-                <input id="pickupDate" type="date" onchange="validateScheduleTiming()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-blue-500 text-slate-600 font-medium" />
-              </div>
-              <div>
-                <div class="flex justify-between items-center mb-1">
-                  <label class="block text-xs font-medium text-slate-600">Pickup Time</label>
-                  <span class="text-[9px] text-blue-600 font-bold">Watch or Type</span>
-                </div>
-                <input id="pickupTime" type="time" step="300" onchange="validateScheduleTiming()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-700 font-semibold" />
-              </div>
-            </div>
-            <p class="text-[10px] text-slate-400 pl-1">* Kam se kam 1 ghanta aage ka time select karein.</p>
-          </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-              <i class="fa-regular fa-user text-blue-600"></i>
-              <h3 class="text-sm font-bold text-slate-800">Passenger Details</h3>
+        <div class="grid grid-cols-4 gap-3 mt-5 text-center">
+            <div onclick="window.location.href='https://booking.tripvyom.in/flights'" class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center cursor-pointer">
+                <span class="text-2xl mb-1">✈️</span>
+                <span class="text-xs font-bold text-slate-700">Flights</span>
             </div>
-            <span id="authIndicatorBadge" class="text-[10px] text-rose-500 font-bold bg-rose-50 px-2 py-0.5 rounded-md">Login Required</span>
-          </div>
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">Full Name</label>
-              <input id="custName" type="text" placeholder="Enter passenger name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+            <div onclick="window.location.href='https://booking.tripvyom.in/hotels'" class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center cursor-pointer">
+                <span class="text-2xl mb-1">🏨</span>
+                <span class="text-xs font-bold text-slate-700">Hotels</span>
             </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">Phone Number</label>
-              <input id="custPhone" type="tel" maxlength="10" placeholder="10-digit mobile" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+            <div onclick="window.location.href='https://booking.tripvyom.in/holidays'" class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center cursor-pointer">
+                <span class="text-2xl mb-1">🏖️</span>
+                <span class="text-xs font-bold text-slate-700">Holidays</span>
             </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1">Pickup Landmark</label>
-              <input id="custLandmark" type="text" placeholder="Near station, bus stop, society gate, etc." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+            <div onclick="window.location.href='https://booking.tripvyom.in/bus'" class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center cursor-pointer">
+                <span class="text-2xl mb-1">🚆</span>
+                <span class="text-xs font-bold text-slate-700">Trains/Bus</span>
             </div>
-          </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-              <i class="fa-solid fa-car-side text-blue-600"></i>
-              <h3 class="text-sm font-bold text-slate-800">Select Vehicle</h3>
+        <div class="grid grid-cols-3 gap-3 mt-5 text-center">
+            <div onclick="switchCabTab('outstation')" id="tile-outstation" class="bg-indigo-50 p-3 rounded-2xl border-2 border-indigo-500 shadow-sm flex flex-col items-center cursor-pointer transition">
+                <span class="text-2xl mb-1">🚗</span>
+                <span class="text-xs font-extrabold text-indigo-900">Outstation</span>
             </div>
-            <span id="rateModeBadge" class="text-[10px] bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md border border-blue-100">All Exclusive Fare</span>
-          </div>
-
-          <div class="space-y-2.5">
-            <label class="flex items-center justify-between p-3 border-2 border-blue-600 bg-blue-50/50 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('Hatchback', this)">
-              <div class="flex items-center gap-3">
-                <input type="radio" name="vehicle" checked class="text-blue-600" />
-                <div>
-                  <p class="text-sm font-bold text-slate-800">Hatchback</p>
-                  <p class="text-[11px] text-slate-500">WagonR, Swift • 4 seats</p>
-                  <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
-                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
-                    <span class="text-slate-600">Extra: ₹11/KM</span>
-                  </div>
-                </div>
-              </div>
-              <div class="text-right">
-                <span id="priceTagHatchback" class="text-sm font-bold text-slate-900">₹0</span>
-              </div>
-            </label>
-
-            <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('Sedan', this)">
-              <div class="flex items-center gap-3">
-                <input type="radio" name="vehicle" class="text-blue-600" />
-                <div>
-                  <p class="text-sm font-bold text-slate-800">Sedan</p>
-                  <p class="text-[11px] text-slate-500">Dzire, Etios, Aura • 4 seats</p>
-                  <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
-                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
-                    <span class="text-slate-600">Extra: ₹12/KM</span>
-                  </div>
-                </div>
-              </div>
-              <div class="text-right">
-                <span id="priceTagSedan" class="text-sm font-bold text-slate-900">₹0</span>
-              </div>
-            </label>
-
-            <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('MUV', this)">
-              <div class="flex items-center gap-3">
-                <input type="radio" name="vehicle" class="text-blue-600" />
-                <div>
-                  <p class="text-sm font-bold text-slate-800">Ertiga (MUV)</p>
-                  <p class="text-[11px] text-slate-500">Maruti Ertiga • 6 seats</p>
-                  <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
-                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
-                    <span class="text-slate-600">Extra: ₹14/KM</span>
-                  </div>
-                </div>
-              </div>
-              <div class="text-right">
-                <span id="priceTagMUV" class="text-sm font-bold text-slate-900">₹0</span>
-              </div>
-            </label>
-
-            <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card" onclick="selectVehicle('SUV', this)">
-              <div class="flex items-center gap-3">
-                <input type="radio" name="vehicle" class="text-blue-600" />
-                <div>
-                  <p class="text-sm font-bold text-slate-800">Innova Crysta</p>
-                  <p class="text-[11px] text-slate-500">Toyota Crysta • 6–7 seats</p>
-                  <div class="flex items-center gap-2 mt-0.5 text-[10px] font-semibold">
-                    <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
-                    <span class="text-slate-600">Extra: ₹20/KM</span>
-                  </div>
-                </div>
-              </div>
-              <div class="text-right">
-                <span id="priceTagSUV" class="text-sm font-bold text-slate-900">₹0</span>
-              </div>
-            </label>
-          </div>
-
-          <div id="localRentalTermsBanner" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-3 mt-3 text-[11px] text-amber-900 space-y-1">
-            <p class="font-bold flex items-center gap-1.5">
-              <i class="fa-solid fa-clock text-amber-600"></i> Local Rental Package T&C
-            </p>
-            <p id="localTermsDetailsText" class="text-amber-800 leading-relaxed text-[10px]">
-              Selected package includes specific hours and KM. Extra KM and Extra Hours charges apply upon completion.
-            </p>
-          </div>
-
-          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between mt-3">
-            <div class="flex items-center gap-2.5">
-              <input id="carrierRequiredCheck" type="checkbox" onchange="toggleCarrierAddon(this.checked)" class="w-4 h-4 text-blue-600 rounded cursor-pointer" />
-              <div>
-                <label for="carrierRequiredCheck" class="text-xs font-bold text-slate-800 cursor-pointer block">Need Roof Luggage Carrier?</label>
-                <p class="text-[10px] text-slate-500">Roof carrier required (+₹300 flat)</p>
-              </div>
+            <div onclick="switchCabTab('airport')" id="tile-airport" class="bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center cursor-pointer transition">
+                <span class="text-2xl mb-1">✈️🚖</span>
+                <span class="text-xs font-bold text-slate-700">Airport Taxi</span>
             </div>
-            <span class="text-xs font-bold text-slate-700 bg-white px-2 py-1 rounded-lg border border-slate-200">+₹300</span>
-          </div>
-
-          <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 mt-3 text-[11px] text-amber-900 space-y-1">
-            <p class="font-bold flex items-center gap-1.5">
-              <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Toll, State Tax & Parking Extra
-            </p>
-            <p class="text-amber-800 leading-relaxed text-[10px]">
-              Toll Plaza, State Entry Tax aur Parking charges base fare me shamil nahi hain. Yeh charges trip ke dauran customer ko directly cash ya Fastag se pay karne honge.
-            </p>
-          </div>
-
-          <div class="mt-3 bg-blue-50 p-3 rounded-xl border border-blue-200 text-xs text-blue-950 space-y-1">
-            <p class="font-bold flex items-center gap-1.5 text-blue-900">
-              <i class="fa-solid fa-circle-check text-emerald-600"></i> ₹0 Advance Booking Guarantee
-            </p>
-            <p class="text-[11px] text-blue-800 leading-relaxed">
-              No advance required online. <b>45% Fuel Allowance</b> pickup ke waqt aur bacha hua <b>55% Balance</b> destination drop par dena hoga.
-            </p>
-          </div>
-
-          <div class="mt-3 text-center text-xs text-slate-500">
-            By confirming, you agree to <img src="full_logo.png" alt="Tripvyom" class="h-10 w-auto inline-block object-contain" />'s 
-            <button type="button" onclick="openModal('termsModal')" class="text-blue-600 underline font-semibold">Terms & Cancellation Policy</button>
-          </div>
-
-          <button id="bookSubmitBtn" onclick="handleBooking()" class="w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
-            Confirm Booking <i class="fa-solid fa-chevron-right text-xs"></i>
-          </button>
+            <div onclick="switchCabTab('local')" id="tile-local" class="bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center cursor-pointer transition">
+                <span class="text-2xl mb-1">⏱️</span>
+                <span class="text-xs font-bold text-slate-700">Local Rentals</span>
+            </div>
         </div>
-      </div>
     </div>
 
-    <div id="receiptSection" class="hidden px-4 pt-4">
-      <button onclick="backToBooking()" class="text-xs font-semibold text-blue-600 flex items-center gap-1 mb-3">
-        <i class="fa-solid fa-arrow-left"></i> Book Another Trip
-      </button>
-
-      <div id="receiptHeaderBox" class="bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2">
-            <i class="fa-solid fa-car text-lg"></i>
-            <span class="font-bold tracking-tight"><img src="full_logo.png" alt="Tripvyom" class="h-10 w-auto inline-block object-contain" /></span>
-          </div>
-          <span id="bookingIdBadge" class="bg-black/20 text-white text-xs font-mono font-bold px-2.5 py-1 rounded-md">MTZ-XXXX</span>
-        </div>
-        <div class="flex items-center justify-between text-xs">
-          <div>
-            <p class="text-blue-100">Booking Status</p>
-            <span id="receiptStatusBadge" class="inline-flex items-center gap-1.5 font-bold text-white text-xs mt-0.5">
-              <span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span> Confirmation Pending
-            </span>
-          </div>
-          <div class="text-right">
-            <p class="text-blue-100">Booked On</p>
-            <p id="receiptBookingDate" class="font-semibold"></p>
-          </div>
-        </div>
-      </div>
-
-      <div id="driverStatusCard" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4">
-        <div id="driverPendingState" class="text-center py-2">
-          <i class="fa-solid fa-hourglass-half text-amber-500 text-2xl mb-1.5 animate-pulse"></i>
-          <p class="text-xs font-bold text-slate-800">Waiting for Partner to Accept...</p>
-          <p class="text-[11px] text-slate-500 mt-0.5">Partner accept karte hi driver details yahan unlock honge.</p>
-        </div>
-
-        <div id="driverConfirmedState" class="hidden space-y-2.5 text-xs">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-            <span class="font-bold text-emerald-700 flex items-center gap-1.5">
-              <i class="fa-solid fa-circle-check text-emerald-600"></i> Partner Confirmed & Assigned
-            </span>
-            <span class="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-md border border-emerald-200">On The Way</span>
-          </div>
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="text-slate-400 text-[10px] uppercase font-bold">Driver Partner</p>
-              <p id="assignedDriverName" class="font-bold text-slate-800 text-sm">-</p>
-              <div id="assignedDriverPhoneContainer" class="mt-1"></div>
-            </div>
-            <div class="text-right">
-              <p class="text-slate-400 text-[10px] uppercase font-bold">Cab Number</p>
-              <p id="assignedCabNumber" class="font-bold font-mono text-slate-800 text-sm">-</p>
-              <p id="assignedCabModel" class="text-slate-500 text-[11px]">Commercial Taxi</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 space-y-3">
-        <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Trip Details</h4>
-        <div class="flex items-start gap-3 text-xs">
-          <div class="space-y-2 flex-1">
-            <div>
-              <p class="text-slate-400">Pickup</p>
-              <p id="receiptPickup" class="font-bold text-slate-800"></p>
-              <p id="receiptDateTime" class="text-slate-500 text-[11px]"></p>
-            </div>
-            <div>
-              <p class="text-slate-400">Dropoff</p>
-              <p id="receiptDrop" class="font-bold text-slate-800"></p>
-            </div>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-xs">
-          <div>
-            <span class="text-slate-400">Trip Type:</span>
-            <p id="receiptTripType" class="font-semibold text-slate-700"></p>
-          </div>
-          <div>
-            <span class="text-slate-400">Vehicle:</span>
-            <p id="receiptVehicle" class="font-semibold text-slate-700"></p>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2">
-        <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Passenger Details</h4>
-        <p id="receiptCustName" class="font-bold text-slate-800"></p>
-        <p id="receiptCustPhone" class="text-slate-500"></p>
-        <p class="text-slate-500 pt-1 border-t border-slate-100">Landmark: <span id="receiptCustLandmark"></span></p>
-      </div>
-
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
-        <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare Breakdown</h4>
-        <div class="flex justify-between text-slate-600">
-          <span id="receiptFareLabel">Vehicle Fare (Inc. Driver Allowance)</span>
-          <span id="receiptTotalFare" class="font-bold text-sm text-slate-900">₹0</span>
-        </div>
-        <div id="receiptCarrierRow" class="hidden flex justify-between text-slate-600">
-          <span>Roof Luggage Carrier</span>
-          <span id="receiptCarrierFee" class="font-semibold">+₹300</span>
-        </div>
-
-        <div class="bg-blue-50/70 rounded-xl p-3 border border-blue-100 space-y-1.5 mt-2">
-          <div class="flex justify-between text-blue-900 font-medium">
-            <span>Advance (Now):</span>
-            <span class="text-emerald-600 font-bold">₹0</span>
-          </div>
-          <div class="flex justify-between text-blue-900 font-medium">
-            <span>At Pickup (45% Fuel Allowance):</span>
-            <span id="receiptPickupAmount" class="font-bold text-slate-900">₹0</span>
-          </div>
-          <div class="flex justify-between text-blue-900 font-medium">
-            <span>At Dropoff (55% Balance):</span>
-            <span id="receiptDropAmount" class="font-bold text-slate-900">₹0</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="space-y-2">
-        <button id="whatsappConfirmBtn" onclick="sendToWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm">
-          <i class="fa-brands fa-whatsapp text-lg"></i> Send Booking on WhatsApp
-        </button>
-        <button id="cancelBookingBtn" onclick="cancelCurrentBooking()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-3 rounded-xl text-xs border border-rose-200 flex items-center justify-center gap-1.5 transition">
-          <i class="fa-solid fa-ban"></i> Cancel This Booking
-        </button>
-      </div>
-    </div>
-  </main>
-
-  <div id="drawerOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
-
-  <aside id="sideDrawer" style="transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);" class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl z-50 flex flex-col">
-    <div id="drawerProfileTrigger" class="p-5 border-b border-slate-200 flex items-center justify-between bg-blue-600 text-white cursor-pointer active:bg-blue-700 select-none">
-      <div class="flex items-center gap-3 pointer-events-none">
-        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-lg">
-          <i class="fa-regular fa-user"></i>
-        </div>
-        <div>
-          <p id="drawerUserTitle" class="text-sm font-bold">Login / Sign In</p>
-          <p id="drawerUserSub" class="text-[11px] text-blue-200">Required to manage bookings</p>
-        </div>
-      </div>
-      <button type="button" id="drawerCloseBtn" class="text-white hover:text-slate-200 text-xl p-1 focus:outline-none">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-
-    <div class="p-4 space-y-2 flex-1 overflow-y-auto text-sm font-medium text-slate-700">
-      <button type="button" onclick="openModal('historyModal')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left">
-        <i class="fa-solid fa-clock-rotate-left text-blue-600 w-5"></i>
-        <span>My Bookings</span>
-      </button>
-      <button type="button" onclick="openModal('aboutModal')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left">
-        <i class="fa-solid fa-shield-halved text-emerald-600 w-5"></i>
-        <span>About <img src="full_logo.png" alt="Tripvyom" class="h-10 w-auto inline-block object-contain" /></span>
-      </button>
-      <button type="button" onclick="openModal('termsModal')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left">
-        <i class="fa-solid fa-file-contract text-amber-600 w-5"></i>
-        <span>Terms & Conditions</span>
-      </button>
-      <a href="https://wa.me/918889637244?text=Hello%20Support" target="_blank" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 text-left text-emerald-700">
-        <i class="fa-brands fa-whatsapp text-emerald-600 text-lg w-5"></i>
-        <span>24x7 Help Desk</span>
-      </a>
-    </div>
-
-    <div class="p-4 border-t border-slate-100 text-center text-xs text-slate-400">
-      <img src="full_logo.png" alt="Tripvyom" class="h-10 w-auto inline-block object-contain" /> Secure Client v3.0
-    </div>
-  </aside>
-
-  <div id="authModal" class="fixed inset-0 bg-slate-900/70 z-[70] hidden items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
-      <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-        <div>
-          <h3 class="font-bold text-slate-800 text-sm">Customer Authentication</h3>
-          <p class="text-[10px] text-slate-500">Secure access to your verified rides</p>
-        </div>
-        <button type="button" onclick="closeModal('authModal')" class="text-slate-400 hover:text-slate-600 p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <div class="p-5 space-y-3.5 text-xs">
-        <button type="button" onclick="loginWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-4 rounded-xl border border-slate-300 flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
-          <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          Continue with Google
-        </button>
-
-        <div class="relative flex items-center justify-center my-2">
-          <div class="border-t border-slate-200 w-full"></div>
-          <span class="bg-white px-2 text-[10px] text-slate-400 uppercase font-bold tracking-widest absolute">Or Email & Password</span>
-        </div>
-
-        <div>
-          <label class="block font-semibold text-slate-600 mb-1">Full Name</label>
-          <input id="loginName" type="text" placeholder="Enter full name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
-        </div>
-        <div>
-          <label class="block font-semibold text-slate-600 mb-1">Email Address</label>
-          <input id="loginEmail" type="email" placeholder="name@domain.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
-        </div>
-        <div>
-          <label class="block font-semibold text-slate-600 mb-1">Phone Number</label>
-          <input id="loginPhone" type="tel" maxlength="10" placeholder="10-digit mobile" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
-        </div>
-        <div>
-          <label class="block font-semibold text-slate-600 mb-1">Password</label>
-          <input id="loginPassword" type="password" placeholder="Minimum 6 characters" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 pt-1">
-          <button type="button" onclick="handleEmailAuth(false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
-            Sign In
-          </button>
-          <button type="button" onclick="handleEmailAuth(true)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">
-            Create Account
-          </button>
-        </div>
-
-        <button id="logoutBtn" type="button" onclick="logoutCustomer()" class="w-full hidden bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold py-2 rounded-xl text-xs border border-rose-200 mt-1">
-          Log Out
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div id="historyModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
-      <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-        <div>
-          <h3 class="font-bold text-slate-800 text-sm">My Bookings Log</h3>
-          <p class="text-[10px] text-slate-500">Tap on any trip to view receipt & cancel live</p>
-        </div>
-        <button type="button" onclick="closeModal('historyModal')" class="text-slate-400 hover:text-slate-600 p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-      <div id="historyListContainer" class="p-4 overflow-y-auto space-y-3 flex-1 text-xs"></div>
-    </div>
-  </div>
-
-  <div id="termsModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
-      <div class="p-4 border-b border-slate-200 flex justify-between items-center">
-        <h3 class="font-bold text-slate-800 text-sm">Terms & Cancellation Policy</h3>
-        <button type="button" onclick="closeModal('termsModal')" class="text-slate-400 hover:text-slate-600 p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-      <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-600 leading-relaxed flex-1">
-        <p class="font-bold text-slate-800">1. Cancellation Policy</p>
-        <p>• Pickup time se 6 ghante pehle cancellation bilkul <b>FREE (₹0 Penalty)</b> hai.</p>
-        <p>• Pickup time ke 6 ghante ke andar cancel karne par <b>10% (Min ₹300, Max ₹1,000)</b> late fee penalty record hoti hai.</p>
-      </div>
-    </div>
-  </div>
-
-  <div id="aboutModal" class="fixed inset-0 bg-slate-900/60 z-[70] hidden items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
-      <div class="p-4 border-b border-slate-200 flex justify-between items-center">
-        <h3 class="font-bold text-slate-800 text-sm">About <img src="full_logo.png" alt="Tripvyom" class="h-10 w-auto inline-block object-contain" /></h3>
-        <button type="button" onclick="closeModal('aboutModal')" class="text-slate-400 hover:text-slate-600 p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-      <div class="p-4 overflow-y-auto space-y-3 text-xs text-slate-600 leading-relaxed flex-1">
-        <p><img src="full_logo.png" alt="Tripvyom" class="h-10 w-auto inline-block object-contain" /> provides transparent aggregator services with zero advance, verified cab partners, and strict live dispatch tracking.</p>
-      </div>
-    </div>
-  </div>
-
-  <script>
-const airports = [
-          { name: 'Indira Gandhi International Airport (DEL) - T1 / T2 / T3, Delhi', city: 'delhi', lat: 28.5562, lon: 77.1000 },
-          { name: 'Noida International Airport (Jewar Airport), Jewar / Noida', city: 'noida', lat: 28.1764, lon: 77.6536 },
-          { name: 'Chhatrapati Shivaji Maharaj International Airport (BOM) - T1 / T2, Mumbai', city: 'mumbai', lat: 19.0896, lon: 72.8656 },
-          { name: 'Navi Mumbai International Airport, Navi Mumbai', city: 'navi mumbai', lat: 18.9890, lon: 73.0650 },
-          { name: 'Kempegowda International Airport (BLR) - T1 / T2, Bengaluru', city: 'bengaluru', lat: 13.1986, lon: 77.7066 },
-          { name: 'Rajiv Gandhi International Airport (HYD), Hyderabad', city: 'hyderabad', lat: 17.2403, lon: 78.4294 },
-          { name: 'Chennai International Airport (MAA) - T1 / T4, Chennai', city: 'chennai', lat: 12.9941, lon: 80.1709 },
-          { name: 'Netaji Subhash Chandra Bose International Airport (CCU), Kolkata', city: 'kolkata', lat: 22.6547, lon: 88.4467 },
-          { name: 'Sardar Vallabhbhai Patel International Airport (AMD), Ahmedabad', city: 'ahmedabad', lat: 23.0772, lon: 72.6347 },
-          { name: 'Pune Airport (PNQ), Pune', city: 'pune', lat: 18.5822, lon: 73.9197 },
-          { name: 'Goa International Airport (GOI - Dabolim), Goa', city: 'goa', lat: 15.3803, lon: 73.8314 },
-          { name: 'Manohar International Airport (GOX - Mopa), Goa', city: 'goa', lat: 15.7258, lon: 73.8767 },
-          { name: 'Jaipur International Airport (JAI), Jaipur', city: 'jaipur', lat: 26.8242, lon: 75.8122 },
-          { name: 'Chaudhary Charan Singh International Airport (LKO) - T1 / T2, Lucknow', city: 'lucknow', lat: 26.7606, lon: 80.8893 },
-          { name: 'Devi Ahilya Bai Holkar Airport (IDR), Indore', city: 'indore', lat: 22.7218, lon: 75.8011 },
-          { name: 'Raja Bhoj Airport (BHO), Bhopal', city: 'bhopal', lat: 23.2875, lon: 77.3375 },
-          { name: 'Maharana Pratap Airport (UDR), Udaipur', city: 'udaipur', lat: 24.6178, lon: 73.8961 },
-          { name: 'Jaisalmer Airport (JSA), Jaisalmer', city: 'jaisalmer', lat: 26.8919, lon: 70.8647 },
-          { name: 'Bikaner Airport (Nal Airport - BKN), Bikaner', city: 'bikaner', lat: 28.0725, lon: 73.5486 },
-          { name: 'Chandigarh International Airport (IXC), Chandigarh', city: 'chandigarh', lat: 30.6735, lon: 76.7885 },
-          { name: 'Surat Airport (STV), Surat', city: 'surat', lat: 21.1167, lon: 72.7417 },
-          { name: 'Vadodara Airport (BDQ), Vadodara', city: 'vadodara', lat: 22.3364, lon: 73.2264 },
-          { name: 'Rajkot International Airport (Hirasar - RAJ), Rajkot', city: 'rajkot', lat: 22.2858, lon: 70.8022 },
-          { name: 'Dr. Babasaheb Ambedkar International Airport (NAG), Nagpur', city: 'nagpur', lat: 21.0922, lon: 79.0472 },
-          { name: 'Jay Prakash Narayan Airport (PAT), Patna', city: 'patna', lat: 25.5913, lon: 85.0877 },
-          { name: 'Lal Bahadur Shastri Airport (VNS), Varanasi', city: 'varanasi', lat: 25.4456, lon: 82.8576 },
-          { name: 'Sri Guru Ram Dass Jee International Airport (ATQ), Amritsar', city: 'amritsar', lat: 31.7094, lon: 74.7972 },
-          { name: 'Cochin International Airport (COK), Kochi', city: 'kochi', lat: 10.1520, lon: 76.3915 },
-          { name: 'Trivandrum International Airport (TRV), Thiruvananthapuram', city: 'thiruvananthapuram', lat: 8.4821, lon: 76.9200 },
-          { name: 'Lokapriya Gopinath Bordoloi International Airport (GAU), Guwahati', city: 'guwahati', lat: 26.1061, lon: 91.5859 },
-          { name: 'Biju Patnaik International Airport (BBI), Bhubaneswar', city: 'bhubaneswar', lat: 20.2444, lon: 85.8178 },
-          { name: 'Jolly Grant Airport (DED), Dehradun', city: 'dehradun', lat: 30.1897, lon: 78.1803 },
-          { name: 'Birsa Munda Airport (IXR), Ranchi', city: 'ranchi', lat: 23.3143, lon: 85.3216 },
-          { name: 'Srinagar Airport (SXR), Srinagar', city: 'srinagar', lat: 33.9871, lon: 74.7745 },
-          { name: 'Bagdogra Airport (IXB), Siliguri', city: 'bagdogra', lat: 26.6812, lon: 88.3285 },
-          { name: 'Coimbatore International Airport (CJB), Coimbatore', city: 'coimbatore', lat: 11.0294, lon: 77.0434 },
-          { name: 'Madurai Airport (IXM), Madurai', city: 'madurai', lat: 9.8344, lon: 78.0934 },
-          { name: 'Mangaluru International Airport (IXE), Mangalore', city: 'mangalore', lat: 12.9612, lon: 74.8901 },
-          { name: 'Jodhpur Airport (JDH), Jodhpur', city: 'jodhpur', lat: 26.2570, lon: 73.0487 },
-          { name: 'Visakhapatnam Airport (VTZ), Visakhapatnam', city: 'visakhapatnam', lat: 17.7211, lon: 83.2244 }
-        ];
-    const firebaseConfig = {
-      apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
-      authDomain: "maketripzy.firebaseapp.com",
-      projectId: "maketripzy",
-      storageBucket: "maketripzy.firebasestorage.app",
-      messagingSenderId: "484778826837",
-      appId: "1:484778826837:web:b9652dbd1fee4c1ccd08dc",
-      measurementId: "G-ZBZZHGGTQX"
-    };
-
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-
-    let currentUser = null;
-    let isCarrierRequired = false;
-    const carrierChargeAmount = 300;
-
-    const CAB_CONFIG = {
-      'Hatchback': { baseRate: 11, oneWayMultiplier: 1.65, extraKmRate: 11 },
-      'Sedan':     { baseRate: 12, oneWayMultiplier: 1.70, extraKmRate: 12 },
-      'MUV':       { baseRate: 14, oneWayMultiplier: 1.85, extraKmRate: 14 },
-      'SUV':       { baseRate: 20, oneWayMultiplier: 2.00, extraKmRate: 20 }
-    };
-
-    let selectedTripType = 'One Way';
-    let selectedVehicle = 'Hatchback';
-    let baseFare = 0;
-    let currentDisplayKm = 0;
-    const driverAllowance = 300;
-    let currentDocId = '';
-    let currentBookingData = null;
-    let unsubscribeBooking = null;
-
-    let pickupCoords = null;
-    let dropCoords = null;
-    let pickupCityName = '';
-    let dropCityName = '';
-    let calculatedDistanceKm = 0;
-    let searchDebounceTimer = null;
-    let adminFixedRoutes = {};
-    let adminLocalRentals = {};
-
-    db.collection("pricing_rules").doc("fixed_routes").onSnapshot((doc) => {
-      if (doc.exists) { adminFixedRoutes = doc.data() || {}; updateDynamicVehicleFares(calculatedDistanceKm); }
-    });
-
-    db.collection("pricing_rules").doc("local_rentals").onSnapshot((doc) => {
-      if (doc.exists) { adminLocalRentals = doc.data() || {}; }
-    });
-
-    function toggleDrawer(open) {
-      const drawer = document.getElementById('sideDrawer');
-      const overlay = document.getElementById('drawerOverlay');
-      if (!drawer || !overlay) return;
-      if (open) {
-        overlay.classList.remove('hidden'); overlay.style.display = 'block'; drawer.style.transform = 'translateX(0%)';
-      } else {
-        drawer.style.transform = 'translateX(100%)';
-        setTimeout(() => { overlay.classList.add('hidden'); overlay.style.display = 'none'; }, 300);
-      }
-    }
-
-    function openModal(id) {
-      toggleDrawer(false);
-      const modal = document.getElementById(id);
-      if (modal) { modal.classList.remove('hidden'); modal.style.display = 'flex'; }
-      if (id === 'historyModal') renderBookingHistory();
-    }
-
-    function closeModal(id) {
-      const modal = document.getElementById(id);
-      if (modal) { modal.classList.add('hidden'); modal.style.display = 'none'; }
-    }
-
-    function initializeSchedulingRestrictions() {
-      const datePicker = document.getElementById('pickupDate');
-      const timePicker = document.getElementById('pickupTime');
-      const now = new Date();
-      const defaultTime = new Date(now.getTime() + (75 * 60 * 1000));
-      const rem = defaultTime.getMinutes() % 5;
-      if (rem !== 0) defaultTime.setMinutes(defaultTime.getMinutes() + (5 - rem));
-
-      if (datePicker) {
-        datePicker.min = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        if (!datePicker.value) datePicker.value = datePicker.min;
-      }
-      if (timePicker && !timePicker.value) {
-        timePicker.value = `${String(defaultTime.getHours()).padStart(2, '0')}:${String(defaultTime.getMinutes()).padStart(2, '0')}`;
-      }
-    }
-
-    function validateScheduleTiming() {
-      const dateInput = document.getElementById('pickupDate');
-      const timeInput = document.getElementById('pickupTime');
-      if (!dateInput || !timeInput) return true;
-      const [hours, minutes] = timeInput.value.split(':').map(Number);
-      const scheduleDateTime = new Date(`${dateInput.value}T00:00:00`);
-      scheduleDateTime.setHours(hours, minutes, 0, 0);
-      return scheduleDateTime >= new Date(Date.now() + (60 * 60 * 1000));
-    }
-
-    function formatDisplayTime(timeStr24) {
-      if (!timeStr24) return '';
-      const [h, m] = timeStr24.split(':').map(Number);
-      return `${String(h % 12 || 12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
-    }
-
-    function toggleCarrierAddon(checked) {
-      isCarrierRequired = checked;
-      updateDynamicVehicleFares(calculatedDistanceKm);
-    }
-
-    function loginWithGoogle() {
-      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then((result) => {
-        const u = result.user;
-        db.collection("customers").doc(u.uid).set({
-          name: u.displayName || '', email: u.email || '', photo: u.photoURL || '',
-          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-        closeModal('authModal'); toggleDrawer(false);
-      }).catch(err => alert("Error: " + err.message));
-    }
-
-    auth.onAuthStateChanged((user) => {
-      currentUser = user;
-      const indicator = document.getElementById('authIndicatorBadge');
-      if (user) {
-        if (indicator) { indicator.className = "text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md"; indicator.innerText = "Verified Customer"; }
-        document.getElementById('drawerUserTitle').innerText = user.displayName || user.email.split('@')[0];
-        document.getElementById('drawerUserSub').innerText = user.email;
-        document.getElementById('logoutBtn').classList.remove('hidden');
-        if (document.getElementById('custName') && !document.getElementById('custName').value) document.getElementById('custName').value = user.displayName || '';
-      } else {
-        if (indicator) { indicator.className = "text-[10px] text-rose-500 font-bold bg-rose-50 px-2 py-0.5 rounded-md"; indicator.innerText = "Login Required"; }
-        document.getElementById('drawerUserTitle').innerText = "Login / Sign In";
-        document.getElementById('logoutBtn').classList.add('hidden');
-      }
-    });
-
-    function handleEmailAuth(isSignUp) {
-      const email = document.getElementById('loginEmail').value.trim();
-      const pass = document.getElementById('loginPassword').value.trim();
-      const name = document.getElementById('loginName').value.trim();
-      const phone = document.getElementById('loginPhone').value.trim();
-
-      if (!email || pass.length < 6) return alert("Valid email aur 6-digit password daalein!");
-      if (isSignUp && (!name || phone.length < 10)) return alert("Full Name aur Phone number mandatory hai!");
-
-      if (isSignUp) {
-        auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
-          return db.collection("customers").doc(cred.user.uid).set({ name, phone, email });
-        }).then(() => { closeModal('authModal'); alert("Account created!"); }).catch(err => alert("Error: " + err.message));
-      } else {
-        auth.signInWithEmailAndPassword(email, pass).then(() => closeModal('authModal')).catch(err => alert("Error: " + err.message));
-      }
-    }
-
-    function logoutCustomer() { auth.signOut().then(() => location.reload()); }
-
-    function handleAddressSearch(query, type) {
-      clearTimeout(searchDebounceTimer);
-      const listContainer = document.getElementById(type === 'pickup' ? 'pickupSuggestions' : 'dropSuggestions');
-
-      if (selectedTripType === 'Airport Transfer') {
-        const pkg = document.getElementById('localPackageSelect').value;
-        const mustBeAirport = (type === 'pickup' && pkg === 'airport_pickup') || (type === 'drop' && pkg === 'airport_drop');
-
-        if (mustBeAirport) {
-          const qStr = query ? query.toLowerCase() : '';
-          const availableAirports = typeof airports !== 'undefined' ? airports : [];
-          const filtered = availableAirports.filter(a => a.name.toLowerCase().includes(qStr) || a.city.toLowerCase().includes(qStr));
-          const displayList = filtered.length > 0 ? filtered : availableAirports;
-
-          listContainer.innerHTML = displayList.map(a => 
-            `<div onclick="selectAirportLocation('${type}', '${a.name}', '${a.city}', ${a.lat}, ${a.lon})" class="p-2.5 hover:bg-blue-50 border-b cursor-pointer font-bold text-blue-900"><i class="fa-solid fa-plane mr-1"></i> ${a.name}</div>`
-          ).join('');
-          listContainer.classList.remove('hidden');
-          return;
-        }
-      }
-
-      if (!query || query.trim().length < 2) { listContainer.classList.add('hidden'); listContainer.innerHTML = ''; return; }
-
-      searchDebounceTimer = setTimeout(() => {
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=6&addressdetails=1`, { headers: { 'Accept-Language': 'en' } })
-          .then(res => res.json())
-          .then(data => {
-            if (selectedTripType === 'Airport Transfer') {
-              const pkg = document.getElementById('localPackageSelect').value;
-              const mustBeAirport = (type === 'pickup' && pkg === 'airport_pickup') || (type === 'drop' && pkg === 'airport_drop');
-              if (!mustBeAirport && data) {
-                data = data.filter(item => {
-                  const nameLower = (item.name || '').toLowerCase();
-                  const dispLower = (item.display_name || '').toLowerCase();
-                  return !nameLower.includes('airport') && !dispLower.includes('airport');
-                });
-              }
-            }
-            if (!data || data.length === 0) { listContainer.classList.add('hidden'); return; }
-            listContainer.innerHTML = data.map(item => {
-              const shortName = item.name || item.display_name.split(',')[0];
-              const subDetails = item.display_name.split(',').slice(1, 4).join(',');
-              const city = item.address?.city || item.address?.town || shortName;
-              return `
-                <div onclick="selectLocation('${type}', '${item.lat}', '${item.lon}', '${shortName.replace(/'/g, "\'")}, ${subDetails.replace(/'/g, "\'")}', '${city.replace(/'/g, "\'")}')" class="p-2.5 hover:bg-blue-50 border-b cursor-pointer flex items-start gap-2">
-                  <i class="fa-solid fa-location-dot text-blue-500 text-xs mt-0.5"></i>
-                  <div><p class="font-bold text-slate-800">${shortName}</p><p class="text-[10px] text-slate-400">${subDetails}</p></div>
-                </div>`;
-            }).join('');
-            listContainer.classList.remove('hidden');
-          });
-      }, 300);
-    }
-
-    function selectAirportLocation(type, name, city, lat = 23.2875, lon = 77.3375) {
-      if (type === 'pickup') {
-        document.getElementById('pickupLocation').value = name;
-        pickupCoords = { lat: lat, lon: lon };
-        pickupCityName = city ? city.trim().toLowerCase() : '';
-        document.getElementById('pickupSuggestions').classList.add('hidden');
-      } else {
-        document.getElementById('dropLocation').value = name;
-        dropCoords = { lat: lat, lon: lon };
-        dropCityName = city ? city.trim().toLowerCase() : '';
-        document.getElementById('dropSuggestions').classList.add('hidden');
-      }
-      if (typeof calculateRouteAndFare === 'function') {
-          calculateRouteAndFare();
-      } else {
-          updateDynamicVehicleFares(calculatedDistanceKm);
-      }
-    }
-
-    function selectLocation(type, lat, lon, fullAddress, city) {
-      if (type === 'pickup') {
-        document.getElementById('pickupLocation').value = fullAddress;
-        pickupCoords = { lat: parseFloat(lat), lon: parseFloat(lon) };
-        pickupCityName = city.trim().toLowerCase();
-        document.getElementById('pickupSuggestions').classList.add('hidden');
-      } else {
-        document.getElementById('dropLocation').value = fullAddress;
-        dropCoords = { lat: parseFloat(lat), lon: parseFloat(lon) };
-        dropCityName = city.trim().toLowerCase();
-        document.getElementById('dropSuggestions').classList.add('hidden');
-      }
-
-      if (selectedTripType === 'Airport Transfer' && pickupCityName && dropCityName && pickupCityName !== dropCityName) {
-        alert("⚠️ Airport Transfer rule: Pickup aur Drop same city ke andar hone chahiye!");
-      }
-
-      if (pickupCoords && dropCoords && selectedTripType !== 'Local Rental') calculateRoadDrivingDistance();
-      else updateDynamicVehicleFares(calculatedDistanceKm);
-    }
-
-    function calculateRoadDrivingDistance() {
-      const badgeBox = document.getElementById('distanceBadgeBox');
-      const badgeText = document.getElementById('distanceBadgeText');
-      if (badgeBox && badgeText) { badgeBox.classList.remove('hidden'); badgeText.innerHTML = `Calculating route...`; }
-
-      fetch(`https://router.project-osrm.org/route/v1/driving/${pickupCoords.lon},${pickupCoords.lat};${dropCoords.lon},${dropCoords.lat}?overview=false`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.code === "Ok" && data.routes?.[0]) {
-            calculatedDistanceKm = Math.round(data.routes[0].distance / 1000);
-            updateDynamicVehicleFares(calculatedDistanceKm);
-          }
-        });
-    }
-
-    function calculateSegmentFare(vehicleType, oneWayDistanceKm, tripType) {
-      const pkgSelect = document.getElementById('localPackageSelect');
-      const selectedPkg = pkgSelect ? pkgSelect.value : '';
-
-      if (tripType === 'Local Rental' && selectedPkg) {
-        const cityData = adminLocalRentals[pickupCityName || 'bhopal'] || adminLocalRentals['bhopal'] || {};
-        const cabPkg = cityData[vehicleType] || cityData['Sedan'];
-        if (cabPkg) return { fare: Number(cabPkg.baseFare) || 1800, isCsvPackage: true, displayKm: `${cabPkg.includedKm} KM / ${cabPkg.includedHours} Hrs` };
-        return { fare: selectedPkg === '4h/40km' ? 1800 : 3200, isCsvPackage: true, displayKm: selectedPkg };
-      }
-
-      if (tripType === 'Airport Transfer') {
-        const cityData = adminLocalRentals[pickupCityName || 'bhopal'] || adminLocalRentals['bhopal'] || {};
-        const cabPkg = cityData[vehicleType] || cityData['Sedan'];
-        return { fare: cabPkg ? Math.round(Number(cabPkg.baseFare) * 0.9) : 1600, isCsvPackage: true, displayKm: 'Airport Transfer Package' };
-      }
-
-      if (tripType === 'One Way' && (!pickupCityName || !dropCityName)) return { fare: 0, isCsvPackage: false, displayKm: '0 KM' };
-
-      if (pickupCityName && dropCityName && tripType === 'One Way') {
-        const fixedPackage = adminFixedRoutes[`${pickupCityName}-${dropCityName}`] || adminFixedRoutes[`${dropCityName}-${pickupCityName}`];
-        if (fixedPackage?.[vehicleType]) return { fare: Number(fixedPackage[vehicleType]), isCsvPackage: true, displayKm: `${oneWayDistanceKm || 56} KM` };
-      }
-
-      const config = CAB_CONFIG[vehicleType] || CAB_CONFIG['Sedan'];
-      const realDist = Number(oneWayDistanceKm) || 0;
-      if (realDist <= 0) return { fare: 0, isCsvPackage: false, displayKm: '0 KM' };
-
-      if (tripType === 'One Way') return { fare: Math.round(Math.max(50, realDist) * config.baseRate * config.oneWayMultiplier), isCsvPackage: false, displayKm: `${realDist} KM` };
-      if (tripType === 'Round Trip') return { fare: Math.round(Math.max(100, realDist * 2) * config.baseRate), isCsvPackage: false, displayKm: `${realDist * 2} KM` };
-      return { fare: Math.round(Math.max(50, realDist) * config.baseRate), isCsvPackage: false, displayKm: `${realDist} KM` };
-    }
-
-    function updateDynamicVehicleFares(distanceKm) {
-      const dist = distanceKm || calculatedDistanceKm || 0;
-      const hRes = calculateSegmentFare('Hatchback', dist, selectedTripType);
-      const sRes = calculateSegmentFare('Sedan', dist, selectedTripType);
-      const mRes = calculateSegmentFare('MUV', dist, selectedTripType);
-      const uRes = calculateSegmentFare('SUV', dist, selectedTripType);
-
-      document.getElementById('priceTagHatchback').innerText = hRes.fare > 0 ? `₹${(hRes.fare + driverAllowance).toLocaleString('en-IN')}` : '₹0';
-      document.getElementById('priceTagSedan').innerText = sRes.fare > 0 ? `₹${(sRes.fare + driverAllowance).toLocaleString('en-IN')}` : '₹0';
-      document.getElementById('priceTagMUV').innerText = mRes.fare > 0 ? `₹${(mRes.fare + driverAllowance).toLocaleString('en-IN')}` : '₹0';
-      document.getElementById('priceTagSUV').innerText = uRes.fare > 0 ? `₹${(uRes.fare + driverAllowance).toLocaleString('en-IN')}` : '₹0';
-
-      const cur = calculateSegmentFare(selectedVehicle, dist, selectedTripType);
-      baseFare = cur.fare > 0 ? cur.fare + driverAllowance : 0; 
-      currentDisplayKm = cur.displayKm;
-
-      document.getElementById('rateModeBadge').innerText = cur.isCsvPackage ? "CSV Package Active" : "All Exclusive Fare";
-      document.querySelectorAll('.inc-km-tag').forEach(el => el.innerText = `Included: ${currentDisplayKm}`);
-    }
-
-    function selectTripType(type, element) {
-      selectedTripType = type;
-      document.querySelectorAll('.trip-type-btn').forEach(btn => btn.className = "trip-type-btn py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-600");
-      element.className = "trip-type-btn py-2 text-xs font-semibold rounded-xl bg-blue-600 text-white";
-
-      const wrapper = document.getElementById('localPackageWrapper');
-      const selectBox = document.getElementById('localPackageSelect');
-      const dropContainer = document.getElementById('dropLocationContainer');
-      const dropInput = document.getElementById('dropLocation');
-      const pickupLabel = document.getElementById('pickupLabelText');
-
-      if (type === 'Local Rental') {
-        wrapper.classList.remove('hidden');
-        selectBox.innerHTML = `<option value="4h/40km">Local 4 Hours / 40 KM</option><option value="8h/80km">Local 8 Hours / 80 KM</option>`;
-        dropContainer.style.display = 'none'; dropInput.value = 'Local Rental'; dropCoords = { lat: 0, lon: 0 }; dropCityName = pickupCityName;
-        pickupLabel.innerText = "City / Locality *";
-      } else if (type === 'Airport Transfer') {
-        wrapper.classList.remove('hidden');
-        selectBox.innerHTML = `<option value="airport_pickup">Airport ➔ City Transfer</option><option value="airport_drop">City ➔ Airport Transfer</option>`;
-        dropContainer.style.display = 'block'; dropInput.value = ''; dropCoords = null; dropCityName = '';
-        pickupLabel.innerText = "Pickup Location (Select Airport or City) *";
-      } else {
-        wrapper.classList.add('hidden'); dropContainer.style.display = 'block'; dropInput.value = ''; dropCoords = null; dropCityName = '';
-        pickupLabel.innerText = "From (Pickup City/Locality)";
-      }
-      updateDynamicVehicleFares(calculatedDistanceKm);
-    }
-
-    function handlePackageChange() { updateDynamicVehicleFares(calculatedDistanceKm); }
-
-    function selectVehicle(name, element) {
-      selectedVehicle = name;
-      const res = calculateSegmentFare(name, calculatedDistanceKm || 0, selectedTripType);
-      baseFare = res.fare > 0 ? res.fare + driverAllowance : 0;
-      document.querySelectorAll('.vehicle-card').forEach(c => c.className = "flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card");
-      element.className = "flex items-center justify-between p-3 border-2 border-blue-600 bg-blue-50/50 rounded-xl cursor-pointer vehicle-card";
-      element.querySelector('input').checked = true;
-    }
-
-    function resetBookingForm() {
-      if (confirm('Reset form?')) {
-        document.getElementById('pickupLocation').value = '';
-        document.getElementById('dropLocation').value = '';
-        pickupCoords = null; dropCoords = null; calculatedDistanceKm = 0;
-        updateDynamicVehicleFares(0);
-      }
-    }
-
-    function handleBooking() {
-      if (!currentUser) { alert("🔒 Login anivarya hai!"); openModal('authModal'); return; }
-      if (!validateScheduleTiming()) return alert("⚠️ Kam se kam 1 ghanta aage ka samay chunein.");
-
-      const from = document.getElementById('pickupLocation').value.trim();
-      const to = document.getElementById('dropLocation').value.trim();
-      const name = document.getElementById('custName').value.trim();
-      const phone = document.getElementById('custPhone').value.trim();
-      const flightNotes = document.getElementById('flightNotes') ? document.getElementById('flightNotes').value.trim() : '';
-      const date = document.getElementById('pickupDate').value;
-      const rawTime = document.getElementById('pickupTime').value;
-
-      if (!from || (selectedTripType !== 'Local Rental' && !to) || !name || phone.length < 10 || baseFare <= 0) {
-        return alert("Kripya sabhi mandatory fields thik se bharein aur valid fare select karein!");
-      }
-
-      const carrierFee = isCarrierRequired ? carrierChargeAmount : 0;
-      const total = baseFare + carrierFee;
-      const bookingPayload = {
-        userId: currentUser.uid, bookingId: 'MTZ-' + Math.floor(1000 + Math.random() * 9000),
-        from, to, estimatedDistanceKm: calculatedDistanceKm || 56, includedKm: currentDisplayKm,
-        date, time: formatDisplayTime(rawTime), vehicle: selectedVehicle, type: selectedTripType,
-        name, phone, landmark: document.getElementById('custLandmark').value.trim() || 'Direct',
-        carrierRequired: isCarrierRequired, carrierCharge: carrierFee, baseFare: baseFare - driverAllowance,
-        driverAllowance: driverAllowance, total, pickupPay: Math.round(total * 0.45), dropPay: total - Math.round(total * 0.45),
-        bookedDate: new Date().toLocaleDateString(), status: 'Confirmation Pending',
-        driverName: '', driverPhone: '', cabNumber: '', createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
-      db.collection("bookings").add(bookingPayload).then((docRef) => {
-        currentDocId = docRef.id; currentBookingData = bookingPayload;
-        displayReceiptView(bookingPayload, docRef.id);
-        listenToBooking(docRef.id);
-      }).catch(err => alert("Error: " + err.message));
-    }
-
-    function viewBookingFromHistory(docId) {
-      closeModal('historyModal');
-      db.collection("bookings").doc(docId).get().then(doc => {
-        if (doc.exists) { currentDocId = docId; currentBookingData = doc.data(); displayReceiptView(doc.data(), docId); listenToBooking(docId); }
-      });
-    }
-
-    function displayReceiptView(data, docId) {
-      document.getElementById('bookingIdBadge').innerText = data.bookingId;
-      document.getElementById('receiptBookingDate').innerText = data.bookedDate || '';
-      document.getElementById('receiptPickup').innerText = data.from;
-      document.getElementById('receiptDrop').innerText = data.to;
-      document.getElementById('receiptDateTime').innerText = `${data.date} • ${data.time}`;
-      document.getElementById('receiptTripType').innerText = data.type;
-      document.getElementById('receiptVehicle').innerText = data.vehicle;
-      document.getElementById('receiptCustName').innerText = data.name;
-      document.getElementById('receiptCustPhone').innerText = data.phone;
-      document.getElementById('receiptCustLandmark').innerText = data.landmark;
-      document.getElementById('receiptTotalFare').innerText = '₹' + data.total.toLocaleString('en-IN');
-      document.getElementById('receiptPickupAmount').innerText = '₹' + data.pickupPay.toLocaleString('en-IN');
-      document.getElementById('receiptDropAmount').innerText = '₹' + data.dropPay.toLocaleString('en-IN');
-
-      const carrierRow = document.getElementById('receiptCarrierRow');
-      if (carrierRow) {
-        if (data.carrierRequired) { carrierRow.classList.remove('hidden'); document.getElementById('receiptCarrierFee').innerText = `+₹${data.carrierCharge || 300}`; }
-        else { carrierRow.classList.add('hidden'); }
-      }
-
-      document.getElementById('bookingSection').classList.add('hidden');
-      document.getElementById('receiptSection').classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function listenToBooking(docId) {
-      if (unsubscribeBooking) unsubscribeBooking();
-      unsubscribeBooking = db.collection("bookings").doc(docId).onSnapshot((doc) => {
-        if (!doc.exists) return;
-        const data = doc.data();
-        currentBookingData = data;
-
-        const headerBox = document.getElementById('receiptHeaderBox');
-        const statusBadge = document.getElementById('receiptStatusBadge');
-        const pendingState = document.getElementById('driverPendingState');
-        const confirmedState = document.getElementById('driverConfirmedState');
-        const cancelBtn = document.getElementById('cancelBookingBtn');
-
-        if (data.status === 'Confirmed') {
-          if (headerBox) headerBox.className = 'bg-blue-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
-          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Partner Confirmed & Assigned';
-          if (pendingState) pendingState.classList.add('hidden');
-          if (confirmedState) confirmedState.classList.remove('hidden');
-          document.getElementById('assignedDriverName').innerText = data.driverName || 'Verified Partner';
-          document.getElementById('assignedCabNumber').innerText = data.cabNumber || 'Assigned';
-          if (data.driverPhone) {
-            document.getElementById('assignedDriverPhoneContainer').innerHTML = `<a href="tel:${data.driverPhone}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200"><i class="fa-solid fa-phone text-[10px]"></i> ${data.driverPhone}</a>`;
-          }
-        } else if (data.status === 'Trip Started') {
-          if (headerBox) headerBox.className = 'bg-emerald-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
-          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> 🚗 Trip In Progress (Garage Out Done)';
-          if (pendingState) pendingState.classList.add('hidden');
-          if (confirmedState) confirmedState.classList.remove('hidden');
-          if (cancelBtn) cancelBtn.classList.add('hidden');
-        } else if (data.status === 'Trip Completed') {
-          if (headerBox) headerBox.className = 'bg-purple-600 text-white rounded-2xl p-5 shadow-sm mb-4 transition-colors';
-          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-white"></span> ✨ Trip Successfully Completed';
-          if (pendingState) pendingState.classList.add('hidden');
-          if (cancelBtn) cancelBtn.classList.add('hidden');
-        } else if (data.status === 'Cancelled') {
-          if (headerBox) headerBox.className = 'bg-slate-700 text-white rounded-2xl p-5 shadow-sm mb-4';
-          if (statusBadge) statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Cancelled';
-          if (pendingState) pendingState.classList.add('hidden');
-          if (confirmedState) confirmedState.classList.add('hidden');
-          if (cancelBtn) cancelBtn.classList.add('hidden');
-        }
-      });
-    }
-
-    function cancelCurrentBooking() {
-      if (!currentDocId || !currentBookingData) return;
-      if (confirm(`Cancellation policy anusaar cancel karein?`)) {
-        db.collection("bookings").doc(currentDocId).update({
-          status: 'Cancelled', cancelledBy: 'customer',
-          customerPenalty: Math.max(300, Math.min(1000, Math.round(Number(currentBookingData.total) * 0.10))),
-          cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => alert('Booking cancelled.'));
-      }
-    }
-
-    function renderBookingHistory() {
-      const container = document.getElementById('historyListContainer');
-      if (!currentUser) { container.innerHTML = `<div class="text-center py-6"><button onclick="openModal('authModal')" class="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold">Sign In</button></div>`; return; }
-      db.collection("bookings").orderBy("createdAt", "desc").limit(25).get().then((snapshot) => {
-        const docs = snapshot.docs.filter(doc => doc.data().userId === currentUser.uid);
-        if (docs.length === 0) { container.innerHTML = `<div class="text-center py-6 text-slate-400">No bookings found.</div>`; return; }
-        container.innerHTML = docs.map(doc => {
-          const item = doc.data();
-          return `
-            <div onclick="viewBookingFromHistory('${doc.id}')" class="bg-slate-50 hover:bg-blue-50 border rounded-2xl p-3 text-xs space-y-1.5 cursor-pointer">
-              <div class="flex justify-between font-bold text-blue-700"><span>${item.bookingId}</span><span>₹${item.total}</span></div>
-              <p class="text-slate-800">${item.from} ➔ ${item.to}</p>
-              <p class="text-[10px] text-slate-400">${item.date} • ${item.status}</p>
-            </div>`;
-        }).join('');
-      });
-    }
-
-    function backToBooking() {
-      document.getElementById('receiptSection').classList.add('hidden');
-      document.getElementById('bookingSection').classList.remove('hidden');
-    }
-
-    function sendToWhatsApp() {
-      const id = document.getElementById('bookingIdBadge').innerText;
-      const from = document.getElementById('receiptPickup').innerText;
-      const to = document.getElementById('receiptDrop').innerText;
-      const total = document.getElementById('receiptTotalFare').innerText;
-      window.open(`https://wa.me/918889637244?text=Booking%20ID:%20${id}%20Route:%20${from}%20to%20${to}%20Total:%20${total}`, '_blank');
-    }
-
-    window.addEventListener("load", () => {
-      document.getElementById('menuToggleBtn').addEventListener('click', () => toggleDrawer(true));
-      document.getElementById('drawerCloseBtn').addEventListener('click', () => toggleDrawer(false));
-      document.getElementById('drawerOverlay').addEventListener('click', () => toggleDrawer(false));
-      document.getElementById('drawerProfileTrigger').addEventListener('click', () => openModal('authModal'));
-      initializeSchedulingRestrictions();
-      updateDynamicVehicleFares(0);
-    });
-  </script>
-
-<!-- REDIRECT_PATCH_START -->
-<script>
-// Redirect Flights, Hotels, Buses to booking.tripvyom.in
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("a, button, div, span, li").forEach(el => {
-        const text = el.innerText ? el.innerText.trim().toLowerCase() : "";
-        if (text === "flights" || text === "hotels" || text === "buses") {
-            // Ensure it is a tab/nav item, not part of a long paragraph
-            if (el.tagName === "A" || el.tagName === "BUTTON" || el.className.includes("tab") || el.className.includes("nav") || el.innerText.trim().split(" ").length <= 2) {
-                el.style.cursor = "pointer";
-                el.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.location.href = "https://booking.tripvyom.in";
-                }, true);
-            }
-        }
-    });
-});
-</script>
-<!-- REDIRECT_PATCH_END -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- RUNTIME_OVERRIDE_START -->
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    if (typeof window.activeTripType === "undefined") {
-        window.activeTripType = "oneway";
-    }
-
-    // 1. Precise click listener on Trip Type buttons
-    document.addEventListener("click", (e) => {
-        const btn = e.target.closest("button, div, span, a");
-        if (!btn) return;
-        const txt = btn.innerText ? btn.innerText.trim() : "";
-        if (txt === "Round Trip") {
-            window.activeTripType = "round";
-        } else if (txt === "One Way") {
-            window.activeTripType = "oneway";
-        } else if (txt === "Local Rental") {
-            window.activeTripType = "local";
-        } else if (txt === "Airport Transfer") {
-            window.activeTripType = "airport";
-        }
-    }, true);
-
-    // 2. Setup Drop Fields with Check Fare button matching exact native styling
-    function setupDropFields() {
-        if (document.getElementById("tripDropDateTimeBox")) return;
+    <main class="max-w-xl mx-auto px-4 mt-6">
         
-        const pickupDateInput = document.querySelector("input[type=\x27date\x27]");
-        if (!pickupDateInput) return;
-        
-        const nativeWrapper = pickupDateInput.closest(".mb-3, .form-group, div");
-        if (nativeWrapper && nativeWrapper.parentElement) {
-            const parentRow = nativeWrapper.parentElement;
-            const computed = window.getComputedStyle(pickupDateInput);
-            const cssText = `
-                width: 100%;
-                padding: ${computed.padding};
-                height: ${computed.height};
-                border: ${computed.border};
-                border-radius: ${computed.borderRadius};
-                font-size: ${computed.fontSize};
-                font-family: ${computed.fontFamily};
-                color: ${computed.color};
-                background: ${computed.backgroundColor};
-                box-sizing: border-box;
-                outline: none;
-            `;
+        <form id="form-outstation" onsubmit="handleSearch(event, 'Outstation')" class="bg-white rounded-3xl shadow-xl border border-slate-100 p-5 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-extrabold text-base text-indigo-900 flex items-center space-x-2">
+                    <span>🚗</span> <span>Outstation Cab Booking</span>
+                </h3>
+                <span class="text-xs bg-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-full">₹0 Advance</span>
+            </div>
 
-            const box = document.createElement("div");
-            box.id = "tripDropDateTimeBox";
-            box.style.cssText = "display: none !important; margin-top: 15px; width: 100%; box-sizing: border-box;";
-            
-            box.innerHTML = `
-                <div style="display: flex; gap: 15px; width: 100%;">
-                    <div style="flex: 1; min-width: 0;">
-                        <label style="font-size: 14px; font-weight: 500; color: #333; display: block; margin-bottom: 8px;">Drop Date (Return)</label>
-                        <input type="date" id="returnDropDate" style="${cssText}">
-                    </div>
-                    <div style="flex: 1; min-width: 0;">
-                        <label style="font-size: 14px; font-weight: 500; color: #333; display: block; margin-bottom: 8px;">Drop Time (Return)</label>
-                        <input type="time" id="returnDropTime" value="18:00" style="${cssText}">
-                    </div>
+            <div class="grid grid-cols-2 gap-2">
+                <label onclick="setTripType('One Way')" id="card-oneway" class="border-2 border-indigo-600 bg-indigo-50/40 p-2.5 rounded-2xl cursor-pointer flex items-center justify-between text-xs font-bold">
+                    <span>One Way</span>
+                    <input type="radio" name="outType" checked class="text-indigo-600">
+                </label>
+                <label onclick="setTripType('Round Trip')" id="card-roundtrip" class="border border-slate-200 bg-white p-2.5 rounded-2xl cursor-pointer flex items-center justify-between text-xs font-semibold">
+                    <span>Round Trip</span>
+                    <input type="radio" name="outType" class="text-indigo-600">
+                </label>
+            </div>
+
+            <div class="space-y-2">
+                <div class="border rounded-2xl p-3 bg-slate-50">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase block">Pickup Location (FROM)</span>
+                    <input type="text" id="outFrom" list="addressList" value="Bhopal Junction, Habib Ganj, Bhopal" required class="w-full bg-transparent font-extrabold text-sm text-slate-800 outline-none mt-0.5">
                 </div>
-                <div style="margin-top: 10px; text-align: right;">
-                    <button type="button" id="checkFareBtn" style="background: #0056b3; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Check / Refresh Fare</button>
-                    <span id="fareRefreshMsg" style="margin-left: 10px; font-size: 12px; color: #28a745; font-weight: bold; display: none;">Fare Updated!</span>
+
+                <div id="stopContainer" class="hidden border rounded-2xl p-3 bg-slate-50 relative">
+                    <span class="text-[10px] text-blue-600 font-bold uppercase block">Via / Add a Stop</span>
+                    <input type="text" id="outStop" list="addressList" placeholder="Enter stop address or city" class="w-full bg-transparent font-extrabold text-sm text-slate-800 outline-none mt-0.5">
+                    <button type="button" onclick="removeStop()" class="absolute right-3 top-3 text-red-500 font-bold text-xs">Remove</button>
                 </div>
-            `;
-            parentRow.after(box);
 
-            document.getElementById("checkFareBtn").onclick = () => {
-                const dropLoc = document.getElementById("dropLocation");
-                if (dropLoc) {
-                    dropLoc.dispatchEvent(new Event("change", { bubbles: true }));
-                    dropLoc.dispatchEvent(new Event("input", { bubbles: true }));
-                }
+                <div class="border rounded-2xl p-3 bg-slate-50">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase block">Drop Location (TO)</span>
+                    <input type="text" id="outTo" list="addressList" value="Vijay Nagar, Square, Indore" required class="w-full bg-transparent font-extrabold text-sm text-slate-800 outline-none mt-0.5">
+                </div>
+            </div>
 
-                const calcBtn = Array.from(document.querySelectorAll("button, input[type=\x27button\x27]")).find(el => {
-                    const t = el.innerText ? el.innerText.toLowerCase() : "";
-                    return t.includes("calculate") || t.includes("search") || t.includes("fare") || t.includes("get") || t.includes("cabs");
-                });
-                if (calcBtn) calcBtn.click();
+            <div id="addStopBtnWrapper">
+                <button type="button" onclick="addStopField()" class="w-full border border-dashed border-indigo-300 text-indigo-600 font-bold text-xs py-2.5 rounded-2xl bg-indigo-50/50 hover:bg-indigo-50 transition">
+                    + Add a Stop (City / Sightseeing)
+                </button>
+            </div>
 
-                const duration = getTripDuration();
-                document.querySelectorAll(".card, .cab-item, div").forEach(card => {
-                    const priceTag = card.querySelector(".fare, .price, span, b");
-                    if (priceTag && priceTag.innerText && priceTag.innerText.includes("₹")) {
-                        const cardText = card.innerText.toLowerCase();
-                        if (cardText.includes("carrier") || cardText.includes("luggage") || cardText.includes("roof")) {
-                            priceTag.innerText = "+₹300";
-                            return;
-                        }
+            <div class="border rounded-2xl p-3 bg-slate-50">
+                <span class="text-[10px] text-slate-400 font-bold uppercase block">Journey Start Date & Time</span>
+                <input type="datetime-local" id="outDate" required class="w-full bg-transparent font-bold text-xs text-slate-800 outline-none mt-0.5">
+            </div>
 
-                        let ratePerKm = 11;
-                        if (cardText.includes("innova")) ratePerKm = 18;
-                        else if (cardText.includes("ertiga")) ratePerKm = 14;
-                        else if (cardText.includes("etios") || cardText.includes("sedan")) ratePerKm = 12;
-                        
-                        const distVal = window.lastStoredDist || 200;
-                        const baseMinKm = 250 * duration.days;
-                        const eff = Math.max(distVal * 2, baseMinKm);
-                        const newTotal = Math.round((eff * ratePerKm) + (duration.days * 300));
-                        
-                        priceTag.innerText = "₹" + newTotal.toLocaleString("en-IN");
-                        window.lastSelectedFare = priceTag.innerText;
-                    }
-                });
+            <div id="returnDateContainer" class="hidden border rounded-2xl p-3 bg-slate-50 border-indigo-200">
+                <span class="text-[10px] text-indigo-600 font-bold uppercase block">Return Date & Time</span>
+                <input type="datetime-local" id="outReturnDate" class="w-full bg-transparent font-bold text-xs text-slate-800 outline-none mt-0.5">
+            </div>
 
-                const msg = document.getElementById("fareRefreshMsg");
-                if (msg) {
-                    msg.style.display = "inline";
-                    setTimeout(() => { msg.style.display = "none"; }, 2000);
-                }
-            };
-        }
-    }
-
-    setupDropFields();
-    setInterval(setupDropFields, 500);
-
-    // 3. Control Visibility & Strict Validation
-    setInterval(() => {
-        const box = document.getElementById("tripDropDateTimeBox");
-        if (!box) return;
-
-        if (window.activeTripType === "round") {
-            box.style.setProperty("display", "block", "important");
-
-            const pDateInp = document.querySelector("input[type=\x27date\x27]");
-            const dDateInp = document.getElementById("returnDropDate");
-            const pTimeInp = document.querySelector("input[type=\x27time\x27]");
-            const dTimeInp = document.getElementById("returnDropTime");
-
-            if (pDateInp && pDateInp.value && dDateInp) {
-                dDateInp.min = pDateInp.value;
-                if (!dDateInp.value || dDateInp.value < pDateInp.value) {
-                    dDateInp.value = pDateInp.value;
-                }
-
-                if (dDateInp.value === pDateInp.value && pTimeInp && pTimeInp.value && dTimeInp) {
-                    if (dTimeInp.value < pTimeInp.value) {
-                        dTimeInp.value = pTimeInp.value;
-                    }
-                }
-            }
-        } else {
-            box.style.setProperty("display", "none", "important");
-        }
-    }, 150);
-
-    // 4. Helper for Duration (Days & Nights)
-    function getTripDuration() {
-        const pDate = document.querySelector("input[type=\x27date\x27]");
-        const dDate = document.getElementById("returnDropDate");
-        const pTime = document.querySelector("input[type=\x27time\x27]");
-        const dTime = document.getElementById("returnDropTime");
-
-        const box = document.getElementById("tripDropDateTimeBox");
-        if (!pDate || !pDate.value || !dDate || !dDate.value || window.activeTripType !== "round") {
-            return { days: 1, nights: 0 };
-        }
-
-        const start = new Date(pDate.value + " " + (pTime ? pTime.value : "08:00"));
-        const end = new Date(dDate.value + " " + (dTime ? dTime.value : "18:00"));
-
-        if (isNaN(start) || isNaN(end) || end <= start) return { days: 1, nights: 0 };
-
-        const diffMs = end - start;
-        const diffDays = Math.max(Math.ceil(diffMs / (1000 * 60 * 60 * 24)), 1);
-
-        let nights = 0;
-        let curr = new Date(start);
-        while (curr < end) {
-            let nStart = new Date(curr);
-            nStart.setHours(22, 0, 0, 0);
-            let nEnd = new Date(curr);
-            nEnd.setDate(nEnd.getDate() + 1);
-            nEnd.setHours(6, 0, 0, 0);
-
-            if ((curr.getHours() >= 22 || curr.getHours() < 6) || (end >= nStart && start <= nEnd)) {
-                nights++;
-            }
-            curr.setDate(curr.getDate() + 1);
-            curr.setHours(0, 0, 0, 0);
-        }
-
-        return { days: diffDays, nights: Math.max(nights, 0) };
-    }
-
-    window.lastSelectedFare = "₹0";
-
-    // 5. Fare Calculation Override
-    if (typeof window.calculateSegmentFare === "function") {
-        const oldCalc = window.calculateSegmentFare;
-        window.calculateSegmentFare = function(vType, dist, tType) {
-            const isRound = (window.activeTripType === "round");
-
-            if (isRound) {
-                window.lastStoredDist = dist;
-                const dropVal = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value.toLowerCase() : "";
-                const s250 = ["madhya pradesh", "rajasthan", "uttar pradesh", "delhi", "chhattisgarh", "haryana", "punjab", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "chaksu", "ujjain", "indore"];
-                const s300 = ["maharashtra", "gujarat", "goa", "tamil nadu", "telangana", "andhra pradesh", "west bengal", "jharkhand", "odisha"];
+            <div class="space-y-2 pt-2 border-t">
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Select Vehicle & Fares</label>
                 
-                let baseMinKmPerDay = 250;
-                let matched = false;
-                for (let s of s250) { if (dropVal.includes(s)) { baseMinKmPerDay = 250; matched = true; break; } }
-                if (!matched) { for (let s of s300) { if (dropVal.includes(s)) { baseMinKmPerDay = 300; matched = true; break; } } }
-                if (!matched) { baseMinKmPerDay = 250; }
-
-                const duration = getTripDuration();
-                const totalMinKm = baseMinKmPerDay * duration.days;
-                
-                const rDist = Number(dist) || 0;
-                const effKm = Math.max(rDist * 2, totalMinKm);
-                const cfg = (typeof CAB_CONFIG !== "undefined" && CAB_CONFIG[vType]) ? CAB_CONFIG[vType] : { baseRate: 11 };
-
-                let baseFare = effKm * cfg.baseRate;
-                let driverAllowance = duration.days * 300;
-
-                let totalFare = Math.round(baseFare + driverAllowance);
-                window.lastSelectedFare = "₹" + totalFare.toLocaleString("en-IN");
-
-                return {
-                    fare: totalFare,
-                    isCsvPackage: false,
-                    displayKm: effKm + " KM (" + duration.days + " Day(s))"
-                };
-            }
-            return oldCalc(vType, dist, tType);
-        };
-    }
-
-    document.addEventListener("click", (e) => {
-        const card = e.target.closest("div, label");
-        if (card) {
-            const txt = card.innerText.toLowerCase();
-            if (txt.includes("carrier") || txt.includes("luggage") || txt.includes("roof")) return;
-            const priceEl = card.querySelector(".fare, .price, span, b");
-            if (priceEl && priceEl.innerText && priceEl.innerText.includes("₹")) {
-                window.lastSelectedFare = priceEl.innerText.trim();
-            }
-        }
-    }, true);
-
-    // 6. Carrier Lock & Correct Pricing Display (+₹300 flat)
-    setInterval(() => {
-        const drop = document.getElementById("dropLocation");
-        if (!drop) return;
-        const val = drop.value.toLowerCase();
-        const rajKeys = ["rajasthan", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "bhilwara", "sikar", "pali", "chaksu", "ujjain", "indore", "madhya pradesh"];
-        const isRaj = rajKeys.some(k => val.includes(k));
-        
-        document.querySelectorAll("input[type=\x27checkbox\x27]").forEach(cb => {
-            const lbl = cb.closest("label") || cb.parentElement;
-            const txt = lbl ? lbl.innerText.toLowerCase() : "";
-            if (txt.includes("roof") || txt.includes("carrier") || txt.includes("luggage")) {
-                cb.checked = false;
-                cb.disabled = isRaj;
-                if (lbl) {
-                    lbl.style.opacity = isRaj ? "0.4" : "1";
-                    lbl.style.pointerEvents = isRaj ? "none" : "auto";
-                }
-                const priceSpan = lbl.querySelector(".fare, .price, span, b") || lbl.nextElementSibling;
-                if (priceSpan && !priceSpan.innerText.includes("300")) {
-                    priceSpan.innerText = "+₹300";
-                }
-            }
-        });
-    }, 400);
-
-    // 7. Booking Preview Modal
-    const bookBtns = document.querySelectorAll("button, input[type=\x27submit\x27]");
-    bookBtns.forEach(btn => {
-        const txt = btn.innerText ? btn.innerText.toLowerCase() : "";
-        if (txt.includes("book") || txt.includes("confirm") || txt.includes("proceed")) {
-            btn.addEventListener("click", function(e) {
-                if (!window.previewConfirmed && !document.getElementById("currentPreviewModal")) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    const pickup = document.getElementById("pickupLocation") ? document.getElementById("pickupLocation").value : "Pickup";
-                    const drop = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value : "Drop";
-                    const duration = getTripDuration();
-                    const driverAmt = duration.days * 300;
-                    const nightAmt = duration.nights * 300;
-
-                    const nightText = nightAmt > 0 
-                        ? `₹300 × ${duration.nights} = ₹${nightAmt} (Direct Payment to Driver)` 
-                        : `₹300 (Not Included / Direct Payment to Driver if applicable)`;
-
-                    const modal = document.createElement("div");
-                    modal.id = "currentPreviewModal";
-                    modal.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; display:flex; align-items:center; justify-content:center;";
-                    modal.innerHTML = `
-                        <div style="background:#fff; padding:25px; border-radius:10px; width:90%; max-width:420px; box-shadow:0 4px 15px rgba(0,0,0,0.3); font-family:sans-serif;">
-                            <h3 style="margin-top:0; color:#333; border-bottom:1px solid #eee; padding-bottom:10px;">Booking Preview & Terms</h3>
-                            <p style="margin:5px 0;"><strong>From:</strong> ${pickup}</p>
-                            <p style="margin:5px 0;"><strong>To:</strong> ${drop}</p>
-                            <div style="background:#f8f9fa; padding:12px; border-radius:6px; margin:12px 0; font-size:13px; line-height:1.6;">
-                                <p style="margin:3px 0; font-size:15px; color:#0056b3; font-weight:bold;">Total Confirm Fare: ${window.lastSelectedFare}</p>
-                                <hr style="border:0; border-top:1px solid #dee2e6; margin:8px 0;">
-                                <p style="margin:3px 0;">Trip Duration: <strong>${duration.days} Day(s)</strong></p>
-                                <p style="margin:3px 0;">Driver Allowance: ₹300 × ${duration.days} = <strong>₹${driverAmt} (Included in Fare)</strong></p>
-                                <p style="margin:3px 0; color:#d9534f;">Night Allowance (10 PM - 6 AM): <strong>${nightText}</strong></p>
-                                <p style="margin:3px 0; color:#0056b3; font-weight:bold;">Toll, State Tax & Parking Extra (Paid directly)</p>
-                            </div>
-                            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
-                                <button id="cancelPreview" style="padding:8px 15px; border:1px solid #ccc; background:#fff; border-radius:5px; cursor:pointer;">Edit</button>
-                                <button id="confirmBookingFinal" style="padding:8px 15px; background:#0056b3; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Confirm Booking</button>
-                            </div>
+                <label class="flex items-center justify-between p-3 rounded-2xl border-2 border-indigo-600 bg-indigo-50/30 cursor-pointer">
+                    <div class="flex items-center space-x-2">
+                        <input type="radio" name="outVehicle" checked class="text-indigo-600">
+                        <div>
+                            <div class="font-bold text-xs">Hatchback</div>
+                            <div class="text-[10px] text-slate-500">WagonR, Swift • 4 Seats</div>
                         </div>
-                    `;
-                    document.body.appendChild(modal);
+                    </div>
+                    <span id="price-hatchback" class="font-extrabold text-sm text-indigo-900">₹3,676</span>
+                </label>
 
-                    document.getElementById("cancelPreview").onclick = () => modal.remove();
-                    document.getElementById("confirmBookingFinal").onclick = () => {
-                        window.previewConfirmed = true;
-                        modal.remove();
+                <label class="flex items-center justify-between p-3 rounded-2xl border border-slate-200 bg-white cursor-pointer">
+                    <div class="flex items-center space-x-2">
+                        <input type="radio" name="outVehicle" class="text-indigo-600">
+                        <div>
+                            <div class="font-bold text-xs">Sedan</div>
+                            <div class="text-[10px] text-slate-500">Dzire, Etios • 4 Seats</div>
+                        </div>
+                    </div>
+                    <span id="price-sedan" class="font-extrabold text-sm text-slate-900">₹4,094</span>
+                </label>
 
-                        setTimeout(() => {
-                            const successBox = document.querySelector(".booking-error, .success-card, #bookingResult, .confirmation-details, form") || document.body;
-                            const termsCard = document.createElement("div");
-                            termsCard.style.cssText = "background:#eef9ff; border:1px solid #bce8f1; padding:15px; margin:15px 0; border-radius:8px; font-size:13px; color:#31708f; box-sizing:border-box;";
-                            termsCard.innerHTML = `
-                                <h4 style="margin:0 0 8px 0; color:#0056b3;">Booking Terms & Fare Breakdown</h4>
-                                <ul style="margin:0; padding-left:20px; line-height:1.5;">
-                                    <li>Total Fare: <strong>${window.lastSelectedFare}</strong></li>
-                                    <li>Trip Duration: <strong>${duration.days} Day(s)</strong></li>
-                                    <li>Driver Allowance: <strong>₹${driverAmt}</strong> (Included in online booking)</li>
-                                    <li>Night Allowance (10 PM - 6 AM): <strong>${nightText}</strong></li>
-                                    <li>Toll, State Tax & Parking: Extra as per actuals (Paid directly)</li>
-                                </ul>
-                            `;
-                            successBox.prepend(termsCard);
-                        }, 1200);
+                <label class="flex items-center justify-between p-3 rounded-2xl border border-slate-200 bg-white cursor-pointer">
+                    <div class="flex items-center space-x-2">
+                        <input type="radio" name="outVehicle" class="text-indigo-600">
+                        <div>
+                            <div class="font-bold text-xs">Ertiga (MUV)</div>
+                            <div class="text-[10px] text-slate-500">Maruti Ertiga • 6-7 Seats</div>
+                        </div>
+                    </div>
+                    <span id="price-ertiga" class="font-extrabold text-sm text-slate-900">₹5,117</span>
+                </label>
 
-                        btn.click();
-                    };
+                <label class="flex items-center justify-between p-3 rounded-2xl border border-slate-200 bg-white cursor-pointer">
+                    <div class="flex items-center space-x-2">
+                        <input type="radio" name="outVehicle" class="text-indigo-600">
+                        <div>
+                            <div class="font-bold text-xs">Innova Crysta</div>
+                            <div class="text-[10px] text-slate-500">Toyota Crysta • 6-7 Seats</div>
+                        </div>
+                    </div>
+                    <span id="price-innova" class="font-extrabold text-sm text-slate-900">₹7,740</span>
+                </label>
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3.5 rounded-2xl shadow-xl transition text-sm">
+                BOOK OUTSTATION CAB 🚀
+            </button>
+        </form>
+
+        <form id="form-airport" onsubmit="handleSearch(event, 'Airport')" class="bg-white rounded-3xl shadow-xl border border-slate-100 p-5 space-y-4 hidden">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-extrabold text-base text-blue-900 flex items-center space-x-2">
+                    <span>✈️🚖</span> <span>Airport Taxi Booking</span>
+                </h3>
+                <span class="text-xs bg-blue-100 text-blue-700 font-bold px-2.5 py-1 rounded-full">24/7 Available</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <label class="border-2 border-blue-600 bg-blue-50/40 p-2.5 rounded-2xl cursor-pointer flex items-center justify-between text-xs font-bold">
+                    <span>To Airport</span>
+                    <input type="radio" name="airDir" checked>
+                </label>
+                <label class="border border-slate-200 bg-white p-2.5 rounded-2xl cursor-pointer flex items-center justify-between text-xs font-semibold">
+                    <span>From Airport</span>
+                    <input type="radio" name="airDir">
+                </label>
+            </div>
+
+            <div class="space-y-2">
+                <div class="border rounded-2xl p-3 bg-slate-50">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase block">Airport Name (Rich Code & City)</span>
+                    <input type="text" id="airName" list="airportList" value="Devi Ahilyabai Holkar Airport (IDR) - Indore, MP" required class="w-full bg-transparent font-extrabold text-sm text-slate-800 outline-none mt-0.5">
+                </div>
+                <div class="border rounded-2xl p-3 bg-slate-50">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase block">City Location / Address Drop</span>
+                    <input type="text" id="airLoc" list="addressList" placeholder="Enter hotel or locality address" required class="w-full bg-transparent font-extrabold text-sm text-slate-800 outline-none mt-0.5">
+                </div>
+            </div>
+
+            <div class="border rounded-2xl p-3 bg-slate-50">
+                <span class="text-[10px] text-slate-400 font-bold uppercase block">Pickup Date & Time</span>
+                <input type="datetime-local" id="airDate" required class="w-full bg-transparent font-bold text-xs text-slate-800 outline-none mt-0.5">
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 rounded-2xl shadow-xl transition text-sm">
+                BOOK AIRPORT TAXI ✈️
+            </button>
+        </form>
+
+        <form id="form-local" onsubmit="handleSearch(event, 'Local Rentals')" class="bg-white rounded-3xl shadow-xl border border-slate-100 p-5 space-y-4 hidden">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-extrabold text-base text-amber-900 flex items-center space-x-2">
+                    <span>⏱️</span> <span>Local Hourly Rentals</span>
+                </h3>
+                <span class="text-xs bg-amber-100 text-amber-700 font-bold px-2.5 py-1 rounded-full">City Package</span>
+            </div>
+
+            <div class="border rounded-2xl p-3 bg-slate-50">
+                <span class="text-[10px] text-slate-400 font-bold uppercase block">Pickup City & Area</span>
+                <input type="text" id="localCity" list="addressList" value="Indore City, Madhya Pradesh" required class="w-full bg-transparent font-extrabold text-sm text-slate-800 outline-none mt-0.5">
+            </div>
+
+            <div class="border rounded-2xl p-3 bg-slate-50">
+                <span class="text-[10px] text-slate-400 font-bold uppercase block">Rental Package</span>
+                <select id="localPkg" class="w-full bg-transparent font-extrabold text-sm text-slate-800 outline-none mt-0.5">
+                    <option value="4 Hours / 40 Kms">4 Hours / 40 Kms</option>
+                    <option value="8 Hours / 80 Kms" selected>8 Hours / 80 Kms</option>
+                    <option value="12 Hours / 120 Kms">12 Hours / 120 Kms</option>
+                </select>
+            </div>
+
+            <div class="border rounded-2xl p-3 bg-slate-50">
+                <span class="text-[10px] text-slate-400 font-bold uppercase block">Pickup Date & Time</span>
+                <input type="datetime-local" id="localDate" required class="w-full bg-transparent font-bold text-xs text-slate-800 outline-none mt-0.5">
+            </div>
+
+            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-extrabold py-3.5 rounded-2xl shadow-xl transition text-sm">
+                BOOK LOCAL RENTAL ⏱️
+            </button>
+        </form>
+
+    </main>
+
+    <datalist id="airportList">
+        <option value="Devi Ahilyabai Holkar Airport (IDR) - Indore, MP">
+        <option value="Raja Bhoj Airport (BHO) - Bhopal, MP">
+        <option value="Dumna Airport (JLR) - Jabalpur, MP">
+        <option value="Gwalior Airport (GWL) - Gwalior, MP">
+        <option value="Indira Gandhi International Airport (DEL) - New Delhi">
+        <option value="Chhatrapati Shivaji Maharaj International Airport (BOM) - Mumbai, MH">
+    </datalist>
+
+    <datalist id="addressList">
+        <option value="Bhopal Junction, Habib Ganj, Bhopal">
+        <option value="MP Nagar Zone 1, Near DB Mall, Bhopal">
+        <option value="Vijay Nagar Square, AB Road, Indore">
+        <option value="Rajwada Palace, Central Indore, Indore">
+        <option value="Mahakaleshwar Jyotirlinga Temple, Ujjain">
+        <option value="Dewas Bypass Road, Dewas">
+        <option value="Omkareshwar Temple Ghat, Khandwa">
+        <option value="Connaught Place, Central Delhi, New Delhi">
+        <option value="Bandra Kurla Complex (BKC), Mumbai, MH">
+    </datalist>
+
+    <div id="myBookingsModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-extrabold text-lg text-slate-800">📋 My Bookings / Rides</h3>
+                <button onclick="closeMyBookings()" class="text-slate-400 font-bold text-lg">&times;</button>
+</div>
+            <div id="bookingsListContainer" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <div id="signupModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-extrabold text-lg text-slate-800">👤 Signup / Login</h3>
+                <button onclick="closeSignupModal()" class="text-slate-400 font-bold text-lg">&times;</button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-slate-500 block mb-1">Mobile Number</label>
+                    <input type="tel" id="signupPhone" placeholder="Enter 10-digit mobile" class="w-full border rounded-xl p-3 text-sm outline-none font-bold">
+                </div>
+                <button onclick="handleSignup()" class="w-full bg-blue-600 text-white font-extrabold py-3 rounded-xl shadow">Get OTP & Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 px-4 flex justify-around items-center z-50 shadow-lg max-w-xl mx-auto">
+        <div class="flex flex-col items-center text-blue-600 cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+            <span class="text-lg">🏠</span>
+            <span class="text-[10px] font-bold">Home</span>
+        </div>
+        <div class="flex flex-col items-center text-slate-400 cursor-pointer" onclick="openMyBookings()">
+            <span class="text-lg">📋</span>
+            <span class="text-[10px] font-medium">My Bookings</span>
+        </div>
+        <div class="flex flex-col items-center -mt-6 cursor-pointer" onclick="window.location.href='/partner.html'">
+            <div class="w-12 h-12 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-full flex items-center justify-center text-white shadow-lg border-2 border-white text-xl">
+                🤝
+            </div>
+        </div>
+        <div class="flex flex-col items-center text-slate-400 cursor-pointer" onclick="window.location.href='/admin.html'">
+            <span class="text-lg">⚙️</span>
+            <span class="text-[10px] font-medium">Admin</span>
+        </div>
+    </nav>
+
+    <script>
+        let currentSegment = 'outstation';
+        let activeTripType = 'One Way';
+
+        function switchCabTab(segment) {
+            currentSegment = segment;
+            ['outstation', 'airport', 'local'].forEach(s => {
+                const form = document.getElementById('form-' + s);
+                const tile = document.getElementById('tile-' + s);
+                if(form && tile) {
+                    if(s === segment) {
+                        form.classList.remove('hidden');
+                        if(s === 'outstation') {
+                            tile.className = "bg-indigo-50 p-3 rounded-2xl border-2 border-indigo-500 shadow-sm flex flex-col items-center cursor-pointer transition";
+                            tile.querySelector('span:last-child').className = "text-xs font-extrabold text-indigo-900";
+                        } else if(s === 'airport') {
+                            tile.className = "bg-blue-50 p-3 rounded-2xl border-2 border-blue-500 shadow-sm flex flex-col items-center cursor-pointer transition";
+                            tile.querySelector('span:last-child').className = "text-xs font-extrabold text-blue-900";
+                        } else {
+                            tile.className = "bg-amber-50 p-3 rounded-2xl border-2 border-amber-500 shadow-sm flex flex-col items-center cursor-pointer transition";
+                            tile.querySelector('span:last-child').className = "text-xs font-extrabold text-amber-900";
+                        }
+                    } else {
+                        form.classList.add('hidden');
+                        tile.className = "bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center cursor-pointer transition";
+                        tile.querySelector('span:last-child').className = "text-xs font-bold text-slate-700";
+                    }
                 }
-            }, true);
-        }
-    });
-
-    // 8. Programmatic SEO Engine for tripvyom.in
-    const allTravelKeywords = [
-        "Outstation cab service", "Outstation cab", "Outstation taxi service", "Outstation taxi",
-        "Travel agent from bhopal", "Bhopal taxi service", "Intercity cab", "Cab from bhopal",
-        "Taxi from bhopal", "Bhopal to indore taxi", "Indore to ujjain taxi", "Bhopal to indore cab",
-        "Taxi service in bhopal", "Cab service in bhopal", "Best cab service in bhopal", "Best cab service in indore",
-        "Cheap flights from bhopal", "Bhopal to delhi flight booking", "Indore to mumbai flight tickets",
-        "Bhopal to indore bus booking", "Bus ticket booking online", "AC bus from bhopal to jaipur",
-        "Best hotels in ujjain", "Hotel booking in bhopal", "Luxury hotels in udaipur", "Budget hotel booking online"
-    ];
-
-    const top250Hubs = [
-        "Bhopal", "Indore", "Ujjain", "Gwalior", "Jabalpur", "Sagar", "Rewa",
-        "Jaipur", "Udaipur", "Jodhpur", "Kota", "Ajmer", "Bikaner", "Alwar", "Pushkar",
-        "Delhi", "Gurugram", "Noida", "Lucknow", "Kanpur", "Agra", "Varanasi",
-        "Mumbai", "Pune", "Nagpur", "Nashik", "Ahmedabad", "Surat", "Vadodara",
-        "Bengaluru", "Mysuru", "Hyderabad", "Chennai", "Kolkata", "Patna", "Ranchi"
-    ];
-
-    function updateProgrammaticSEO() {
-        let activeTab = "Cabs";
-        const activeBtn = document.querySelector(".nav-link.active, .tab.active, button.active");
-        if (activeBtn) activeTab = activeBtn.innerText.trim();
-
-        const pickup = document.getElementById("pickupLocation") ? document.getElementById("pickupLocation").value : "Bhopal";
-        const drop = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value : "Indore";
-
-        let title = "Tripvyom.in | Outstation Cabs, Flights, Buses & Hotels Booking";
-        let desc = "Book outstation cabs, cheap flights, luxury buses, and verified hotels across 250+ Indian cities with best price guarantee on tripvyom.in.";
-
-        if (activeTab.includes("Flight") || window.activeCategory === "flights") {
-            title = `Book Cheap Flights from ${pickup} to ${drop} | Airfare Deals - Tripvyom`;
-            desc = `Find and book low-cost flight tickets across 250+ cities instantly on tripvyom.in. Compare airline schedules and get exclusive discounts.`;
-        } else if (activeTab.includes("Bus") || window.activeCategory === "buses") {
-            title = `${pickup} to ${drop} Bus Booking: AC/Non-AC Tickets & Timings - Tripvyom`;
-            desc = `Book online bus tickets across top Indian cities. Verified operators, live tracking, and best price guarantee on tripvyom.in.`;
-        } else if (activeTab.includes("Hotel") || window.activeCategory === "hotels") {
-            title = `Best Hotels in ${drop || pickup} | Budget & Luxury Hotel Booking - Tripvyom`;
-            desc = `Explore top-rated hotels with verified reviews, amenities, and best price guarantee across 250+ destinations on tripvyom.in.`;
-        } else {
-            title = `Outstation Cab Service & Taxi Booking from ${pickup} | Tripvyom`;
-            desc = `Looking for an outstation cab or reliable travel agent from Bhopal? Book outstation taxi services with transparent pricing on tripvyom.in.`;
+            });
+            window.scrollTo({ top: 150, behavior: 'smooth' });
         }
 
-        document.title = title;
+        function setTripType(type) {
+            activeTripType = type;
+            const returnContainer = document.getElementById('returnDateContainer');
+            
+            if(type === 'One Way') {
+                document.getElementById('card-oneway').className = "border-2 border-indigo-600 bg-indigo-50/40 p-2.5 rounded-2xl cursor-pointer flex items-center justify-between text-xs font-bold";
+                document.getElementById('card-oneway').querySelector('input').checked = true;
+                document.getElementById('card-roundtrip').className = "border border-slate-200 bg-white p-2.5 rounded-2xl cursor-pointer flex items-center justify-between text-xs font-semibold";
+                document.getElementById('card-roundtrip').querySelector('input').checked = false;
 
-        let metaDesc = document.querySelector("meta[name=\x27description\x27]");
-        if (!metaDesc) {
-            metaDesc = document.createElement("meta");
-            metaDesc.name = "description";
-            document.head.appendChild(metaDesc);
+                returnContainer.classList.add('hidden');
+
+                document.getElementById('price-hatchback').innerText = "₹3,676";
+                document.getElementById('price-sedan').innerText = "₹4,094";
+                document.getElementById('price-ertiga').innerText = "₹5,117";
+                document.getElementById('price-innova').innerText = "₹7,740";
+            } else {
+                document.getElementById('card-roundtrip').className = "border-2 border-indigo-600 bg-indigo-50/40 p-2.5 rounded-2xl cursor-pointer flex items-center justify-between text-xs font-bold";
+                document.getElementById('card-roundtrip').querySelector('input').checked = true;
+                document.getElementById('card-oneway').className = "border border-slate-200 bg-white p-2.5 rounded-2xl cursor-pointer flex items-center justify-between text-xs font-semibold";
+                document.getElementById('card-oneway').querySelector('input').checked = false;
+
+                returnContainer.classList.remove('hidden');
+
+                document.getElementById('price-hatchback').innerText = "₹6,850";
+                document.getElementById('price-sedan').innerText = "₹7,450";
+                document.getElementById('price-ertiga').innerText = "₹9,500";
+                document.getElementById('price-innova').innerText = "₹13,800";
+            }
         }
-        metaDesc.content = desc;
 
-        let metaKeys = document.querySelector("meta[name=\x27keywords\x27]");
-        if (!metaKeys) {
-            metaKeys = document.createElement("meta");
-            metaKeys.name = "keywords";
-            document.head.appendChild(metaKeys);
+        function addStopField() {
+            document.getElementById('stopContainer').classList.remove('hidden');
+            document.getElementById('addStopBtnWrapper').classList.add('hidden');
         }
-        metaKeys.content = allTravelKeywords.join(", ");
-    }
 
-    function injectSchemaMarkup() {
-        if (document.getElementById("tripSchema")) return;
-        const schema = document.createElement("script");
-        schema.id = "tripSchema";
-        schema.type = "application/ld+json";
-        schema.text = JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "TravelAgency",
-            "name": "Tripvyom",
-            "url": "https://tripvyom.in",
-            "logo": "https://tripvyom.in/logo.png",
-            "description": "Comprehensive travel platform providing outstation cabs, flights, buses, and hotels across 250+ Indian cities.",
-            "areaServed": top250Hubs,
-            "knowsAbout": allTravelKeywords,
-            "priceRange": "₹₹"
-        });
-        document.head.appendChild(schema);
-    }
+        function removeStop() {
+            document.getElementById('outStop').value = '';
+            document.getElementById('stopContainer').classList.add('hidden');
+            document.getElementById('addStopBtnWrapper').classList.remove('hidden');
+        }
 
-    updateProgrammaticSEO();
-    injectSchemaMarkup();
-    setInterval(updateProgrammaticSEO, 2000);
-});
-</script>
-<!-- RUNTIME_OVERRIDE_END -->
+        function handleSearch(event, category) {
+            event.preventDefault();
+            let route = '';
 
+            if(category === 'Outstation') {
+                const from = document.getElementById('outFrom').value;
+                const to = document.getElementById('outTo').value;
+                const stop = document.getElementById('outStop').value;
+                const viaText = stop ? ` (via ${stop})` : '';
+                route = `Outstation (${activeTripType})${viaText}: ${from} ➔ ${to}`;
+            } else if(category === 'Airport') {
+                const airport = document.getElementById('airName').value;
+                const loc = document.getElementById('airLoc').value;
+                route = `Airport Taxi: ${airport} ➔ ${loc}`;
+            } else if(category === 'Local Rentals') {
+                const city = document.getElementById('localCity').value;
+                const pkg = document.getElementById('localPkg').value;
+                route = `Local Rental (${city}) - ${pkg}`;
+            }
+
+            const newBooking = {
+                id: 'TV-' + Math.floor(100000 + Math.random() * 900000),
+                route,
+                category,
+                timestamp: new Date().toLocaleString()
+            };
+
+            let existingBookings = JSON.parse(localStorage.getItem('tripvyom_user_bookings') || '[]');
+            existingBookings.unshift(newBooking);
+            localStorage.setItem('tripvyom_user_bookings', JSON.stringify(existingBookings));
+
+            alert("Search Success! Booking ID: " + newBooking.id);
+            openMyBookings();
+        }
+
+        function openMyBookings() {
+            const modal = document.getElementById('myBookingsModal');
+            const container = document.getElementById('bookingsListContainer');
+            const bookings = JSON.parse(localStorage.getItem('tripvyom_user_bookings') || '[]');
+
+            if(bookings.length === 0) {
+                container.innerHTML = `<p class="text-center text-sm text-slate-400 py-6">Koi active bookings nahi mili!</p>`;
+            } else {
+                container.innerHTML = bookings.map(b => `
+                    <div class="border rounded-2xl p-4 bg-slate-50 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-extrabold text-blue-600">${b.id}</span>
+                            <span class="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Confirmed</span>
+                        </div>
+                        <div class="text-sm font-bold text-slate-800">${b.route}</div>
+                        <div class="text-xs text-slate-500">Segment: <b>${b.category}</b></div>
+                    </div>
+                `).join('');
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeMyBookings() {
+            document.getElementById('myBookingsModal').classList.add('hidden');
+        }
+
+        function openSignupModal() {
+            document.getElementById('signupModal').classList.remove('hidden');
+        }
+
+        function closeSignupModal() {
+            document.getElementById('signupModal').classList.add('hidden');
+        }
+
+        function handleSignup() {
+            const phone = document.getElementById('signupPhone').value;
+            if(phone.length < 10) {
+                alert("Kripya sahi 10-digit mobile number enter karein.");
+                return;
+            }
+            alert("OTP sent successfully to " + phone);
+            closeSignupModal();
+        }
+    </script>
 </body>
 </html>
