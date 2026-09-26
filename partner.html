@@ -746,8 +746,6 @@
       } else {
         myRidesContainer.innerHTML = myAssignedRides.map(b => {
           const totalFare = Number(b.total) || 0;
-          const fee15 = Math.round(totalFare * 0.15);
-          const vendorNet = totalFare - fee15;
           const status = b.status || "Confirmed";
           const isDriverAssigned = Boolean(b.driverName && b.cabNumber);
 
