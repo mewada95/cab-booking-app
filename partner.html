@@ -343,13 +343,13 @@
     function getVehicleBadge(vehicleType) {
       const str = (vehicleType || '').toLowerCase();
       if (str.includes('crysta') || str.includes('suv')) {
-        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-800"><i class="fa-solid fa-car-rear mr-1"></i> SUV Crysta</span>`;
+        return '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-800"><i class="fa-solid fa-car-rear mr-1"></i> SUV Crysta</span>';
       } else if (str.includes('ertiga') || str.includes('muv')) {
-        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800"><i class="fa-solid fa-van-shuttle mr-1"></i> MUV Ertiga</span>`;
+        return '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800"><i class="fa-solid fa-van-shuttle mr-1"></i> MUV Ertiga</span>';
       } else if (str.includes('sedan')) {
-        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-car mr-1"></i> Sedan</span>`;
+        return '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-car mr-1"></i> Sedan</span>';
       } else {
-        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-800"><i class="fa-solid fa-taxi mr-1"></i> Hatchback</span>`;
+        return '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-800"><i class="fa-solid fa-taxi mr-1"></i> Hatchback</span>';
       }
     }
 
@@ -533,13 +533,13 @@
       }
 
       const btn = document.getElementById('submitKycBtn');
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving Profile...`;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving Profile...';
       btn.disabled = true;
 
       try {
         let selfieUrl = currentVendorProfile?.selfieUrl || '';
         if (capturedSelfieBase64) {
-          const selfieRef = storage.ref(`partners/${currentVendor.uid}/selfie_${Date.now()}.jpg`);
+          const selfieRef = storage.ref('partners/' + currentVendor.uid + '/selfie_' + Date.now() + '.jpg');
           const snap = await selfieRef.putString(capturedSelfieBase64, 'data_url');
           selfieUrl = await snap.ref.getDownloadURL();
         }
@@ -556,12 +556,12 @@
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
-        btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Profile Saved`;
+        btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Profile Saved';
         btn.disabled = false;
         closeModal('kycModal');
         alert("🎉 Partner profile successfully saved and synced to Admin panel.");
       } catch (err) {
-        btn.innerHTML = `Save Partner Profile`;
+        btn.innerHTML = 'Save Partner Profile';
         btn.disabled = false;
         alert("Error: " + err.message);
       }
@@ -669,8 +669,8 @@
         }
       });
       document.getElementById("kpiVendorAcceptedCount").innerText = myAssignedRides.length;
-      document.getElementById("kpiVendorNetPayout").innerText = `₹${netPayoutTotal.toLocaleString('en-IN')}`;
-      document.getElementById("kpiVendorCut").innerText = `₹${cutTotal.toLocaleString('en-IN')}`;
+      document.getElementById("kpiVendorNetPayout").innerText = '₹' + netPayoutTotal.toLocaleString('en-IN');
+      document.getElementById("kpiVendorCut").innerText = '₹' + cutTotal.toLocaleString('en-IN');
 
       // 1. RENDER AVAILABLE LEADS
       if (availableLeads.length === 0) {
@@ -908,7 +908,7 @@
       const assignedTier = getTierLevel(assignedCabType);
 
       if (assignedTier < bookedTier) {
-        alert(`⚠️ Downgrade Not Allowed!\nCustomer ne '${bookedVehicle}' book kiya hai. Aap usse chhota model ('${assignedCabType}') assign nahi kar sakte. Barabar ya upgraded gaadi hi chunein.`);
+        alert("⚠️ Downgrade Not Allowed!\nCustomer ne '" + bookedVehicle + "' book kiya hai. Aap usse chhota model ('" + assignedCabType + "') assign nahi kar sakte. Barabar ya upgraded gaadi hi chunein.");
         return;
       }
 
@@ -958,7 +958,7 @@
 
     function cancelByVendor(docId, totalFare) {
       const penalty = Math.max(300, Math.round(Number(totalFare) * 0.10));
-      if (confirm(`⚠️ VENDOR PENALTY WARNING:\nRide accept karne ke baad drop karne par ₹${penalty} penalty lagegi aur ride wapas open pool me chali jayegi.\n\nKya aap sach me cancel karna chahte hain?`)) {
+      if (confirm("⚠️ VENDOR PENALTY WARNING:\nRide accept karne ke baad drop karne par ₹" + penalty + " penalty lagegi aur ride wapas open pool me chali jayegi.\n\nKya aap sach me cancel karna chahte hain?")) {
         db.collection("bookings").doc(docId).update({
           status: "Confirmation Pending",
           reassignedNotice: true,
