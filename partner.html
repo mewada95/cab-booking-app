@@ -655,6 +655,24 @@
       if (confirm("Logout partner account?")) { auth.signOut().then(() => location.reload()); }
     }
 
+    // WORKFLOW BUTTONS HTML HELPER (NO NESTED BACKTICKS)
+    function getWorkflowButtonsHtml(b) {
+      const status = b.status || "Confirmed";
+      const isDriverAssigned = Boolean(b.driverName && b.cabNumber);
+
+      if (status === "Confirmed") {
+        return '<button onclick="updateTripStatus(\'' + b.docId + '\', \'Dispatched from Garage\')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1"><i class="fa-solid fa-warehouse"></i> 1. Dispatch from Garage</button>';
+      } else if (status === "Dispatched from Garage") {
+        return '<button onclick="updateTripStatus(\'' + b.docId + '\', \'Reached Pickup Point\')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1"><i class="fa-solid fa-map-pin"></i> 2. Reached Pickup Point</button>';
+      } else if (status === "Reached Pickup Point") {
+        return '<button onclick="updateTripStatus(\'' + b.docId + '\', \'Trip Started\')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1"><i class="fa-solid fa-play"></i> 3. Start Trip</button>';
+      } else if (status === "Trip Started") {
+        return '<button onclick="openTripBillingModal(\'' + b.docId + '\')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1"><i class="fa-solid fa-file-invoice-dollar"></i> 4. End Trip & Add Extras (Toll/KM/Cash)</button>';
+      } else {
+        return '<div class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl text-purple-900 space-y-0.5 text-[11px]"><p class="font-bold">Trip Completed & Closed ✓</p><p>Cash Collected: <b>₹' + (b.cashCollected || 0) + '</b> | Extras: <b>₹' + (b.totalExtras || 0) + '</b></p></div>';
+      }
+    }
+
     // FIRESTORE LISTENER
     function listenToAllBookings() {
       db.collection("bookings").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
@@ -773,28 +791,7 @@
 
               <!-- WORKFLOW ACTION BUTTONS -->
               <div class="space-y-1.5 pt-1">
-                ${status === "Confirmed" ? `
-                  <button onclick="updateTripStatus('${b.docId}', 'Dispatched from Garage')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-warehouse"></i> 1. Dispatch from Garage
-                  </button>
-                ` : status === "Dispatched from Garage" ? `
-                  <button onclick="updateTripStatus('${b.docId}', 'Reached Pickup Point')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-map-pin"></i> 2. Reached Pickup Point
-                  </button>
-                ` : status === "Reached Pickup Point" ? `
-                  <button onclick="updateTripStatus('${b.docId}', 'Trip Started')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-play"></i> 3. Start Trip
-                  </button>
-                ` : status === "Trip Started" ? `
-                  <button onclick="openTripBillingModal('${b.docId}')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-file-invoice-dollar"></i> 4. End Trip & Add Extras (Toll/KM/Cash)
-                  </button>
-                ` : `
-                  <div class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl text-purple-900 space-y-0.5 text-[11px]">
-                    <p class="font-bold">Trip Completed & Closed ✓</p>
-                    <p>Cash Collected: <b>₹${b.cashCollected \vert{}\vert{} 0}</b> \vert{} Extras: <b>₹${b.totalExtras || 0}</b></p>
-                  </div>
-                `}
+                ${getWorkflowButtonsHtml(b)}
               </div>
             </div>
           `;
