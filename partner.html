@@ -129,7 +129,6 @@
 
       <div class="p-5 space-y-3 text-xs">
         <input type="hidden" id="modalDocId" />
-        <input type="hidden" id="modalBookedVehicleCache" />
         
         <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-100 text-blue-900 space-y-0.5">
           <p id="modalRouteText" class="font-bold text-xs">Bhopal ➔ Indore</p>
@@ -814,7 +813,7 @@
                     ${isDriverAssigned ? 'Assigned Driver & Cab' : 'Driver Not Assigned Yet'}
                   </span>
                   ${!isCompleted ? `
-                    <button onclick="openAssignDriverModal('${b.docId}', '${b.from.replace(/'/g, "\\'")} ➔ ${b.to.replace(/'/g, "\\'")}', '${b.bookingId}', '${(b.driverName \vert{}\vert{} '').replace(/'/g, "\\'")}', '${b.driverPhone || ''}', '${b.cabNumber \vert{}\vert{} ''}', '${(b.vehicle || b.type || 'Sedan').replace(/'/g, "\\'")}')" class="text-[10px] font-bold px-2 py-0.5 rounded-md ${isDriverAssigned ? 'bg-white border border-emerald-300 text-emerald-700' : 'bg-amber-600 text-white shadow-sm'}">
+                    <button onclick="openAssignDriverModal('${b.docId}')" class="text-[10px] font-bold px-2 py-0.5 rounded-md ${isDriverAssigned ? 'bg-white border border-emerald-300 text-emerald-700' : 'bg-amber-600 text-white shadow-sm'}">
                       ${isDriverAssigned ? 'Change Driver' : '+ Assign Driver & Cab'}
                     </button>
                   ` : ''}
@@ -880,20 +879,26 @@
       });
     }
 
-    function openAssignDriverModal(docId, routeText, bookingId, dName, dPhone, cNum, bookedVehicle) {
+    function openAssignDriverModal(docId) {
+      const b = allBookingsCache.find(item => item.docId === docId);
+      if (!b) return;
+
       document.getElementById('modalDocId').value = docId;
-      document.getElementById('modalBookedVehicleCache').value = bookedVehicle || 'Sedan';
-      document.getElementById('modalRouteText').innerText = routeText;
-      document.getElementById('modalBookingIdText').innerText = bookingId;
-      document.getElementById('modalDriverName').value = dName || '';
-      document.getElementById('modalDriverPhone').value = dPhone || '';
-      document.getElementById('modalCabNumber').value = cNum || '';
+      document.getElementById('modalRouteText2Cache') = b.vehicle || b.type || 'Sedan';
+      // Store booked vehicle in a custom data attribute or cache variable
+      window.activeBookedVehicle = b.vehicle || b.type || 'Sedan';
+
+      document.getElementById('modalRouteText').innerText = (b.from || '') + ' ➔ ' + (b.to || '');
+      document.getElementById('modalBookingIdText').innerText = b.bookingId || 'MTZ-XXXX';
+      document.getElementById('modalDriverName').value = b.driverName || '';
+      document.getElementById('modalDriverPhone').value = b.driverPhone || '';
+      document.getElementById('modalCabNumber').value = b.cabNumber || '';
       openModal('assignDriverModal');
     }
 
     function saveDriverCabDetails() {
       const docId = document.getElementById('modalDocId').value;
-      const bookedVehicle = document.getElementById('modalBookedVehicleCache').value;
+      const bookedVehicle = window.activeBookedVehicle || 'Sedan';
       const assignedCabType = document.getElementById('modalCabTypeSelect').value;
       const dName = document.getElementById('modalDriverName').value.trim();
       const dPhone = document.getElementById('modalDriverPhone').value.trim();
