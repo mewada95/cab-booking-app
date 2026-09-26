@@ -120,7 +120,7 @@
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
           <h3 class="font-bold text-slate-800 text-sm">Assign Driver & Cab Details</h3>
-          <p class="text-[10px] text-slate-500">Yeh details customer ke receipt view par unlock honge</p>
+          <p class="text-[10px] text-slate-500">Customer ko exact ya upgraded model hi assign karein</p>
         </div>
         <button type="button" onclick="closeModal('assignDriverModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -129,10 +129,22 @@
 
       <div class="p-5 space-y-3 text-xs">
         <input type="hidden" id="modalDocId" />
+        <input type="hidden" id="modalBookedVehicleCache" />
         
         <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-100 text-blue-900 space-y-0.5">
           <p id="modalRouteText" class="font-bold text-xs">Bhopal ➔ Indore</p>
           <p id="modalBookingIdText" class="text-[10px] font-mono text-blue-700">MTZ-XXXX</p>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Select Cab Model (Hatchback / Sedan / MUV / SUV) *</label>
+          <select id="modalCabTypeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold text-slate-800">
+            <option value="Hatchback">Hatchback (WagonR / Swift)</option>
+            <option value="Sedan">Sedan (Dzire / Etios)</option>
+            <option value="MUV Ertiga">MUV Ertiga / Carens</option>
+            <option value="SUV Crysta">SUV Innova Crysta</option>
+          </select>
+          <p class="text-[10px] text-amber-700 mt-1">⚠️ Rule: Downgrade allowed nahi hai (e.g. SUV ki jagah Sedan nahi bhej sakte).</p>
         </div>
 
         <div>
@@ -157,7 +169,7 @@
     </div>
   </div>
 
-  <!-- PARTNER PROFILE MODAL (OPTIONAL AADHAAR/PAN) -->
+  <!-- PARTNER PROFILE MODAL -->
   <div id="kycModal" class="fixed inset-0 bg-slate-900/80 z-[85] hidden items-center justify-center p-3">
     <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -165,7 +177,7 @@
           <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
             <i class="fa-solid fa-shield-halved text-emerald-600"></i> Partner Profile & Verification
           </h3>
-          <p class="text-[10px] text-slate-500">Live selfie & basic details (Aadhaar/PAN optional)</p>
+          <p class="text-[10px] text-slate-500">Live selfie & basic details</p>
         </div>
         <div class="flex items-center gap-2">
           <button type="button" onclick="skipKycForNow()" class="text-[11px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-xl transition">
@@ -178,8 +190,6 @@
       </div>
 
       <div class="p-4 overflow-y-auto space-y-4 text-xs">
-        
-        <!-- 1. LIVE CAMERA SELFIE -->
         <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2">
           <div class="flex justify-between items-center">
             <label class="font-bold text-slate-800 flex items-center gap-1.5">
@@ -209,46 +219,22 @@
           </div>
         </div>
 
-        <!-- 2. PERSONAL, MOBILE & CITY DETAILS (MANDATORY) -->
         <div class="space-y-3">
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Full Legal / Agency Name *</label>
             <input id="kycFullName" type="text" placeholder="Travel Agency / Driver Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
           </div>
-
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Mobile Number (Mandatory) *</label>
             <input id="kycMobileNum" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
           </div>
-
           <div>
             <label class="block font-semibold text-slate-700 mb-1">City (Mandatory) *</label>
             <input id="kycCityInput" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
           </div>
-
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Permanent Residential / Office Address *</label>
             <textarea id="kycAddress" rows="2" placeholder="House/Flat No, Street, State, PIN Code" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500"></textarea>
-          </div>
-        </div>
-
-        <!-- 3. AADHAAR CARD (OPTIONAL) -->
-        <div class="space-y-2 pt-1 border-t border-slate-100">
-          <label class="block font-semibold text-slate-700">Aadhaar Card Number (Optional)</label>
-          <input id="kycAadhaarNum" type="tel" maxlength="12" placeholder="12 digit Aadhaar Number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold" />
-          <div>
-            <label class="block text-[11px] text-slate-500 mb-1">Aadhaar Photo (Optional)</label>
-            <input id="kycAadhaarFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700" />
-          </div>
-        </div>
-
-        <!-- 4. PAN CARD (OPTIONAL) -->
-        <div class="space-y-2 pt-1 border-t border-slate-100">
-          <label class="block font-semibold text-slate-700">PAN Card Number (Optional)</label>
-          <input id="kycPanNum" type="text" maxlength="10" placeholder="ABCDE1234F" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold uppercase" />
-          <div>
-            <label class="block text-[11px] text-slate-500 mb-1">PAN Photo (Optional)</label>
-            <input id="kycPanFile" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700" />
           </div>
         </div>
 
@@ -344,6 +330,28 @@
     let allBookingsCache = [];
     let videoStream = null;
     let capturedSelfieBase64 = null;
+
+    // VEHICLE HIERARCHY TIER SYSTEM (Anti-Downgrade Check)
+    function getTierLevel(vehicleStr) {
+      const str = (vehicleStr || '').toLowerCase();
+      if (str.includes('crysta') || str.includes('suv')) return 4;
+      if (str.includes('ertiga') || str.includes('muv')) return 3;
+      if (str.includes('sedan')) return 2;
+      return 1; // Hatchback
+    }
+
+    function getVehicleBadge(vehicleType) {
+      const str = (vehicleType || '').toLowerCase();
+      if (str.includes('crysta') || str.includes('suv')) {
+        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-800"><i class="fa-solid fa-car-rear mr-1"></i> SUV Crysta</span>`;
+      } else if (str.includes('ertiga') || str.includes('muv')) {
+        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800"><i class="fa-solid fa-van-shuttle mr-1"></i> MUV Ertiga</span>`;
+      } else if (str.includes('sedan')) {
+        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-car mr-1"></i> Sedan</span>`;
+      } else {
+        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-800"><i class="fa-solid fa-taxi mr-1"></i> Hatchback</span>`;
+      }
+    }
 
     function openModal(id) {
       const el = document.getElementById(id);
@@ -456,8 +464,6 @@
           if (currentVendorProfile.address && document.getElementById('kycAddress')) {
             document.getElementById('kycAddress').value = currentVendorProfile.address;
           }
-          if (currentVendorProfile.aadhaar) document.getElementById('kycAadhaarNum').value = currentVendorProfile.aadhaar;
-          if (currentVendorProfile.pan) document.getElementById('kycPanNum').value = currentVendorProfile.pan;
         } else {
           if (alertBanner) alertBanner.classList.remove('hidden');
         }
@@ -521,11 +527,6 @@
       const phone = document.getElementById('kycMobileNum').value.trim();
       const city = document.getElementById('kycCityInput').value.trim();
       const address = document.getElementById('kycAddress').value.trim();
-      const aadhaarNum = document.getElementById('kycAadhaarNum').value.trim();
-      const panNum = document.getElementById('kycPanNum').value.trim().toUpperCase();
-
-      const aadhaarFile = document.getElementById('kycAadhaarFile').files[0];
-      const panFile = document.getElementById('kycPanFile').files[0];
 
       if (!name || phone.length < 10 || !city || !address) {
         return alert("Full Name, 10-digit Mobile Number, City aur Address bharna anivarya hai!");
@@ -537,25 +538,10 @@
 
       try {
         let selfieUrl = currentVendorProfile?.selfieUrl || '';
-        let aadhaarUrl = currentVendorProfile?.aadhaarUrl || '';
-        let panUrl = currentVendorProfile?.panUrl || '';
-
         if (capturedSelfieBase64) {
           const selfieRef = storage.ref(`partners/${currentVendor.uid}/selfie_${Date.now()}.jpg`);
           const snap = await selfieRef.putString(capturedSelfieBase64, 'data_url');
           selfieUrl = await snap.ref.getDownloadURL();
-        }
-
-        if (aadhaarFile) {
-          const aRef = storage.ref(`partners/${currentVendor.uid}/aadhaar_${Date.now()}_${aadhaarFile.name}`);
-          const aSnap = await aRef.put(aadhaarFile);
-          aadhaarUrl = await aSnap.ref.getDownloadURL();
-        }
-
-        if (panFile) {
-          const pRef = storage.ref(`partners/${currentVendor.uid}/pan_${Date.now()}_${panFile.name}`);
-          const pSnap = await pRef.put(panFile);
-          panUrl = await pSnap.ref.getDownloadURL();
         }
 
         await db.collection("vendors").doc(currentVendor.uid).set({
@@ -564,10 +550,6 @@
           phone: phone,
           city: city,
           address: address,
-          aadhaar: aadhaarNum || '',
-          aadhaarUrl: aadhaarUrl,
-          pan: panNum || '',
-          panUrl: panUrl,
           selfieUrl: selfieUrl,
           kycVerified: true,
           kycStatus: 'Approved',
@@ -594,7 +576,6 @@
             name: u.displayName || '',
             agencyName: u.displayName || 'Google Partner',
             city: 'Bhopal',
-            phone: u.phoneNumber || '',
             email: u.email || '',
             kycVerified: false,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -612,12 +593,13 @@
       const city = document.getElementById('vendorCityInput').value.trim();
       const phone = document.getElementById('vendorPhoneInput').value.trim();
 
-      if (!email || pass.length < 6) return alert("Valid email aur 6-digit password bharein!");
-      if (isSignUp && (!agency || !city || phone.length < 10)) {
-        return alert("Agency Name, City aur 10-digit Mobile Number mandatory hai!");
-      }
-
+      if (!email || pass.length < 6) return alert("Valid email aur minimum 6-digit password bharein!");
+      
       if (isSignUp) {
+        if (!agency || !city || phone.length < 10) {
+          return alert("Registration ke liye Agency Name, City aur 10-digit Mobile Number mandatory hai!");
+        }
+
         auth.createUserWithEmailAndPassword(email, pass)
           .then((cred) => {
             return db.collection("vendors").doc(cred.user.uid).set({
@@ -631,7 +613,7 @@
             });
           })
           .then(() => {
-            alert("Partner Registered Successfully! Data synced to Admin panel.");
+            alert("Partner Registered Successfully!");
             closeModal('vendorAuthModal');
           })
           .catch(err => alert("Sign Up Error: " + err.message));
@@ -644,7 +626,7 @@
             }, { merge: true });
             closeModal('vendorAuthModal');
           })
-          .catch(err => alert("Error: " + err.message));
+          .catch(err => alert("Login Error: " + err.message));
       }
     }
 
@@ -706,6 +688,7 @@
           const vendorNet = totalFare - fee15;
           const pickupFuel = b.pickupPay || Math.round(totalFare * 0.45);
           const dropBal = totalFare - pickupFuel;
+          const vehicleBadgeHtml = getVehicleBadge(b.vehicle || b.type);
 
           return `
             <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
@@ -718,10 +701,10 @@
 
               <div>
                 <p class="font-bold text-slate-800 text-sm">${b.from} ➔ ${b.to}</p>
-                <div class="flex flex-wrap gap-2 text-[11px] text-slate-500 mt-1 font-medium">
+                <div class="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 mt-1 font-medium">
                   <span><i class="fa-regular fa-calendar text-slate-400 mr-0.5"></i> ${b.date} (${b.time})</span>
                   <span>•</span>
-                  <span><i class="fa-solid fa-car-side text-slate-400 mr-0.5"></i> ${b.vehicle} (${b.type})</span>
+                  ${vehicleBadgeHtml}
                 </div>
                 ${b.carrierRequired ? `
                   <div class="mt-2 bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md text-[10px] font-bold inline-flex items-center gap-1">
@@ -785,6 +768,7 @@
           const isStarted = b.status === "Trip Started";
           const isCompleted = b.status === "Trip Completed";
           const isDriverAssigned = Boolean(b.driverName && b.cabNumber);
+          const vehicleBadgeHtml = getVehicleBadge(b.vehicle || b.type);
 
           return `
             <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
@@ -801,7 +785,11 @@
 
               <div>
                 <p class="font-bold text-slate-800 text-sm">${b.from} ➔ ${b.to}</p>
-                <p class="text-slate-500 text-[11px] mt-0.5">${b.date} • ${b.time} • ${b.vehicle}</p>
+                <div class="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 mt-1 font-medium">
+                  <span>${b.date} • ${b.time}</span>
+                  <span>•</span>
+                  ${vehicleBadgeHtml}
+                </div>
                 ${b.carrierRequired ? `
                   <span class="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded mt-1 inline-block">Roof Carrier Cab</span>
                 ` : ''}
@@ -826,7 +814,7 @@
                     ${isDriverAssigned ? 'Assigned Driver & Cab' : 'Driver Not Assigned Yet'}
                   </span>
                   ${!isCompleted ? `
-                    <button onclick="openAssignDriverModal('${b.docId}', '${b.from.replace(/'/g, "\\'")} ➔ ${b.to.replace(/'/g, "\\'")}', '${b.bookingId}', '${(b.driverName || '').replace(/'/g, "\\'")}', '${b.driverPhone || ''}', '${b.cabNumber || ''}')" class="text-[10px] font-bold px-2 py-0.5 rounded-md ${isDriverAssigned ? 'bg-white border border-emerald-300 text-emerald-700' : 'bg-amber-600 text-white shadow-sm'}">
+                    <button onclick="openAssignDriverModal('${b.docId}', '${b.from.replace(/'/g, "\\'")} ➔ ${b.to.replace(/'/g, "\\'")}', '${b.bookingId}', '${(b.driverName \vert{}\vert{} '').replace(/'/g, "\\'")}', '${b.driverPhone || ''}', '${b.cabNumber \vert{}\vert{} ''}', '${(b.vehicle || b.type || 'Sedan').replace(/'/g, "\\'")}')" class="text-[10px] font-bold px-2 py-0.5 rounded-md ${isDriverAssigned ? 'bg-white border border-emerald-300 text-emerald-700' : 'bg-amber-600 text-white shadow-sm'}">
                       ${isDriverAssigned ? 'Change Driver' : '+ Assign Driver & Cab'}
                     </button>
                   ` : ''}
@@ -835,7 +823,7 @@
                 ${isDriverAssigned ? `
                   <div class="grid grid-cols-2 text-[10px] pt-1 border-t border-emerald-200/60">
                     <p><b>Driver:</b> ${b.driverName} (${b.driverPhone})</p>
-                    <p class="text-right"><b>Cab No:</b> <span class="font-mono font-bold">${b.cabNumber}</span></p>
+                    <p class="text-right"><b>Cab:</b> <span class="font-mono font-bold">${b.cabNumber}</span> <span class="text-emerald-700">(${b.cabModelType || 'Standard'})</span></p>
                   </div>
                 ` : `
                   <p class="text-[10px] text-amber-800">Customer ko driver details bhejne ke liye upar diye button se driver add karein.</p>
@@ -849,7 +837,7 @@
 
               <div class="pt-1 space-y-2">
                 ${isConfirmed ? `
-                  <button onclick="startTripAction('${b.docId}', ${isDriverAssigned})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                  <button onclick="startTripAction('${b.docId}',${isDriverAssigned})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
                     <i class="fa-solid fa-play"></i> Start Ride (45% Fuel Collected)
                   </button>
                   <button onclick="cancelByVendor('${b.docId}', '${totalFare}')" class="w-full text-rose-600 hover:text-rose-700 bg-rose-50 border border-rose-200 font-semibold py-2 rounded-xl text-xs">
@@ -892,8 +880,9 @@
       });
     }
 
-    function openAssignDriverModal(docId, routeText, bookingId, dName, dPhone, cNum) {
+    function openAssignDriverModal(docId, routeText, bookingId, dName, dPhone, cNum, bookedVehicle) {
       document.getElementById('modalDocId').value = docId;
+      document.getElementById('modalBookedVehicleCache').value = bookedVehicle || 'Sedan';
       document.getElementById('modalRouteText').innerText = routeText;
       document.getElementById('modalBookingIdText').innerText = bookingId;
       document.getElementById('modalDriverName').value = dName || '';
@@ -904,12 +893,23 @@
 
     function saveDriverCabDetails() {
       const docId = document.getElementById('modalDocId').value;
+      const bookedVehicle = document.getElementById('modalBookedVehicleCache').value;
+      const assignedCabType = document.getElementById('modalCabTypeSelect').value;
       const dName = document.getElementById('modalDriverName').value.trim();
       const dPhone = document.getElementById('modalDriverPhone').value.trim();
       const cabNum = document.getElementById('modalCabNumber').value.trim();
 
       if (!dName || dPhone.length < 10 || !cabNum) {
         return alert("Driver Name, 10-digit Phone aur Commercial Cab Number bharna compulsory hai!");
+      }
+
+      // ANTI-DOWNGRADE VALIDATION CHECK
+      const bookedTier = getTierLevel(bookedVehicle);
+      const assignedTier = getTierLevel(assignedCabType);
+
+      if (assignedTier < bookedTier) {
+        alert(`⚠️ Downgrade Not Allowed!\nCustomer ne '${bookedVehicle}' book kiya hai. Aap usse chhota model ('${assignedCabType}') assign nahi kar sakte. Barabar ya upgraded gaadi hi chunein.`);
+        return;
       }
 
       const btn = document.getElementById('modalSaveDriverBtn');
@@ -920,6 +920,7 @@
         driverName: dName,
         driverPhone: dPhone,
         cabNumber: cabNum.toUpperCase(),
+        cabModelType: assignedCabType,
         driverAssignedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
         btn.innerText = "Save & Send Details to Customer";
@@ -965,7 +966,8 @@
           vendorId: firebase.firestore.FieldValue.delete(),
           driverName: "",
           driverPhone: "",
-          cabNumber: ""
+          cabNumber: "",
+          cabModelType: ""
         }).then(() => {
           alert("Ride pool me wapas bhej di gayi hai.");
         });
