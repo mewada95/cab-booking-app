@@ -884,8 +884,6 @@
       if (!b) return;
 
       document.getElementById('modalDocId').value = docId;
-      document.getElementById('modalRouteText2Cache') = b.vehicle || b.type || 'Sedan';
-      // Store booked vehicle in a custom data attribute or cache variable
       window.activeBookedVehicle = b.vehicle || b.type || 'Sedan';
 
       document.getElementById('modalRouteText').innerText = (b.from || '') + ' ➔ ' + (b.to || '');
