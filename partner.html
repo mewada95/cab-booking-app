@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tripvyom - Partner & Fleet</title>
+  <title>Tripvyom - Partner & Fleet Control</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
@@ -23,7 +23,7 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide">Tripvyom Partner</h1>
-        <p class="text-[10px] text-slate-400">Driver & Fleet Dispatch Control</p>
+        <p class="text-[10px] text-slate-400">Advanced Fleet Lifecycle & Billing</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -102,7 +102,7 @@
     <!-- TAB VIEW 2: ACCEPTED / ACTIVE FLEET RIDES -->
     <div id="viewMyRides" class="hidden space-y-3">
       <div class="flex justify-between items-center px-1">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Assigned Trips & Dispatch</span>
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Assigned Trips & Lifecycle</span>
         <span class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">Fleet Control</span>
       </div>
 
@@ -120,7 +120,7 @@
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
           <h3 class="font-bold text-slate-800 text-sm">Assign Driver & Cab Details</h3>
-          <p class="text-[10px] text-slate-500">Customer ko exact ya upgraded model hi assign karein</p>
+          <p class="text-[10px] text-slate-500">Anti-downgrade rule applied</p>
         </div>
         <button type="button" onclick="closeModal('assignDriverModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -136,33 +136,94 @@
         </div>
 
         <div>
-          <label class="block font-semibold text-slate-600 mb-1">Select Cab Model (Hatchback / Sedan / MUV / SUV) *</label>
-          <select id="modalCabTypeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold text-slate-800">
+          <label class="block font-semibold text-slate-600 mb-1">Select Cab Model *</label>
+          <select id="modalCabTypeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800">
             <option value="Hatchback">Hatchback (WagonR / Swift)</option>
             <option value="Sedan">Sedan (Dzire / Etios)</option>
             <option value="MUV Ertiga">MUV Ertiga / Carens</option>
             <option value="SUV Crysta">SUV Innova Crysta</option>
           </select>
-          <p class="text-[10px] text-amber-700 mt-1">⚠️ Rule: Downgrade allowed nahi hai (e.g. SUV ki jagah Sedan nahi bhej sakte).</p>
         </div>
 
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Driver Name *</label>
-          <input id="modalDriverName" type="text" placeholder="e.g. Ramesh Kumar" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+          <input id="modalDriverName" type="text" placeholder="e.g. Ramesh Kumar" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold" />
         </div>
 
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Driver Mobile Number *</label>
-          <input id="modalDriverPhone" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+          <input id="modalDriverPhone" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold" />
         </div>
 
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Commercial Cab Number *</label>
-          <input id="modalCabNumber" type="text" placeholder="e.g. MP04TB5049" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-mono font-bold uppercase" />
+          <input id="modalCabNumber" type="text" placeholder="e.g. MP04TB5049" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold uppercase" />
         </div>
 
-        <button type="button" id="modalSaveDriverBtn" onclick="saveDriverCabDetails()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
-          <i class="fa-solid fa-circle-check"></i> Save & Send Details to Customer
+        <button type="button" onclick="saveDriverCabDetails()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-circle-check"></i> Save & Send Details
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: TRIP COMPLETION, EXTRAS & SETTLEMENT MODAL -->
+  <div id="tripBillingModal" class="fixed inset-0 bg-slate-900/70 z-[75] hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
+      <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+        <div>
+          <h3 class="font-bold text-slate-800 text-sm">Trip Settlement & Extras</h3>
+          <p class="text-[10px] text-slate-500">Add toll, km, parking & cash collection</p>
+        </div>
+        <button type="button" onclick="closeModal('tripBillingModal')" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-4 space-y-2.5 text-xs overflow-y-auto max-h-[80vh]">
+        <input type="hidden" id="billingDocId" />
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-slate-600 mb-0.5">Extra KM Charges (₹)</label>
+            <input id="billExtraKm" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+          </div>
+          <div>
+            <label class="block font-medium text-slate-600 mb-0.5">Night Charges (₹)</label>
+            <input id="billNight" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-slate-600 mb-0.5">Toll Tax (₹)</label>
+            <input id="billToll" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+          </div>
+          <div>
+            <label class="block font-medium text-slate-600 mb-0.5">Regular Parking (₹)</label>
+            <input id="billParking" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-slate-600 mb-0.5">Airport Parking (₹)</label>
+            <input id="billAirportParking" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+          </div>
+          <div>
+            <label class="block font-medium text-slate-600 mb-0.5">Roof Carrier (₹)</label>
+            <input id="billCarrier" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100">
+          <label class="block font-bold text-slate-700 mb-1">Cash Collected By Driver (₹)</label>
+          <input id="billCashCollected" type="number" value="0" class="w-full bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl px-3 py-2 font-black text-sm" />
+          <p class="text-[10px] text-slate-400 mt-0.5">Driver ne customer se kitna cash total collect kiya</p>
+        </div>
+
+        <button type="button" onclick="submitTripBillingAndClose()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 mt-2">
+          <i class="fa-solid fa-flag-checkered"></i> Complete & Close Trip
         </button>
       </div>
     </div>
@@ -209,7 +270,7 @@
           </div>
 
           <div class="grid grid-cols-2 gap-2 pt-1">
-            <button type="button" id="startCamBtn" onclick="startLiveCamera()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1">
+            <button type="button" onclick="startLiveCamera()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1">
               <i class="fa-solid fa-video"></i> Start Camera
             </button>
             <button type="button" id="snapCamBtn" onclick="captureLiveSelfie()" disabled class="bg-slate-200 text-slate-400 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1 cursor-not-allowed">
@@ -221,36 +282,36 @@
         <div class="space-y-3">
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Full Legal / Agency Name *</label>
-            <input id="kycFullName" type="text" placeholder="Travel Agency / Driver Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+            <input id="kycFullName" type="text" placeholder="Travel Agency / Driver Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold" />
           </div>
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Mobile Number (Mandatory) *</label>
-            <input id="kycMobileNum" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+            <input id="kycMobileNum" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold" />
           </div>
           <div>
             <label class="block font-semibold text-slate-700 mb-1">City (Mandatory) *</label>
-            <input id="kycCityInput" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+            <input id="kycCityInput" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold" />
           </div>
           <div>
-            <label class="block font-semibold text-slate-700 mb-1">Permanent Residential / Office Address *</label>
-            <textarea id="kycAddress" rows="2" placeholder="House/Flat No, Street, State, PIN Code" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500"></textarea>
+            <label class="block font-semibold text-slate-700 mb-1">Permanent Address *</label>
+            <textarea id="kycAddress" rows="2" placeholder="House/Flat No, Street, State" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs"></textarea>
           </div>
         </div>
 
-        <button type="button" id="submitKycBtn" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+        <button type="button" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-cloud-arrow-up"></i> Save Partner Profile
         </button>
       </div>
     </div>
   </div>
 
-  <!-- VENDOR AUTH / LOGIN MODAL -->
+  <!-- VENDOR AUTH MODAL -->
   <div id="vendorAuthModal" class="fixed inset-0 bg-slate-900/70 z-[80] hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
           <h3 class="font-bold text-slate-800 text-sm">Partner Authentication</h3>
-          <p class="text-[10px] text-slate-500">Access your fleet dispatch and wallet</p>
+          <p class="text-[10px] text-slate-500">Access fleet dispatch & wallet</p>
         </div>
         <button type="button" onclick="closeModal('vendorAuthModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -258,7 +319,7 @@
       </div>
 
       <div class="p-5 space-y-3.5 text-xs">
-        <button type="button" onclick="vendorLoginWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-4 rounded-xl border border-slate-300 flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
+        <button type="button" onclick="vendorLoginWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-4 rounded-xl border border-slate-300 flex items-center justify-center gap-2 shadow-sm transition">
           <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
           Partner Sign-in with Google
         </button>
@@ -270,27 +331,27 @@
 
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Fleet / Agency Name *</label>
-          <input id="vendorAgencyName" type="text" placeholder="Travel Agency Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
+          <input id="vendorAgencyName" type="text" placeholder="Travel Agency Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
         </div>
         <div>
           <label class="block font-semibold text-slate-600 mb-1">City (Mandatory) *</label>
-          <input id="vendorCityInput" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
+          <input id="vendorCityInput" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
         </div>
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Mobile Number (Mandatory) *</label>
-          <input id="vendorPhoneInput" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
+          <input id="vendorPhoneInput" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
         </div>
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Email Address *</label>
-          <input id="vendorEmail" type="email" placeholder="partner@domain.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
+          <input id="vendorEmail" type="email" placeholder="partner@domain.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
         </div>
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Password *</label>
-          <input id="vendorPassword" type="password" placeholder="Minimum 6 characters" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
+          <input id="vendorPassword" type="password" placeholder="Minimum 6 characters" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
         </div>
 
         <div class="grid grid-cols-2 gap-2 pt-1">
-          <button type="button" onclick="handleVendorEmailAuth(false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
+          <button type="button" onclick="handleVendorEmailAuth(false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
             Sign In
           </button>
           <button type="button" onclick="handleVendorEmailAuth(true)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">
@@ -330,13 +391,12 @@
     let videoStream = null;
     let capturedSelfieBase64 = null;
 
-    // VEHICLE HIERARCHY TIER SYSTEM (Anti-Downgrade Check)
     function getTierLevel(vehicleStr) {
       const str = (vehicleStr || '').toLowerCase();
       if (str.includes('crysta') || str.includes('suv')) return 4;
       if (str.includes('ertiga') || str.includes('muv')) return 3;
       if (str.includes('sedan')) return 2;
-      return 1; // Hatchback
+      return 1;
     }
 
     function getVehicleBadge(vehicleType) {
@@ -371,23 +431,12 @@
       }
     }
 
-    function openVendorAuthModal() {
-      openModal('vendorAuthModal');
-    }
-
+    function openVendorAuthModal() { openModal('vendorAuthModal'); }
     function openKycModal() {
-      if (!currentVendor) {
-        alert("Pehle Partner Login karein!");
-        openVendorAuthModal();
-        return;
-      }
+      if (!currentVendor) { alert("Pehle Partner Login karein!"); openVendorAuthModal(); return; }
       openModal('kycModal');
     }
-
-    function skipKycForNow() {
-      closeModal('kycModal');
-      alert("Aapne profile verification baad ke liye skip kar diya hai.");
-    }
+    function skipKycForNow() { closeModal('kycModal'); }
 
     function switchVendorTab(tab) {
       const vAvail = document.getElementById('viewAvailable');
@@ -438,21 +487,15 @@
         if (doc.exists) {
           currentVendorProfile = doc.data();
           const isVerified = currentVendorProfile.kycVerified === true;
-
           if (isVerified) {
             if (kycText) kycText.innerText = "Profile Verified";
-            if (kycBtn) kycBtn.className = "text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-xl flex items-center gap-1 font-semibold";
             if (alertBanner) alertBanner.classList.add('hidden');
           } else {
             if (kycText) kycText.innerText = "Profile Pending";
-            if (kycBtn) kycBtn.className = "text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded-xl flex items-center gap-1 font-semibold";
             if (alertBanner) alertBanner.classList.remove('hidden');
           }
-
           if (currentVendorProfile.agencyName && document.getElementById('kycFullName')) {
             document.getElementById('kycFullName').value = currentVendorProfile.agencyName;
-          } else if (currentVendorProfile.name && document.getElementById('kycFullName')) {
-            document.getElementById('kycFullName').value = currentVendorProfile.name;
           }
           if (currentVendorProfile.phone && document.getElementById('kycMobileNum')) {
             document.getElementById('kycMobileNum').value = currentVendorProfile.phone;
@@ -487,7 +530,7 @@
         snapBtn.disabled = false;
         snapBtn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm";
       } catch (err) {
-        alert("Camera permission error: " + err.message);
+        alert("Camera error: " + err.message);
       }
     }
 
@@ -509,37 +552,35 @@
       video.classList.add('hidden');
       statusTag.innerText = "Captured ✓";
       statusTag.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800";
-      stopLiveCamera();
+      if (videoStream) {
+        videoStream.getTracks().forEach(t => t.stop());
+        videoStream = null;
+      }
     }
 
     function stopLiveCamera() {
       if (videoStream) {
-        videoStream.getTracks().forEach(track => track.stop());
+        videoStream.getTracks().forEach(t => t.stop());
         videoStream = null;
       }
     }
 
     async function submitPartnerKycForm() {
       if (!currentVendor) return alert("Pehle Login karein!");
-
       const name = document.getElementById('kycFullName').value.trim();
       const phone = document.getElementById('kycMobileNum').value.trim();
       const city = document.getElementById('kycCityInput').value.trim();
       const address = document.getElementById('kycAddress').value.trim();
 
       if (!name || phone.length < 10 || !city || !address) {
-        return alert("Full Name, 10-digit Mobile Number, City aur Address bharna anivarya hai!");
+        return alert("Sabhi mandatory fields bharna anivarya hai!");
       }
-
-      const btn = document.getElementById('submitKycBtn');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving Profile...';
-      btn.disabled = true;
 
       try {
         let selfieUrl = currentVendorProfile?.selfieUrl || '';
         if (capturedSelfieBase64) {
-          const selfieRef = storage.ref('partners/' + currentVendor.uid + '/selfie_' + Date.now() + '.jpg');
-          const snap = await selfieRef.putString(capturedSelfieBase64, 'data_url');
+          const ref = storage.ref('partners/' + currentVendor.uid + '/selfie_' + Date.now() + '.jpg');
+          const snap = await ref.putString(capturedSelfieBase64, 'data_url');
           selfieUrl = await snap.ref.getDownloadURL();
         }
 
@@ -551,38 +592,31 @@
           address: address,
           selfieUrl: selfieUrl,
           kycVerified: true,
-          kycStatus: 'Approved',
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
-        btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Profile Saved';
-        btn.disabled = false;
         closeModal('kycModal');
-        alert("🎉 Partner profile successfully saved and synced to Admin panel.");
+        alert("🎉 Partner profile saved successfully!");
       } catch (err) {
-        btn.innerHTML = 'Save Partner Profile';
-        btn.disabled = false;
         alert("Error: " + err.message);
       }
     }
 
     function vendorLoginWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then((res) => {
-          const u = res.user;
-          db.collection("vendors").doc(u.uid).set({
-            name: u.displayName || '',
-            agencyName: u.displayName || 'Google Partner',
-            city: 'Bhopal',
-            email: u.email || '',
-            kycVerified: false,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge: true });
-          closeModal('vendorAuthModal');
-          alert("Login Successful! Data synced to Admin panel.");
-        })
-        .catch(err => alert("Login Error: " + err.message));
+      auth.signInWithPopup(provider).then((res) => {
+        const u = res.user;
+        db.collection("vendors").doc(u.uid).set({
+          name: u.displayName || '',
+          agencyName: u.displayName || 'Google Partner',
+          city: 'Bhopal',
+          email: u.email || '',
+          kycVerified: false,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        closeModal('vendorAuthModal');
+        alert("Login Successful!");
+      }).catch(err => alert("Login Error: " + err.message));
     }
 
     function handleVendorEmailAuth(isSignUp) {
@@ -592,58 +626,42 @@
       const city = document.getElementById('vendorCityInput').value.trim();
       const phone = document.getElementById('vendorPhoneInput').value.trim();
 
-      if (!email || pass.length < 6) return alert("Valid email aur minimum 6-digit password bharein!");
+      if (!email || pass.length < 6) return alert("Valid email aur 6-digit password bharein!");
       
       if (isSignUp) {
-        if (!agency || !city || phone.length < 10) {
-          return alert("Registration ke liye Agency Name, City aur 10-digit Mobile Number mandatory hai!");
-        }
-
-        auth.createUserWithEmailAndPassword(email, pass)
-          .then((cred) => {
-            return db.collection("vendors").doc(cred.user.uid).set({
-              agencyName: agency,
-              name: agency,
-              city: city,
-              phone: phone,
-              email: email,
-              kycVerified: false,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-          })
-          .then(() => {
-            alert("Partner Registered Successfully!");
-            closeModal('vendorAuthModal');
-          })
-          .catch(err => alert("Sign Up Error: " + err.message));
+        if (!agency || !city || phone.length < 10) return alert("Agency Name, City aur Mobile mandatory hai!");
+        auth.createUserWithEmailAndPassword(email, pass).then((cred) => {
+          return db.collection("vendors").doc(cred.user.uid).set({
+            agencyName: agency,
+            name: agency,
+            city: city,
+            phone: phone,
+            email: email,
+            kycVerified: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }).then(() => {
+          alert("Partner Registered Successfully!");
+          closeModal('vendorAuthModal');
+        }).catch(err => alert("Error: " + err.message));
       } else {
-        auth.signInWithEmailAndPassword(email, pass)
-          .then(() => {
-            db.collection("vendors").doc(auth.currentUser.uid).set({
-              email: email,
-              lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-            closeModal('vendorAuthModal');
-          })
-          .catch(err => alert("Login Error: " + err.message));
+        auth.signInWithEmailAndPassword(email, pass).then(() => {
+          closeModal('vendorAuthModal');
+        }).catch(err => alert("Error: " + err.message));
       }
     }
 
     function logoutVendor() {
-      if (confirm("Logout partner account?")) {
-        auth.signOut().then(() => location.reload());
-      }
+      if (confirm("Logout partner account?")) { auth.signOut().then(() => location.reload()); }
     }
 
-    // FIRESTORE DISPATCH LISTENER
+    // FIRESTORE LISTENER
     function listenToAllBookings() {
       db.collection("bookings").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
         allBookingsCache = [];
-        snapshot.forEach(doc => {
-          allBookingsCache.push({ docId: doc.id, ...doc.data() });
-        });
+        snapshot.forEach(doc => { allBookingsCache.push({ docId: doc.id, ...doc.data() }); });
         renderPortals();
-      }, (err) => console.error("Bookings load error:", err));
+      }, (err) => console.error("Bookings error:", err));
     }
 
     function renderPortals() {
@@ -671,13 +689,12 @@
       document.getElementById("kpiVendorNetPayout").innerText = '₹' + netPayoutTotal.toLocaleString('en-IN');
       document.getElementById("kpiVendorCut").innerText = '₹' + cutTotal.toLocaleString('en-IN');
 
-      // 1. RENDER AVAILABLE LEADS
+      // 1. AVAILABLE LEADS
       if (availableLeads.length === 0) {
         availableContainer.innerHTML = `
           <div class="text-center py-10 bg-white rounded-3xl border border-slate-200 p-6 text-slate-400 text-xs">
-            <i class="fa-solid fa-mug-hot text-3xl mb-2 text-slate-300"></i>
             <p class="font-bold text-slate-600">No Pending Requests</p>
-            <p class="text-[11px] mt-1">Jab bhi koi customer ride request karega, instant yahan display hogi.</p>
+            <p class="text-[11px] mt-1">Nayi ride requests yahan display hongi.</p>
           </div>
         `;
       } else {
@@ -685,54 +702,26 @@
           const totalFare = Number(b.total) || 0;
           const fee15 = Math.round(totalFare * 0.15);
           const vendorNet = totalFare - fee15;
-          const pickupFuel = b.pickupPay || Math.round(totalFare * 0.45);
-          const dropBal = totalFare - pickupFuel;
-          const vehicleBadgeHtml = getVehicleBadge(b.vehicle || b.type);
 
           return `
             <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
               <div class="flex justify-between items-center pb-2 border-b border-slate-100">
                 <span class="font-mono font-bold text-blue-700">${b.bookingId || 'MTZ'}</span>
-                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] bg-amber-100 text-amber-800">
-                  Ready to Accept
-                </span>
+                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] bg-amber-100 text-amber-800">Ready to Accept</span>
               </div>
-
               <div>
                 <p class="font-bold text-slate-800 text-sm">${b.from} ➔ ${b.to}</p>
                 <div class="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 mt-1 font-medium">
-                  <span><i class="fa-regular fa-calendar text-slate-400 mr-0.5"></i> ${b.date} (${b.time})</span>
-                  <span>•</span>
-                  ${vehicleBadgeHtml}
+                  <span>${b.date} (${b.time})</span> • ${getVehicleBadge(b.vehicle || b.type)}
                 </div>
-                ${b.carrierRequired ? `
-                  <div class="mt-2 bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md text-[10px] font-bold inline-flex items-center gap-1">
-                    <i class="fa-solid fa-truck-ramp-box"></i> Roof Carrier Required (+₹300 Included)
-                  </div>
-                ` : ''}
               </div>
-
-              <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 space-y-1 text-[11px]">
-                <div class="flex justify-between text-slate-600">
-                  <span>Customer Gross Fare:</span>
-                  <span class="font-semibold">₹${totalFare}</span>
-                </div>
-                <div class="flex justify-between text-blue-700">
-                  <span>Tripvyom Commission (15%):</span>
-                  <span class="font-bold">-₹${fee15}</span>
-                </div>
+              <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1 text-[11px]">
+                <div class="flex justify-between text-slate-600"><span>Gross Fare:</span> <span class="font-semibold">₹${totalFare}</span></div>
                 <div class="flex justify-between text-emerald-800 font-bold pt-1 border-t border-slate-200">
-                  <span>Your Net Fleet Earning:</span>
-                  <span class="text-sm font-black text-emerald-600">₹${vendorNet}</span>
+                  <span>Your Net Fleet Earning:</span> <span class="text-sm font-black text-emerald-600">₹${vendorNet}</span>
                 </div>
-                <div class="text-[10px] text-slate-500 pt-0.5 flex justify-between border-t border-dashed border-slate-200">
-                  <span>Customer 45% Fuel at Pickup: <b>₹${pickupFuel}</b></span>
-                  <span>55% at Drop: <b>₹${dropBal}</b></span>
-                </div>
-                <p class="text-[9px] text-amber-700 pt-1">* Fastag Toll, State Border Tax & Parking customer directly pay karega.</p>
               </div>
-
-              <button onclick="instantAcceptRide('${b.docId}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+              <button onclick="instantAcceptRide('${b.docId}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition">
                 <i class="fa-solid fa-hand-holding-dollar"></i> Accept Ride (Lock To Fleet)
               </button>
             </div>
@@ -740,13 +729,11 @@
         }).join('');
       }
 
-      // 2. RENDER MY FLEET RIDES
+      // 2. MY FLEET RIDES (LIFECYCLE MANAGEMENT)
       if (!currentVendor) {
         myRidesContainer.innerHTML = `
           <div class="text-center py-10 bg-white rounded-3xl border border-slate-200 p-6 space-y-2">
-            <i class="fa-solid fa-lock text-slate-300 text-3xl"></i>
             <p class="font-bold text-slate-700">Partner Login Required</p>
-            <p class="text-xs text-slate-400">Apni accepted rides manage karne ke liye login karein.</p>
             <button onclick="openVendorAuthModal()" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl text-xs">Login as Partner</button>
           </div>
         `;
@@ -754,7 +741,6 @@
         myRidesContainer.innerHTML = `
           <div class="text-center py-10 bg-white rounded-3xl border border-slate-200 p-6 text-slate-400 text-xs">
             <p class="font-bold text-slate-600">Koi active ride nahi hai.</p>
-            <p class="text-[11px] mt-1">Available Leads tab me jakar nayi rides accept karein.</p>
           </div>
         `;
       } else {
@@ -762,91 +748,55 @@
           const totalFare = Number(b.total) || 0;
           const fee15 = Math.round(totalFare * 0.15);
           const vendorNet = totalFare - fee15;
-
-          const isConfirmed = b.status === "Confirmed";
-          const isStarted = b.status === "Trip Started";
-          const isCompleted = b.status === "Trip Completed";
+          const status = b.status || "Confirmed";
           const isDriverAssigned = Boolean(b.driverName && b.cabNumber);
-          const vehicleBadgeHtml = getVehicleBadge(b.vehicle || b.type);
 
           return `
             <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
               <div class="flex justify-between items-center pb-2 border-b border-slate-100">
                 <span class="font-mono font-bold text-blue-700">${b.bookingId}</span>
-                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
-                  isCompleted ? 'bg-purple-100 text-purple-800' :
-                  isStarted ? 'bg-blue-100 text-blue-800' :
-                  isConfirmed ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-                }">
-                  ${b.status}
-                </span>
+                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">${status}</span>
               </div>
 
               <div>
                 <p class="font-bold text-slate-800 text-sm">${b.from} ➔ ${b.to}</p>
-                <div class="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 mt-1 font-medium">
-                  <span>${b.date} • ${b.time}</span>
-                  <span>•</span>
-                  ${vehicleBadgeHtml}
-                </div>
-                ${b.carrierRequired ? `
-                  <span class="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded mt-1 inline-block">Roof Carrier Cab</span>
-                ` : ''}
+                <p class="text-slate-500 text-[11px] mt-0.5">${b.date} • ${b.time}</p>
               </div>
 
-              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/70 text-[11px] flex justify-between items-center">
-                <div>
-                  <p class="text-slate-400 uppercase font-bold text-[9px]">Passenger</p>
-                  <p class="font-bold text-slate-800">${b.name}</p>
-                </div>
-                <div class="text-right">
-                  <a href="tel:${b.phone}" class="inline-flex items-center gap-1 text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-200 font-bold">
-                    <i class="fa-solid fa-phone text-[9px]"></i> ${b.phone}
-                  </a>
-                </div>
-              </div>
-
-              <div class="p-2.5 rounded-xl border ${isDriverAssigned ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'} space-y-1.5">
+              <div class="p-2.5 rounded-xl border ${isDriverAssigned ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'} space-y-1">
                 <div class="flex justify-between items-center">
-                  <span class="font-bold text-[11px] flex items-center gap-1">
-                    <i class="fa-solid ${isDriverAssigned ? 'fa-id-card text-emerald-600' : 'fa-triangle-exclamation text-amber-600'}"></i>
-                    ${isDriverAssigned ? 'Assigned Driver & Cab' : 'Driver Not Assigned Yet'}
-                  </span>
-                  ${!isCompleted ? `
-                    <button onclick="openAssignDriverModal('${b.docId}')" class="text-[10px] font-bold px-2 py-0.5 rounded-md ${isDriverAssigned ? 'bg-white border border-emerald-300 text-emerald-700' : 'bg-amber-600 text-white shadow-sm'}">
-                      ${isDriverAssigned ? 'Change Driver' : '+ Assign Driver & Cab'}
-                    </button>
-                  ` : ''}
+                  <span class="font-bold text-[11px]">${isDriverAssigned ? 'Driver Assigned ✓' : 'Driver Pending'}</span>
+                  <button onclick="openAssignDriverModal('${b.docId}')" class="text-[10px] font-bold px-2 py-0.5 rounded bg-white border border-emerald-300 text-emerald-700">
+                    ${isDriverAssigned ? 'Edit Driver' : '+ Assign Driver'}
+                  </button>
                 </div>
+                ${isDriverAssigned ? `<p class="text-[10px]"><b>${b.driverName}</b> (${b.driverPhone}) • <b>${b.cabNumber}</b> (${b.cabModelType || 'Standard'})</p>` : ''}
+              </div>
 
-                ${isDriverAssigned ? `
-                  <div class="grid grid-cols-2 text-[10px] pt-1 border-t border-emerald-200/60">
-                    <p><b>Driver:</b> ${b.driverName} (${b.driverPhone})</p>
-                    <p class="text-right"><b>Cab:</b> <span class="font-mono font-bold">${b.cabNumber}</span> <span class="text-emerald-700">(${b.cabModelType || 'Standard'})</span></p>
-                  </div>
+              <!-- WORKFLOW ACTION BUTTONS -->
+              <div class="space-y-1.5 pt-1">
+                ${status === "Confirmed" ? `
+                  <button onclick="updateTripStatus('${b.docId}', 'Dispatched from Garage')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-warehouse"></i> 1. Dispatch from Garage
+                  </button>
+                ` : status === "Dispatched from Garage" ? `
+                  <button onclick="updateTripStatus('${b.docId}', 'Reached Pickup Point')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-map-pin"></i> 2. Reached Pickup Point
+                  </button>
+                ` : status === "Reached Pickup Point" ? `
+                  <button onclick="updateTripStatus('${b.docId}', 'Trip Started')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-play"></i> 3. Start Trip
+                  </button>
+                ` : status === "Trip Started" ? `
+                  <button onclick="openTripBillingModal('${b.docId}')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> 4. End Trip & Add Extras (Toll/KM/Cash)
+                  </button>
                 ` : `
-                  <p class="text-[10px] text-amber-800">Customer ko driver details bhejne ke liye upar diye button se driver add karein.</p>
+                  <div class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl text-purple-900 space-y-0.5 text-[11px]">
+                    <p class="font-bold">Trip Completed & Closed ✓</p>
+                    <p>Cash Collected: <b>₹${b.cashCollected \vert{}\vert{} 0}</b> \vert{} Extras: <b>₹${b.totalExtras || 0}</b></p>
+                  </div>
                 `}
-              </div>
-
-              <div class="flex justify-between items-center text-[11px] font-bold pt-1">
-                <span>Net Vendor Settlement:</span>
-                <span class="text-emerald-700 font-black text-sm">₹${vendorNet}</span>
-              </div>
-
-              <div class="pt-1 space-y-2">
-                ${isConfirmed ? `
-                  <button onclick="startTripAction('${b.docId}',${isDriverAssigned})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
-                    <i class="fa-solid fa-play"></i> Start Ride (45% Fuel Collected)
-                  </button>
-                  <button onclick="cancelByVendor('${b.docId}', '${totalFare}')" class="w-full text-rose-600 hover:text-rose-700 bg-rose-50 border border-rose-200 font-semibold py-2 rounded-xl text-xs">
-                    Cancel & Reassign
-                  </button>
-                ` : isStarted ? `
-                  <button onclick="completeTripAction('${b.docId}')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
-                    <i class="fa-solid fa-flag-checkered"></i> Mark Trip Completed (Collect 55%)
-                  </button>
-                ` : ''}
               </div>
             </div>
           `;
@@ -854,38 +804,26 @@
       }
     }
 
-    // DISPATCH LOGIC
+    // DISPATCH & WORKFLOW ACTIONS
     function instantAcceptRide(docId) {
-      if (!currentVendor) {
-        alert("Ride accept karne ke liye Vendor/Partner login anivarya hai!");
-        openVendorAuthModal();
-        return;
-      }
-
-      if (!confirm("Kya aap yeh booking accept karke apne fleet me lock karna chahte hain?")) {
-        return;
-      }
-
+      if (!currentVendor) { alert("Pehle Login karein!"); openVendorAuthModal(); return; }
+      if (!confirm("Accept this ride into your fleet?")) return;
       db.collection("bookings").doc(docId).update({
         status: "Confirmed",
         vendorId: currentVendor.uid,
         vendorEmail: currentVendor.email || '',
         acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        alert("Ride accepted! Ab aap 'My Fleet Rides' tab me jakar Driver & Cab assign kar sakte hain.");
+        alert("Ride accepted! Ab driver & cab assign karein.");
         switchVendorTab('myrides');
-      }).catch(err => {
-        alert("Error accepting ride: " + err.message);
       });
     }
 
     function openAssignDriverModal(docId) {
       const b = allBookingsCache.find(item => item.docId === docId);
       if (!b) return;
-
       document.getElementById('modalDocId').value = docId;
       window.activeBookedVehicle = b.vehicle || b.type || 'Sedan';
-
       document.getElementById('modalRouteText').innerText = (b.from || '') + ' ➔ ' + (b.to || '');
       document.getElementById('modalBookingIdText').innerText = b.bookingId || 'MTZ-XXXX';
       document.getElementById('modalDriverName').value = b.driverName || '';
@@ -902,22 +840,12 @@
       const dPhone = document.getElementById('modalDriverPhone').value.trim();
       const cabNum = document.getElementById('modalCabNumber').value.trim();
 
-      if (!dName || dPhone.length < 10 || !cabNum) {
-        return alert("Driver Name, 10-digit Phone aur Commercial Cab Number bharna compulsory hai!");
-      }
+      if (!dName || dPhone.length < 10 || !cabNum) return alert("Sabhi details bharna anivarya hai!");
 
-      // ANTI-DOWNGRADE VALIDATION CHECK
-      const bookedTier = getTierLevel(bookedVehicle);
-      const assignedTier = getTierLevel(assignedCabType);
-
-      if (assignedTier < bookedTier) {
-        alert("⚠️ Downgrade Not Allowed!\nCustomer ne '" + bookedVehicle + "' book kiya hai. Aap usse chhota model ('" + assignedCabType + "') assign nahi kar sakte. Barabar ya upgraded gaadi hi chunein.");
+      if (getTierLevel(assignedCabType) < getTierLevel(bookedVehicle)) {
+        alert("⚠️ Downgrade Not Allowed! Customer ne '" + bookedVehicle + "' book kiya hai.");
         return;
       }
-
-      const btn = document.getElementById('modalSaveDriverBtn');
-      btn.innerText = "Saving Details...";
-      btn.disabled = true;
 
       db.collection("bookings").doc(docId).update({
         driverName: dName,
@@ -926,60 +854,62 @@
         cabModelType: assignedCabType,
         driverAssignedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        btn.innerText = "Save & Send Details to Customer";
-        btn.disabled = false;
         closeModal('assignDriverModal');
-        alert("Driver aur Cab details successfully save ho gayi! Customer ke screen par live reflect ho gayi hain.");
-      }).catch(err => {
-        btn.innerText = "Save & Send Details to Customer";
-        btn.disabled = false;
-        alert("Error: " + err.message);
+        alert("Driver & Cab details saved successfully!");
       });
     }
 
-    function startTripAction(docId, isDriverAssigned) {
-      if (!isDriverAssigned) {
-        alert("⚠️ Kripya trip shuru karne se pehle '+ Assign Driver & Cab' button se Driver details assign karein!");
-        return;
-      }
-      if (confirm("Customer pickup ho chuka hai aur 45% fuel allowance verify ho gayi hai?")) {
+    function updateTripStatus(docId, newStatus) {
+      if (confirm("Update trip status to: " + newStatus + "?")) {
         db.collection("bookings").doc(docId).update({
-          status: "Trip Started",
-          tripStartedAt: firebase.firestore.FieldValue.serverTimestamp()
+          status: newStatus,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       }
     }
 
-    function completeTripAction(docId) {
-      if (confirm("Trip destination par complete ho chuki hai aur remaining 55% payment collect ho gayi hai?")) {
-        db.collection("bookings").doc(docId).update({
-          status: "Trip Completed",
-          tripCompletedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }
+    function openTripBillingModal(docId) {
+      document.getElementById('billingDocId').value = docId;
+      document.getElementById('billExtraKm').value = 0;
+      document.getElementById('billNight').value = 0;
+      document.getElementById('billToll').value = 0;
+      document.getElementById('billParking').value = 0;
+      document.getElementById('billAirportParking').value = 0;
+      document.getElementById('billCarrier').value = 0;
+      document.getElementById('billCashCollected').value = 0;
+      openModal('tripBillingModal');
     }
 
-    function cancelByVendor(docId, totalFare) {
-      const penalty = Math.max(300, Math.round(Number(totalFare) * 0.10));
-      if (confirm("⚠️ VENDOR PENALTY WARNING:\nRide accept karne ke baad drop karne par ₹" + penalty + " penalty lagegi aur ride wapas open pool me chali jayegi.\n\nKya aap sach me cancel karna chahte hain?")) {
-        db.collection("bookings").doc(docId).update({
-          status: "Confirmation Pending",
-          reassignedNotice: true,
-          lastVendorPenalty: penalty,
-          vendorId: firebase.firestore.FieldValue.delete(),
-          driverName: "",
-          driverPhone: "",
-          cabNumber: "",
-          cabModelType: ""
-        }).then(() => {
-          alert("Ride pool me wapas bhej di gayi hai.");
-        });
-      }
+    function submitTripBillingAndClose() {
+      const docId = document.getElementById('billingDocId').value;
+      const extraKm = Number(document.getElementById('billExtraKm').value) || 0;
+      const night = Number(document.getElementById('billNight').value) || 0;
+      const toll = Number(document.getElementById('billToll').value) || 0;
+      const parking = Number(document.getElementById('billParking').value) || 0;
+      const airportParking = Number(document.getElementById('billAirportParking').value) || 0;
+      const carrier = Number(document.getElementById('billCarrier').value) || 0;
+      const cashCollected = Number(document.getElementById('billCashCollected').value) || 0;
+
+      const totalExtras = extraKm + night + toll + parking + airportParking + carrier;
+
+      db.collection("bookings").doc(docId).update({
+        status: "Trip Completed & Closed",
+        extraKmCharge: extraKm,
+        nightCharge: night,
+        tollCharge: toll,
+        parkingCharge: parking,
+        airportParkingCharge: airportParking,
+        carrierCharge: carrier,
+        totalExtras: totalExtras,
+        cashCollected: cashCollected,
+        tripClosedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        closeModal('tripBillingModal');
+        alert("🎉 Trip successfully completed, billed & closed!");
+      }).catch(err => alert("Error: " + err.message));
     }
 
-    window.addEventListener("load", () => {
-      listenToAllBookings();
-    });
+    window.addEventListener("load", () => { listenToAllBookings(); });
   </script>
 </body>
 </html>
