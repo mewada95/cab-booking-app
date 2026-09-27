@@ -23,7 +23,7 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide">Tripvyom Partner</h1>
-        <p class="text-[10px] text-slate-400">Odometer KM & Smart Billing Control</p>
+        <p class="text-[10px] text-slate-400">Advanced Fleet Lifecycle & Waiting Billing</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -102,7 +102,7 @@
     <!-- TAB VIEW 2: ACCEPTED / ACTIVE FLEET RIDES -->
     <div id="viewMyRides" class="hidden space-y-3">
       <div class="flex justify-between items-center px-1">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Assigned Trips & Dispatch</span>
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Assigned Trips & Lifecycle</span>
         <span class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">Fleet Control</span>
       </div>
 
@@ -167,13 +167,13 @@
     </div>
   </div>
 
-  <!-- STEP 3: ODOMETER & FARE BILLING MODAL (END TRIP) -->
+  <!-- STEP 3: ODOMETER, WAITING & FARE BILLING MODAL (END TRIP) -->
   <div id="tripBillingModal" class="fixed inset-0 bg-slate-900/70 z-[75] hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
-          <h3 class="font-bold text-slate-800 text-sm">Trip Settlement & KM Billing</h3>
-          <p class="text-[10px] text-slate-500">Auto calculated based on Start & End KM</p>
+          <h3 class="font-bold text-slate-800 text-sm">Trip Settlement, KM & Waiting Billing</h3>
+          <p class="text-[10px] text-slate-500">Auto calculated based on KM & Waiting duration</p>
         </div>
         <button type="button" onclick="closeModal('tripBillingModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -183,7 +183,7 @@
       <div class="p-4 space-y-3 text-xs overflow-y-auto max-h-[82vh]">
         <input type="hidden" id="billingDocId" />
 
-        <!-- KM Readings Card -->
+        <!-- KM & Waiting Card -->
         <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100 space-y-2 text-blue-900">
           <div class="flex justify-between items-center">
             <span>Start KM Reading:</span>
@@ -197,6 +197,10 @@
             <span>Total Distance Run:</span>
             <b id="displayTotalKmRun" class="font-black text-blue-700">0 KM</b>
           </div>
+          <div class="flex justify-between items-center pt-1 border-t border-blue-200 text-xs">
+            <span>Waiting Time (Scheduled vs Actual):</span>
+            <b id="displayWaitingTime" class="font-bold text-amber-700">0 Mins</b>
+          </div>
         </div>
 
         <!-- Extra Charges Grid (Editable) -->
@@ -206,26 +210,26 @@
             <input id="billExtraKmCharge" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
           <div>
-            <label class="block font-medium text-slate-600 mb-0.5">Night Charge (₹)</label>
-            <input id="billNight" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
+            <label class="block font-medium text-slate-600 mb-0.5">Waiting Charge (₹)</label>
+            <input id="billWaitingCharge" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-slate-600 mb-0.5">Night Charge (₹)</label>
+            <input id="billNight" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
+          </div>
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Toll Tax (₹)</label>
             <input id="billToll" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
-          <div>
-            <label class="block font-medium text-slate-600 mb-0.5">Regular Parking (₹)</label>
-            <input id="billParking" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
-          </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block font-medium text-slate-600 mb-0.5">Airport Parking (₹)</label>
-            <input id="billAirportParking" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
+            <label class="block font-medium text-slate-600 mb-0.5">Parking / Airport Parking (₹)</label>
+            <input id="billParking" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Roof Carrier (₹)</label>
@@ -240,7 +244,7 @@
             <span id="summaryBaseFare" class="font-bold">₹0</span>
           </div>
           <div class="flex justify-between text-slate-600">
-            <span>Total Extras (KM/Toll/Night/Parking):</span>
+            <span>Total Extras (KM/Waiting/Toll/Night):</span>
             <span id="summaryTotalExtras" class="font-bold">₹0</span>
           </div>
           <div class="flex justify-between text-slate-900 font-extrabold pt-1 border-t border-slate-200 text-xs">
@@ -284,11 +288,15 @@
             <b id="popupTotalKm" class="font-bold text-slate-900">0 KM</b>
           </div>
           <div class="flex justify-between">
+            <span>Waiting Duration:</span>
+            <b id="popupWaitingMins" class="font-bold text-slate-900">0 Mins</b>
+          </div>
+          <div class="flex justify-between">
             <span>Base Fare:</span>
             <b id="popupBaseFare" class="font-bold text-slate-900">₹0</b>
           </div>
           <div class="flex justify-between">
-            <span>Extra KM & Extras:</span>
+            <span>Extra KM & Waiting & Extras:</span>
             <b id="popupExtras" class="font-bold text-slate-900">₹0</b>
           </div>
           <div class="flex justify-between pt-2 border-t border-slate-200 text-sm font-black text-slate-900">
@@ -303,7 +311,7 @@
         </div>
 
         <div class="grid grid-cols-2 gap-2 pt-1">
-          <button type="button" onclick="closeModal('customerBillPopupModal')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">
+          <button type="button" onclick="closeModal('customerBillPopupModal'); openModal('tripBillingModal');" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">
             ✏️ Edit Bill
           </button>
           <button type="button" onclick="confirmAndFinalizeTrip()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1">
@@ -760,21 +768,30 @@
       }
     }
 
-    // LIFECYCLE WORKFLOW BUTTONS HTML HELPER
+    // HELPER FOR LIFECYCLE WORKFLOW BUTTONS WITH TIMESTAMPS
     function getWorkflowButtonsHtml(b) {
       const status = b.status || "Confirmed";
 
+      let timestampsHtml = '<div class="text-[10px] text-slate-500 space-y-0.5 pt-1 border-t border-slate-100">';
+      if (b.garageOutTime) timestampsHtml += '<p>🏠 Garage Out: <b>' + new Date(b.garageOutTime.toDate?.() || b.garageOutTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '</b></p>';
+      if (b.reachedPickupTime) timestampsHtml += '<p>📍 Reached Pickup: <b>' + new Date(b.reachedPickupTime.toDate?.() || b.reachedPickupTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '</b></p>';
+      if (b.tripStartedAt) timestampsHtml += '<p>🚗 Trip Started (Start KM: ' + (b.startKm || '-') + '): <b>' + new Date(b.tripStartedAt.toDate?.() || b.tripStartedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '</b></p>';
+      timestampsHtml += '</div>';
+
+      let actionBtn = '';
       if (status === "Confirmed") {
-        return '<button onclick="updateTripStatus(\'' + b.docId + '\', \'Dispatched from Garage\')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-warehouse mr-1"></i> 1. Dispatch from Garage</button>';
+        actionBtn = '<button onclick="updateTripTimestamp(\'' + b.docId + '\', \'Dispatched from Garage\', \'garageOutTime\')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-warehouse mr-1"></i> 1. Dispatch from Garage</button>';
       } else if (status === "Dispatched from Garage") {
-        return '<button onclick="updateTripStatus(\'' + b.docId + '\', \'Reached Pickup Point\')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-map-pin mr-1"></i> 2. Reached Pickup Point</button>';
+        actionBtn = '<button onclick="updateTripTimestamp(\'' + b.docId + '\', \'Reached Pickup Point\', \'reachedPickupTime\')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-map-pin mr-1"></i> 2. Reached Pickup Point</button>';
       } else if (status === "Reached Pickup Point") {
-        return '<button onclick="promptStartTrip(\'' + b.docId + '\')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-play mr-1"></i> 3. Start Trip (Enter Start KM)</button>';
+        actionBtn = '<button onclick="promptStartTrip(\'' + b.docId + '\')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-play mr-1"></i> 3. Start Trip (Enter Start KM)</button>';
       } else if (status === "Trip Started") {
-        return '<button onclick="openTripBillingModal(\'' + b.docId + '\')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> 4. End Trip & Bill Fare</button>';
+        actionBtn = '<button onclick="openTripBillingModal(\'' + b.docId + '\')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> 4. End Trip & Bill Fare</button>';
       } else {
-        return '<div class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl text-purple-900 space-y-0.5 text-[11px]"><p class="font-bold">Trip Completed & Closed ✓</p><p>Total KM: <b>' + (b.totalKmRun || 0) + ' KM</b> | Cash: <b>₹' + (b.cashCollected || 0) + '</b></p></div>';
+        actionBtn = '<div class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl text-purple-900 space-y-0.5 text-[11px]"><p class="font-bold">Trip Completed & Closed ✓</p><p>Total KM: <b>' + (b.totalKmRun || 0) + ' KM</b> | Waiting: <b>' + (b.waitingMins || 0) + ' Mins</b> | Cash: <b>₹' + (b.cashCollected || 0) + '</b></p></div>';
       }
+
+      return timestampsHtml + '<div class="pt-1.5">' + actionBtn + '</div>';
     }
 
     // FIRESTORE DISPATCH LISTENER
@@ -967,7 +984,7 @@
                 <span class="text-emerald-700 font-black text-sm">₹${vendorNet}</span>
               </div>
 
-              <!-- LIFECYCLE WORKFLOW BUTTONS -->
+              <!-- LIFECYCLE WORKFLOW BUTTONS WITH TIMESTAMPS -->
               <div class="pt-1 space-y-2">
                 ${getWorkflowButtonsHtml(b)}
               </div>
@@ -1059,11 +1076,16 @@
       });
     }
 
-    function updateTripStatus(docId, newStatus) {
-      if (confirm("Update trip status to: " + newStatus + "?")) {
-        db.collection("bookings").doc(docId).update({
+    function updateTripTimestamp(docId, newStatus, fieldName) {
+      if (confirm("Update status to: " + newStatus + "?")) {
+        let updateData = {
           status: newStatus,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        updateData[fieldName] = firebase.firestore.FieldValue.serverTimestamp();
+
+        db.collection("bookings").doc(docId).update(updateData).then(() => {
+          alert("Status updated: " + newStatus);
         });
       }
     }
@@ -1092,11 +1114,12 @@
       document.getElementById('displayStartKm').innerText = b.startKm || '0';
       document.getElementById('billEndKm').value = '';
       document.getElementById('displayTotalKmRun').innerText = '0 KM';
+      document.getElementById('displayWaitingTime').innerText = '0 Mins';
       document.getElementById('billExtraKmCharge').value = 0;
+      document.getElementById('billWaitingCharge').value = 0;
       document.getElementById('billNight').value = 0;
       document.getElementById('billToll').value = 0;
       document.getElementById('billParking').value = 0;
-      document.getElementById('billAirportParking').value = 0;
       document.getElementById('billCarrier').value = b.carrierRequired ? 300 : 0;
       document.getElementById('billCashCollected').value = Number(b.total) || 0;
 
@@ -1114,15 +1137,53 @@
       const totalKmRun = endKm > startKm ? (endKm - startKm) : 0;
       document.getElementById('displayTotalKmRun').innerText = totalKmRun + ' KM';
 
+      // Waiting duration calculation (Scheduled time vs Actual trip start time)
+      let waitingMins = 0;
+      if (b.tripStartedAt && b.time) {
+        const tripStartDate = b.tripStartedAt.toDate?.() || new Date(b.tripStartedAt);
+        // Parse scheduled time string (e.g. "10:30 AM")
+        const [timeStr, modifier] = b.time.split(' ');
+        let [hours, minutes] = timeStr.split(':').map(Number);
+        if (modifier === 'PM' && hours < 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
+
+        const scheduledDate = new Date(tripStartDate);
+        scheduledDate.setHours(hours, minutes, 0, 0);
+
+        const diffMs = tripStartDate - scheduledDate;
+        const diffMins = Math.floor(diffMs / (1000 * 60));
+        // Free waiting time: 45 minutes allowed, after that ₹3 per minute or configurable
+        if (diffMins > 45) {
+          waitingMins = diffMins - 45;
+        }
+      }
+      document.getElementById('displayWaitingTime').innerText = waitingMins + ' Mins';
+
+      // Auto waiting charge calculation (₹3 per extra minute or ₹150/hr)
+      const autoWaitingCharge = waitingMins * 3;
+      if (document.getElementById('billWaitingCharge').value == 0 && autoWaitingCharge > 0) {
+        document.getElementById('billWaitingCharge').value = autoWaitingCharge;
+      }
+
+      // Auto Extra KM calculation (Assuming 100 KM included or standard calculation rule)
+      let autoExtraKmCharge = 0;
+      if (totalKmRun > 120) { // Standard threshold example
+        const extraKm = totalKmRun - 120;
+        autoExtraKmCharge = extraKm * 12; // ₹12 per extra KM
+        if (document.getElementById('billExtraKmCharge').value == 0) {
+          document.getElementById('billExtraKmCharge').value = autoExtraKmCharge;
+        }
+      }
+
       const baseFare = Number(b.total) || 0;
       const extraKmCharge = Number(document.getElementById('billExtraKmCharge').value) || 0;
+      const waitingCharge = Number(document.getElementById('billWaitingCharge').value) || 0;
       const night = Number(document.getElementById('billNight').value) || 0;
       const toll = Number(document.getElementById('billToll').value) || 0;
       const parking = Number(document.getElementById('billParking').value) || 0;
-      const airportParking = Number(document.getElementById('billAirportParking').value) || 0;
       const carrier = Number(document.getElementById('billCarrier').value) || 0;
 
-      const totalExtras = extraKmCharge + night + toll + parking + airportParking + carrier;
+      const totalExtras = extraKmCharge + waitingCharge + night + toll + parking + carrier;
       const grandTotal = baseFare + totalExtras;
 
       document.getElementById('summaryBaseFare').innerText = '₹' + baseFare.toLocaleString('en-IN');
@@ -1149,18 +1210,20 @@
 
       const baseFare = Number(b.total) || 0;
       const extraKmCharge = Number(document.getElementById('billExtraKmCharge').value) || 0;
+      const waitingCharge = Number(document.getElementById('billWaitingCharge').value) || 0;
       const night = Number(document.getElementById('billNight').value) || 0;
       const toll = Number(document.getElementById('billToll').value) || 0;
       const parking = Number(document.getElementById('billParking').value) || 0;
-      const airportParking = Number(document.getElementById('billAirportParking').value) || 0;
       const carrier = Number(document.getElementById('billCarrier').value) || 0;
 
-      const totalExtras = extraKmCharge + night + toll + parking + airportParking + carrier;
+      const totalExtras = extraKmCharge + waitingCharge + night + toll + parking + carrier;
       const grandTotal = baseFare + totalExtras;
+      const waitingMins = Number(document.getElementById('displayWaitingTime').innerText.replace(' Mins', '')) || 0;
 
       // Populate confirmation popup fields
       document.getElementById('popupBookingId').innerText = b.bookingId || 'MTZ';
       document.getElementById('popupTotalKm').innerText = totalKmRun + ' KM';
+      document.getElementById('popupWaitingMins').innerText = waitingMins + ' Mins';
       document.getElementById('popupBaseFare').innerText = '₹' + baseFare.toLocaleString('en-IN');
       document.getElementById('popupExtras').innerText = '₹' + totalExtras.toLocaleString('en-IN');
       document.getElementById('popupGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
@@ -1170,11 +1233,12 @@
         docId: b.docId,
         endKm: endKm,
         totalKmRun: totalKmRun,
+        waitingMins: waitingMins,
         extraKmCharge: extraKmCharge,
+        waitingCharge: waitingCharge,
         nightCharge: night,
         tollCharge: toll,
         parkingCharge: parking,
-        airportParkingCharge: airportParking,
         carrierCharge: carrier,
         totalExtras: totalExtras,
         grandTotal: grandTotal,
@@ -1193,11 +1257,12 @@
         status: "Trip Completed & Closed",
         endKm: data.endKm,
         totalKmRun: data.totalKmRun,
+        waitingMins: data.waitingMins,
         extraKmCharge: data.extraKmCharge,
+        waitingCharge: data.waitingCharge,
         nightCharge: data.nightCharge,
         tollCharge: data.tollCharge,
         parkingCharge: data.parkingCharge,
-        airportParkingCharge: data.airportParkingCharge,
         carrierCharge: data.carrierCharge,
         totalExtras: data.totalExtras,
         grandTotal: data.grandTotal,
