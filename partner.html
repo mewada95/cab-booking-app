@@ -23,7 +23,7 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide">Tripvyom Partner</h1>
-        <p class="text-[10px] text-slate-400">Odometer KM & Fare Billing Control</p>
+        <p class="text-[10px] text-slate-400">Odometer KM & Smart Billing Control</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -120,7 +120,7 @@
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
           <h3 class="font-bold text-slate-800 text-sm">Assign Driver & Cab Details</h3>
-          <p class="text-[10px] text-slate-500">Customer ko exact ya upgraded model hi assign karein</p>
+          <p class="text-[10px] text-slate-500">Anti-downgrade rule applied</p>
         </div>
         <button type="button" onclick="closeModal('assignDriverModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -143,7 +143,6 @@
             <option value="MUV Ertiga">MUV Ertiga / Carens</option>
             <option value="SUV Crysta">SUV Innova Crysta</option>
           </select>
-          <p class="text-[10px] text-amber-700 mt-1">⚠️ Rule: Downgrade allowed nahi hai.</p>
         </div>
 
         <div>
@@ -173,8 +172,8 @@
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
-          <h3 class="font-bold text-slate-800 text-sm">Trip Billing & Fare Settlement</h3>
-          <p class="text-[10px] text-slate-500">Enter End KM & extra charges (One-Way / Round Trip)</p>
+          <h3 class="font-bold text-slate-800 text-sm">Trip Settlement & KM Billing</h3>
+          <p class="text-[10px] text-slate-500">Auto calculated based on Start & End KM</p>
         </div>
         <button type="button" onclick="closeModal('tripBillingModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -187,12 +186,12 @@
         <!-- KM Readings Card -->
         <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100 space-y-2 text-blue-900">
           <div class="flex justify-between items-center">
-            <span>Start KM (Garage/Pickup):</span>
+            <span>Start KM Reading:</span>
             <b id="displayStartKm" class="font-mono text-sm">0</b>
           </div>
           <div>
             <label class="block font-bold mb-1">End KM Reading (Odometer) *</label>
-            <input id="billEndKm" type="number" placeholder="e.g. 45280" oninput="calculateFareAndBilling()" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 font-mono font-bold text-sm text-blue-900 focus:outline-none" />
+            <input id="billEndKm" type="number" placeholder="e.g. 45800" oninput="calculateFareAndBilling()" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 font-mono font-bold text-sm text-blue-900 focus:outline-none" />
           </div>
           <div class="flex justify-between items-center pt-1 border-t border-blue-200 text-xs">
             <span>Total Distance Run:</span>
@@ -200,37 +199,37 @@
           </div>
         </div>
 
-        <!-- Extra Charges Grid -->
+        <!-- Extra Charges Grid (Editable) -->
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Extra KM Charge (₹)</label>
-            <input id="billExtraKmCharge" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+            <input id="billExtraKmCharge" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Night Charge (₹)</label>
-            <input id="billNight" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+            <input id="billNight" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Toll Tax (₹)</label>
-            <input id="billToll" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+            <input id="billToll" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Regular Parking (₹)</label>
-            <input id="billParking" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+            <input id="billParking" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Airport Parking (₹)</label>
-            <input id="billAirportParking" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+            <input id="billAirportParking" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Roof Carrier (₹)</label>
-            <input id="billCarrier" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+            <input id="billCarrier" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
         </div>
 
@@ -241,7 +240,7 @@
             <span id="summaryBaseFare" class="font-bold">₹0</span>
           </div>
           <div class="flex justify-between text-slate-600">
-            <span>Total Extras (Toll/KM/Night/Parking):</span>
+            <span>Total Extras (KM/Toll/Night/Parking):</span>
             <span id="summaryTotalExtras" class="font-bold">₹0</span>
           </div>
           <div class="flex justify-between text-slate-900 font-extrabold pt-1 border-t border-slate-200 text-xs">
@@ -253,12 +252,64 @@
         <div>
           <label class="block font-bold text-slate-700 mb-1">Cash Collected By Driver from Customer (₹)</label>
           <input id="billCashCollected" type="number" value="0" class="w-full bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl px-3 py-2 font-black text-sm focus:outline-none" />
-          <p class="text-[10px] text-slate-400 mt-0.5">Driver dwara customer se total cash kitna liya gaya</p>
         </div>
 
-        <button type="button" onclick="submitTripBillingAndClose()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 mt-2">
-          <i class="fa-solid fa-flag-checkered"></i> Finalize & Close Trip
+        <button type="button" onclick="previewCustomerBillPopup()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 mt-2">
+          <i class="fa-solid fa-receipt"></i> Preview Customer Bill & Close
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: CUSTOMER BILL CONFIRMATION POPUP -->
+  <div id="customerBillPopupModal" class="fixed inset-0 bg-slate-900/80 z-[85] hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
+      <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-emerald-50 text-emerald-900">
+        <div>
+          <h3 class="font-bold text-sm flex items-center gap-1.5">
+            <i class="fa-solid fa-file-invoice text-emerald-600"></i> Customer Final Bill Summary
+          </h3>
+          <p class="text-[10px] text-emerald-700">Verify amount to be collected before closing</p>
+        </div>
+      </div>
+
+      <div class="p-5 space-y-3 text-xs">
+        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2 text-slate-700">
+          <div class="flex justify-between">
+            <span>Booking ID:</span>
+            <b id="popupBookingId" class="font-mono text-slate-900">MTZ-XXXX</b>
+          </div>
+          <div class="flex justify-between">
+            <span>Total Distance Run:</span>
+            <b id="popupTotalKm" class="font-bold text-slate-900">0 KM</b>
+          </div>
+          <div class="flex justify-between">
+            <span>Base Fare:</span>
+            <b id="popupBaseFare" class="font-bold text-slate-900">₹0</b>
+          </div>
+          <div class="flex justify-between">
+            <span>Extra KM & Extras:</span>
+            <b id="popupExtras" class="font-bold text-slate-900">₹0</b>
+          </div>
+          <div class="flex justify-between pt-2 border-t border-slate-200 text-sm font-black text-slate-900">
+            <span>Grand Total Collectible:</span>
+            <span id="popupGrandTotal" class="text-emerald-600">₹0</span>
+          </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900 text-[11px]">
+          <p class="font-bold mb-0.5">⚠️ Confirmation Required:</p>
+          <p>Kya aapne customer se poora bill collect kar liya hai aur booking close karna chahte hain?</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button type="button" onclick="closeModal('customerBillPopupModal')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">
+            ✏️ Edit Bill
+          </button>
+          <button type="button" onclick="confirmAndFinalizeTrip()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1">
+            ✓ Close Booking
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -273,14 +324,9 @@
           </h3>
           <p class="text-[10px] text-slate-500">Live selfie & basic details</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="skipKycForNow()" class="text-[11px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-xl transition">
-            Skip for Now ➔
-          </button>
-          <button type="button" onclick="closeModal('kycModal')" class="text-slate-400 hover:text-slate-600 p-1">
-            <i class="fa-solid fa-xmark text-lg"></i>
-          </button>
-        </div>
+        <button type="button" onclick="closeModal('kycModal')" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
       </div>
 
       <div class="p-4 overflow-y-auto space-y-4 text-xs">
@@ -316,36 +362,36 @@
         <div class="space-y-3">
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Full Legal / Agency Name *</label>
-            <input id="kycFullName" type="text" placeholder="Travel Agency / Driver Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+            <input id="kycFullName" type="text" placeholder="Travel Agency / Driver Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold" />
           </div>
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Mobile Number (Mandatory) *</label>
-            <input id="kycMobileNum" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+            <input id="kycMobileNum" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold" />
           </div>
           <div>
             <label class="block font-semibold text-slate-700 mb-1">City (Mandatory) *</label>
-            <input id="kycCityInput" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+            <input id="kycCityInput" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold" />
           </div>
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Permanent Residential / Office Address *</label>
-            <textarea id="kycAddress" rows="2" placeholder="House/Flat No, Street, State, PIN Code" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500"></textarea>
+            <textarea id="kycAddress" rows="2" placeholder="House/Flat No, Street, State, PIN Code" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs"></textarea>
           </div>
         </div>
 
-        <button type="button" id="submitKycBtn" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+        <button type="button" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-cloud-arrow-up"></i> Save Partner Profile
         </button>
       </div>
     </div>
   </div>
 
-  <!-- VENDOR AUTH / LOGIN MODAL -->
+  <!-- VENDOR AUTH MODAL -->
   <div id="vendorAuthModal" class="fixed inset-0 bg-slate-900/70 z-[80] hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
           <h3 class="font-bold text-slate-800 text-sm">Partner Authentication</h3>
-          <p class="text-[10px] text-slate-500">Access your fleet dispatch and wallet</p>
+          <p class="text-[10px] text-slate-500">Access fleet dispatch & wallet</p>
         </div>
         <button type="button" onclick="closeModal('vendorAuthModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -353,7 +399,7 @@
       </div>
 
       <div class="p-5 space-y-3.5 text-xs">
-        <button type="button" onclick="vendorLoginWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-4 rounded-xl border border-slate-300 flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
+        <button type="button" onclick="vendorLoginWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-4 rounded-xl border border-slate-300 flex items-center justify-center gap-2 shadow-sm transition">
           <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
           Partner Sign-in with Google
         </button>
@@ -365,27 +411,27 @@
 
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Fleet / Agency Name *</label>
-          <input id="vendorAgencyName" type="text" placeholder="Travel Agency Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
+          <input id="vendorAgencyName" type="text" placeholder="Travel Agency Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
         </div>
         <div>
           <label class="block font-semibold text-slate-600 mb-1">City (Mandatory) *</label>
-          <input id="vendorCityInput" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
+          <input id="vendorCityInput" type="text" placeholder="e.g. Bhopal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
         </div>
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Mobile Number (Mandatory) *</label>
-          <input id="vendorPhoneInput" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
+          <input id="vendorPhoneInput" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
         </div>
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Email Address *</label>
-          <input id="vendorEmail" type="email" placeholder="partner@domain.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
+          <input id="vendorEmail" type="email" placeholder="partner@domain.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
         </div>
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Password *</label>
-          <input id="vendorPassword" type="password" placeholder="Minimum 6 characters" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500" />
+          <input id="vendorPassword" type="password" placeholder="Minimum 6 characters" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
         </div>
 
         <div class="grid grid-cols-2 gap-2 pt-1">
-          <button type="button" onclick="handleVendorEmailAuth(false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
+          <button type="button" onclick="handleVendorEmailAuth(false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
             Sign In
           </button>
           <button type="button" onclick="handleVendorEmailAuth(true)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">
@@ -524,18 +570,14 @@
 
           if (isVerified) {
             if (kycText) kycText.innerText = "Profile Verified";
-            if (kycBtn) kycBtn.className = "text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-xl flex items-center gap-1 font-semibold";
             if (alertBanner) alertBanner.classList.add('hidden');
           } else {
             if (kycText) kycText.innerText = "Profile Pending";
-            if (kycBtn) kycBtn.className = "text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded-xl flex items-center gap-1 font-semibold";
             if (alertBanner) alertBanner.classList.remove('hidden');
           }
 
           if (currentVendorProfile.agencyName && document.getElementById('kycFullName')) {
             document.getElementById('kycFullName').value = currentVendorProfile.agencyName;
-          } else if (currentVendorProfile.name && document.getElementById('kycFullName')) {
-            document.getElementById('kycFullName').value = currentVendorProfile.name;
           }
           if (currentVendorProfile.phone && document.getElementById('kycMobileNum')) {
             document.getElementById('kycMobileNum').value = currentVendorProfile.phone;
@@ -641,7 +683,7 @@
         btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Profile Saved';
         btn.disabled = false;
         closeModal('kycModal');
-        alert("🎉 Partner profile successfully saved and synced to Admin panel.");
+        alert("🎉 Partner profile successfully saved!");
       } catch (err) {
         btn.innerHTML = 'Save Partner Profile';
         btn.disabled = false;
@@ -663,7 +705,7 @@
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
           closeModal('vendorAuthModal');
-          alert("Login Successful! Data synced to Admin panel.");
+          alert("Login Successful!");
         })
         .catch(err => alert("Login Error: " + err.message));
     }
@@ -718,10 +760,9 @@
       }
     }
 
-    // HELPER FOR LIFECYCLE WORKFLOW BUTTONS
+    // LIFECYCLE WORKFLOW BUTTONS HTML HELPER
     function getWorkflowButtonsHtml(b) {
       const status = b.status || "Confirmed";
-      const isDriverAssigned = Boolean(b.driverName && b.cabNumber);
 
       if (status === "Confirmed") {
         return '<button onclick="updateTripStatus(\'' + b.docId + '\', \'Dispatched from Garage\')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-warehouse mr-1"></i> 1. Dispatch from Garage</button>';
@@ -732,7 +773,7 @@
       } else if (status === "Trip Started") {
         return '<button onclick="openTripBillingModal(\'' + b.docId + '\')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> 4. End Trip & Bill Fare</button>';
       } else {
-        return '<div class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl text-purple-900 space-y-0.5 text-[11px]"><p class="font-bold">Trip Completed & Settled ✓</p><p>Total KM: <b>' + (b.totalKmRun || 0) + ' KM</b> | Cash: <b>₹' + (b.cashCollected || 0) + '</b></p></div>';
+        return '<div class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl text-purple-900 space-y-0.5 text-[11px]"><p class="font-bold">Trip Completed & Closed ✓</p><p>Total KM: <b>' + (b.totalKmRun || 0) + ' KM</b> | Cash: <b>₹' + (b.cashCollected || 0) + '</b></p></div>';
       }
     }
 
@@ -1039,7 +1080,7 @@
         startKm: Number(startKm),
         tripStartedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        alert("Trip Started! Start KM recorded: " + startKm);
+        alert("Trip Started Successfully! Start KM recorded: " + startKm);
       });
     }
 
@@ -1057,7 +1098,7 @@
       document.getElementById('billParking').value = 0;
       document.getElementById('billAirportParking').value = 0;
       document.getElementById('billCarrier').value = b.carrierRequired ? 300 : 0;
-      document.getElementById('billCashCollected').value = 0;
+      document.getElementById('billCashCollected').value = Number(b.total) || 0;
 
       window.activeBillingBooking = b;
       calculateFareAndBilling();
@@ -1089,11 +1130,12 @@
       document.getElementById('summaryGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
     }
 
-    function submitTripBillingAndClose() {
-      const docId = document.getElementById('billingDocId').value;
+    function previewCustomerBillPopup() {
       const b = window.activeBillingBooking;
+      if (!b) return;
+
       const endKm = Number(document.getElementById('billEndKm').value) || 0;
-      const startKm = Number(b?.startKm) || 0;
+      const startKm = Number(b.startKm) || 0;
 
       if (endKm <= startKm) {
         alert("⚠️ End KM, Start KM se zyada hona chahiye!");
@@ -1101,19 +1143,31 @@
       }
 
       const totalKmRun = endKm - startKm;
+      if (totalKmRun > 1500 && !confirm("⚠️ Dhyan dein: Total distance " + totalKmRun + " KM dikh rahi hai. Kya aapko yakin hai ki yeh reading sahi hai?")) {
+        return;
+      }
+
+      const baseFare = Number(b.total) || 0;
       const extraKmCharge = Number(document.getElementById('billExtraKmCharge').value) || 0;
       const night = Number(document.getElementById('billNight').value) || 0;
       const toll = Number(document.getElementById('billToll').value) || 0;
       const parking = Number(document.getElementById('billParking').value) || 0;
       const airportParking = Number(document.getElementById('billAirportParking').value) || 0;
       const carrier = Number(document.getElementById('billCarrier').value) || 0;
-      const cashCollected = Number(document.getElementById('billCashCollected').value) || 0;
 
       const totalExtras = extraKmCharge + night + toll + parking + airportParking + carrier;
-      const grandTotal = (Number(b?.total) || 0) + totalExtras;
+      const grandTotal = baseFare + totalExtras;
 
-      db.collection("bookings").doc(docId).update({
-        status: "Trip Completed & Closed",
+      // Populate confirmation popup fields
+      document.getElementById('popupBookingId').innerText = b.bookingId || 'MTZ';
+      document.getElementById('popupTotalKm').innerText = totalKmRun + ' KM';
+      document.getElementById('popupBaseFare').innerText = '₹' + baseFare.toLocaleString('en-IN');
+      document.getElementById('popupExtras').innerText = '₹' + totalExtras.toLocaleString('en-IN');
+      document.getElementById('popupGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
+
+      // Cache final calculated data
+      window.finalBillingData = {
+        docId: b.docId,
         endKm: endKm,
         totalKmRun: totalKmRun,
         extraKmCharge: extraKmCharge,
@@ -1124,11 +1178,34 @@
         carrierCharge: carrier,
         totalExtras: totalExtras,
         grandTotal: grandTotal,
-        cashCollected: cashCollected,
+        cashCollected: Number(document.getElementById('billCashCollected').value) || 0
+      };
+
+      closeModal('tripBillingModal');
+      openModal('customerBillPopupModal');
+    }
+
+    function confirmAndFinalizeTrip() {
+      const data = window.finalBillingData;
+      if (!data) return;
+
+      db.collection("bookings").doc(data.docId).update({
+        status: "Trip Completed & Closed",
+        endKm: data.endKm,
+        totalKmRun: data.totalKmRun,
+        extraKmCharge: data.extraKmCharge,
+        nightCharge: data.nightCharge,
+        tollCharge: data.tollCharge,
+        parkingCharge: data.parkingCharge,
+        airportParkingCharge: data.airportParkingCharge,
+        carrierCharge: data.carrierCharge,
+        totalExtras: data.totalExtras,
+        grandTotal: data.grandTotal,
+        cashCollected: data.cashCollected,
         tripClosedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        closeModal('tripBillingModal');
-        alert("🎉 Trip successfully completed, billed & closed!");
+        closeModal('customerBillPopupModal');
+        alert("🎉 Trip successfully closed & bill settled!");
       }).catch(err => alert("Error: " + err.message));
     }
 
