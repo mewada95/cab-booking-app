@@ -259,7 +259,7 @@
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">Cash Collected By Driver from Customer (₹)</label>
-          <input id="billCashCollected" type="number" value="0" class="w-full bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl px-3 py-2 font-black text-sm focus:outline-none" />
+          <input id="billCashCollected" type="number" value="0" oninput="markUserEditedCash()" class="w-full bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl px-3 py-2 font-black text-sm focus:outline-none" />
         </div>
 
         <button type="button" onclick="previewCustomerBillPopup()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 mt-2">
@@ -292,7 +292,7 @@
             <b id="popupGrandTotal" class="font-bold text-slate-900">₹0</b>
           </div>
           <div class="flex justify-between text-emerald-900 font-bold pt-1 border-t border-slate-200">
-            <span>Cash Collected:</span>
+            <span>Cash Collected (Incl. Extras):</span>
             <b id="popupCashCollected" class="text-emerald-700 text-sm">₹0</b>
           </div>
           <div class="flex justify-between text-blue-700">
@@ -372,7 +372,7 @@
             <span id="detailGrandTotal" class="text-blue-600">₹0</span>
           </div>
           <div class="flex justify-between pt-1 border-t border-slate-200 text-emerald-900 font-bold">
-            <span>Cash Collected:</span>
+            <span>Total Cash Collected (Incl. Extras):</span>
             <span id="detailCashCollected" class="text-emerald-700">₹0</span>
           </div>
         </div>
@@ -556,6 +556,7 @@
     let allBookingsCache = [];
     let videoStream = null;
     let capturedSelfieBase64 = null;
+    let userManuallyEditedCash = false;
 
     function getTierLevel(vehicleStr) {
       const str = (vehicleStr || '').toLowerCase();
@@ -628,7 +629,7 @@
         vAvail.classList.add('hidden');
         vRides.classList.remove('hidden');
         btnAvail.className = "flex-1 py-2.5 rounded-xl text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1.5 transition";
-        btnRides.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition";
+        btnRides.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 transition";
       }
     }
 
@@ -1221,7 +1222,8 @@
       document.getElementById('billToll').value = 0;
       document.getElementById('billParking').value = 0;
       document.getElementById('billCarrier').value = b.carrierRequired ? 300 : 0;
-      document.getElementById('billCashCollected').value = Number(b.total) || 0;
+      
+      userManuallyEditedCash = false;
 
       // Robustly extract base route KM safely from multiple possible fields
       const rawDist = b.includedKm || b.distance || b.kmLimit || b.baseKm || b.packageKm || 0;
@@ -1257,7 +1259,7 @@
       document.getElementById('detailWaitingCharge').innerText = '₹' + (b.waitingCharge || 0).toLocaleString('en-IN');
       document.getElementById('detailExtras').innerText = '₹' + ((b.tollCharge || 0) + (b.parkingCharge || 0) + (b.carrierCharge || 0)).toLocaleString('en-IN');
       document.getElementById('detailGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
-      document.getElementById('detailCashCollected').innerText = '₹' + (Number(b.cashCollected) || 0).toLocaleString('en-IN');
+      document.getElementById('detailCashCollected').innerText = '₹' + (Number(b.cashCollected) || grandTotal).toLocaleString('en-IN');
       document.getElementById('detailCommission').innerText = '₹' + comm.toLocaleString('en-IN') + ' (15%)';
       document.getElementById('detailVendorPayout').innerText = '₹' + payout.toLocaleString('en-IN');
 
@@ -1324,6 +1326,16 @@
       document.getElementById('summaryBaseFare').innerText = '₹' + baseFare.toLocaleString('en-IN');
       document.getElementById('summaryTotalExtras').innerText = '₹' + totalExtras.toLocaleString('en-IN');
       document.getElementById('summaryGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
+
+      // Automatically update cash collected including all extras if vendor hasn't manually overridden it
+      const cashInput = document.getElementById('billCashCollected');
+      if (cashInput && !userManuallyEditedCash) {
+        cashInput.value = grandTotal;
+      }
+    }
+
+    function markUserEditedCash() {
+      userManuallyEditedCash = true;
     }
 
     function previewCustomerBillPopup() {
@@ -1350,6 +1362,7 @@
       const totalExtras = extraKmCharge + waitingCharge + night + toll + parking + carrier;
       const grandTotal = baseFare + totalExtras;
       const waitingMins = Number(document.getElementById('displayWaitingTime').innerText.replace(' Mins', '')) || 0;
+      const cashCollected = Number(document.getElementById('billCashCollected').value) || grandTotal;
 
       // Commission calculated on service fare ONLY (Excluding Toll, Parking, and State Tax)
       const commissionableFare = baseFare + extraKmCharge + waitingCharge + night + carrier;
@@ -1358,7 +1371,7 @@
 
       document.getElementById('popupBookingId').innerText = b.bookingId || 'MTZ';
       document.getElementById('popupGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
-      document.getElementById('popupCashCollected').innerText = '₹' + (Number(document.getElementById('billCashCollected').value) || 0).toLocaleString('en-IN');
+      document.getElementById('popupCashCollected').innerText = '₹' + cashCollected.toLocaleString('en-IN');
       document.getElementById('popupCompanyCommission').innerText = '₹' + companyCommission.toLocaleString('en-IN') + ' (15%)';
       document.getElementById('popupVendorPayout').innerText = '₹' + vendorPayout.toLocaleString('en-IN');
 
@@ -1377,7 +1390,7 @@
         grandTotal: grandTotal,
         companyCommission: companyCommission,
         vendorPayout: vendorPayout,
-        cashCollected: Number(document.getElementById('billCashCollected').value) || 0
+        cashCollected: cashCollected
       };
 
       closeModal('tripBillingModal');
