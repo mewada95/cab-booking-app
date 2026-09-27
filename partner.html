@@ -23,7 +23,7 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide">Tripvyom Partner</h1>
-        <p class="text-[10px] text-slate-400">Smart KM & Flexible Billing Control</p>
+        <p class="text-[10px] text-slate-400">Smart Model-wise KM & Flexible Billing</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -172,8 +172,8 @@
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
-          <h3 class="font-bold text-slate-800 text-sm">Trip Settlement & Flexible Billing</h3>
-          <p class="text-[10px] text-slate-500">Fully editable KM & extra charges</p>
+          <h3 class="font-bold text-slate-800 text-sm">Trip Settlement & Smart Billing</h3>
+          <p class="text-[10px] text-slate-500">Model-wise extra KM rates & live calculation</p>
         </div>
         <button type="button" onclick="closeModal('tripBillingModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -194,8 +194,8 @@
             <input id="billEndKm" type="number" placeholder="e.g. 45800" oninput="calculateFareAndBilling()" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 font-mono font-bold text-sm text-blue-900 focus:outline-none" />
           </div>
           <div>
-            <label class="block font-semibold mb-0.5 text-blue-800">Included Base KM (Editable)</label>
-            <input id="billBaseKmInput" type="number" oninput="calculateFareAndBilling()" class="w-full bg-white border border-blue-200 rounded-xl px-2.5 py-1.5 font-bold text-blue-900" />
+            <label class="block font-semibold mb-0.5 text-blue-800">Included Base KM (Fixed)</label>
+            <input id="billBaseKmInput" type="number" readonly class="w-full bg-slate-100 border border-blue-200 rounded-xl px-2.5 py-1.5 font-bold text-slate-600 cursor-not-allowed" />
           </div>
           <div class="flex justify-between items-center pt-1 border-t border-blue-200 text-xs">
             <span>Total Distance Run:</span>
@@ -210,7 +210,7 @@
         <!-- Extra Charges Grid (Fully Editable & Zero-allowed) -->
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block font-medium text-slate-600 mb-0.5">Extra KM Charge (₹)</label>
+            <label id="extraKmLabel" class="block font-medium text-slate-600 mb-0.5">Extra KM Charge (₹)</label>
             <input id="billExtraKmCharge" type="number" value="0" oninput="markUserEditedExtraKm(); calculateFareAndBilling();" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
           <div>
@@ -456,7 +456,7 @@
           </div>
         </div>
 
-        <button type="button" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+        <button type="button" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-cloud-arrow-up"></i> Save Partner Profile
         </button>
       </div>
@@ -548,6 +548,7 @@
     let allBookingsCache = [];
     let videoStream = null;
     let capturedSelfieBase64 = null;
+    let userManuallyEditedExtraKm = false;
 
     function getTierLevel(vehicleStr) {
       const str = (vehicleStr || '').toLowerCase();
@@ -555,6 +556,15 @@
       if (str.includes('ertiga') || str.includes('muv')) return 3;
       if (str.includes('sedan')) return 2;
       return 1;
+    }
+
+    // Model-wise Extra KM per/km rates
+    function getExtraKmRate(vehicleStr) {
+      const str = (vehicleStr || '').toLowerCase();
+      if (str.includes('crysta') || str.includes('suv')) return 18; // ₹18/km
+      if (str.includes('ertiga') || str.includes('muv')) return 15; // ₹15/km
+      if (str.includes('sedan')) return 12; // ₹12/km
+      return 11; // ₹11/km for Hatchback
     }
 
     function getVehicleBadge(vehicleType) {
@@ -1185,15 +1195,15 @@
       document.getElementById('billEndKm').value = '';
       document.getElementById('displayTotalKmRun').innerText = '0 KM';
       document.getElementById('displayWaitingTime').innerText = '0 Mins';
-      document.getElementById('billExtraKmCharge').value = b.extraKmCharge || 0;
-      document.getElementById('billWaitingCharge').value = b.waitingCharge || 0;
-      document.getElementById('billNight').value = b.nightCharge || 0;
-      document.getElementById('billToll').value = b.tollCharge || 0;
-      document.getElementById('billParking').value = b.parkingCharge || b.airportParkingCharge || 0;
-      document.getElementById('billCarrier').value = b.carrierCharge || (b.carrierRequired ? 300 : 0);
-      document.getElementById('billCashCollected').value = Number(b.cashCollected || b.total) || 0;
+      document.getElementById('billExtraKmCharge').value = 0;
+      document.getElementById('billWaitingCharge').value = 0;
+      document.getElementById('billNight').value = 0;
+      document.getElementById('billToll').value = 0;
+      document.getElementById('billParking').value = 0;
+      document.getElementById('billCarrier').value = b.carrierRequired ? 300 : 0;
+      document.getElementById('billCashCollected').value = Number(b.total) || 0;
 
-      // Extract base route KM safely
+      // Robustly extract base route KM (e.g. 670)
       const rawDist = b.distance || b.baseKm || b.packageKm || 0;
       const routeDistance = parseFloat(String(rawDist).replace(/[^0-9.]/g, '')) || 0;
       document.getElementById('billBaseKmInput').value = routeDistance;
@@ -1233,7 +1243,7 @@
       openModal('tripDetailsModal');
     }
 
-    // REAL-TIME INSTANT FARE & BILLING CALCULATION WITH ROBUST DISTANCE PARSING
+    // REAL-TIME INSTANT FARE & BILLING CALCULATION WITH VEHICLE MODEL RATES
     function calculateFareAndBilling() {
       const b = window.activeBillingBooking;
       if (!b) return;
@@ -1263,13 +1273,19 @@
       }
       document.getElementById('displayWaitingTime').innerText = waitingMins + ' Mins';
 
-      // Use the editable Base KM input value
+      // Get fixed base KM from non-editable input
       const baseKmIncluded = Number(document.getElementById('billBaseKmInput').value) || 0;
       const extraKmInput = document.getElementById('billExtraKmCharge');
+      const extraKmLabel = document.getElementById('extraKmLabel');
+
+      // Determine model-wise rate (Hatchback=11, Sedan=12, MUV=15, SUV=18)
+      const vehicleModel = b.cabModelType || b.vehicle || b.type || 'Sedan';
+      const perKmRate = getExtraKmRate(vehicleModel);
+      extraKmLabel.innerText = `Extra KM Charge (₹${perKmRate}/km)`;
 
       if (baseKmIncluded > 0 && totalKmRun > baseKmIncluded && extraKmInput.dataset.userEdited !== "true") {
         const extraKm = totalKmRun - baseKmIncluded;
-        extraKmInput.value = extraKm * 12; // ₹12 per extra KM standard slab
+        extraKmInput.value = extraKm * perKmRate;
       }
 
       const baseFare = Number(b.total) || 0;
@@ -1288,11 +1304,10 @@
       document.getElementById('summaryGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
     }
 
-    document.addEventListener('input', (e) => {
-      if (e.target && e.target.id === 'billExtraKmCharge') {
-        e.target.dataset.userEdited = "true";
-      }
-    });
+    function markUserEditedExtraKm() {
+      const input = document.getElementById('billExtraKmCharge');
+      if (input) input.dataset.userEdited = "true";
+    }
 
     function previewCustomerBillPopup() {
       const b = window.activeBillingBooking;
