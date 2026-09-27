@@ -194,8 +194,8 @@
             <input id="billEndKm" type="number" placeholder="e.g. 45800" oninput="calculateFareAndBilling()" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 font-mono font-bold text-sm text-blue-900 focus:outline-none" />
           </div>
           <div>
-            <label class="block font-semibold mb-0.5 text-blue-800">Included Base KM (Fixed)</label>
-            <input id="billBaseKmInput" type="number" readonly class="w-full bg-slate-100 border border-blue-200 rounded-xl px-2.5 py-1.5 font-bold text-slate-600 cursor-not-allowed" />
+            <label class="block font-semibold mb-0.5 text-blue-800">Included Base KM (Fixed & Non-Editable)</label>
+            <input id="billBaseKmInput" type="number" readonly class="w-full bg-slate-200 border border-blue-300 rounded-xl px-2.5 py-1.5 font-black text-slate-700 cursor-not-allowed" />
           </div>
           <div class="flex justify-between items-center pt-1 border-t border-blue-200 text-xs">
             <span>Total Distance Run:</span>
@@ -560,10 +560,10 @@
     // Model-wise Extra KM per/km rates
     function getExtraKmRate(vehicleStr) {
       const str = (vehicleStr || '').toLowerCase();
-      if (str.includes('crysta') || str.includes('suv')) return 18; // ₹18/km
-      if (str.includes('ertiga') || str.includes('muv')) return 15; // ₹15/km
-      if (str.includes('sedan')) return 12; // ₹12/km
-      return 11; // ₹11/km for Hatchback
+      if (str.includes('crysta') || str.includes('suv')) return 18; // SUV/Crysta: ₹18/km
+      if (str.includes('ertiga') || str.includes('muv')) return 15; // MUV: ₹15/km
+      if (str.includes('sedan')) return 12; // Sedan: ₹12/km
+      return 11; // Hatchback: ₹11/km
     }
 
     function getVehicleBadge(vehicleType) {
@@ -926,7 +926,9 @@
           const pickupFuel = b.pickupPay || Math.round(totalFare * 0.45);
           const dropBal = totalFare - pickupFuel;
           const vehicleBadgeHtml = getVehicleBadge(b.vehicle || b.type);
-          const includedKmStr = b.distance || b.kmLimit || b.baseKm || b.packageKm || 'Standard';
+          
+          // Universal Included KM detection across all possible booking formats
+          const rawDist = b.includedKm || b.distance || b.kmLimit || b.baseKm || b.packageKm || 'As per package';
 
           return `
             <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
@@ -944,11 +946,12 @@
                   <span>•</span>
                   ${vehicleBadgeHtml}
                 </div>
-                <div class="mt-1 text-[11px] font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded inline-block">
-                  <i class="fa-solid fa-road mr-1"></i> Included KM: ${includedKmStr}
+                <div class="mt-1.5 flex items-center justify-between bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-xl text-blue-900 font-bold text-[11px]">
+                  <span><i class="fa-solid fa-road text-blue-600 mr-1"></i> Included KM Limit:</span>
+                  <span class="font-black text-blue-700">${rawDist}</span>
                 </div>
                 ${b.carrierRequired ? `
-                  <div class="mt-1.5 bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md text-[10px] font-bold inline-flex items-center gap-1">
+                  <div class="mt-2 bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md text-[10px] font-bold inline-flex items-center gap-1">
                     <i class="fa-solid fa-truck-ramp-box"></i> Roof Carrier Required (+₹300 Included)
                   </div>
                 ` : ''}
@@ -971,7 +974,10 @@
                   <span>Customer 45% Fuel at Pickup: <b>₹${pickupFuel}</b></span>
                   <span>55% at Drop: <b>₹${dropBal}</b></span>
                 </div>
-                <p class="text-[9px] text-amber-700 pt-1">* Fastag Toll, State Border Tax & Parking customer directly pay karega.</p>
+                <div class="mt-2 pt-1 border-t border-slate-200 text-[10px] text-slate-700 flex items-center justify-between bg-amber-50/60 p-1.5 rounded-lg border border-amber-200">
+                  <span><b>Toll, Parking & State Tax:</b> Paid directly by customer</span>
+                  <span class="text-amber-800 font-bold">Excluded</span>
+                </div>
               </div>
 
               <button onclick="instantAcceptRide('${b.docId}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
@@ -1007,7 +1013,7 @@
 
           const isDriverAssigned = Boolean(b.driverName && b.cabNumber);
           const vehicleBadgeHtml = getVehicleBadge(b.vehicle || b.type);
-          const includedKmStr = b.distance || b.kmLimit || b.baseKm || b.packageKm || 'Standard';
+          const rawDist = b.includedKm || b.distance || b.kmLimit || b.baseKm || b.packageKm || 'Standard';
 
           return `
             <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
@@ -1026,7 +1032,7 @@
                   ${vehicleBadgeHtml}
                 </div>
                 <div class="mt-1 text-[11px] font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded inline-block">
-                  <i class="fa-solid fa-road mr-1"></i> Included KM: ${includedKmStr}
+                  <i class="fa-solid fa-road mr-1"></i> Included KM: ${rawDist}
                 </div>
                 ${b.carrierRequired ? `
                   <span class="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded mt-1 inline-block">Roof Carrier Cab</span>
@@ -1210,8 +1216,8 @@
       document.getElementById('billCarrier').value = b.carrierRequired ? 300 : 0;
       document.getElementById('billCashCollected').value = Number(b.total) || 0;
 
-      // Extract base route KM safely from multiple possible fields
-      const rawDist = b.distance || b.kmLimit || b.baseKm || b.packageKm || 0;
+      // Robustly extract base route KM from any matching field
+      const rawDist = b.includedKm || b.distance || b.kmLimit || b.baseKm || b.packageKm || 0;
       const routeDistance = parseFloat(String(rawDist).replace(/[^0-9.]/g, '')) || 0;
       document.getElementById('billBaseKmInput').value = routeDistance;
 
