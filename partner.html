@@ -23,7 +23,7 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide">Tripvyom Partner</h1>
-        <p class="text-[10px] text-slate-400">Advanced Fleet Lifecycle & Dynamic Billing</p>
+        <p class="text-[10px] text-slate-400">Real-time Fleet Lifecycle & Billing</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -172,8 +172,8 @@
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
-          <h3 class="font-bold text-slate-800 text-sm">Trip Settlement, KM & Waiting Billing</h3>
-          <p class="text-[10px] text-slate-500">Auto calculated based on KM & Waiting duration</p>
+          <h3 class="font-bold text-slate-800 text-sm">Trip Settlement & Flexible Billing</h3>
+          <p class="text-[10px] text-slate-500">Fully editable KM & extra charges</p>
         </div>
         <button type="button" onclick="closeModal('tripBillingModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -198,12 +198,12 @@
             <b id="displayTotalKmRun" class="font-black text-blue-700">0 KM</b>
           </div>
           <div class="flex justify-between items-center pt-1 border-t border-blue-200 text-xs">
-            <span>Waiting Time (Scheduled vs Actual):</span>
+            <span>Waiting Time:</span>
             <b id="displayWaitingTime" class="font-bold text-amber-700">0 Mins</b>
           </div>
         </div>
 
-        <!-- Extra Charges Grid (Editable) -->
+        <!-- Extra Charges Grid (Fully Editable & Zero-allowed) -->
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Extra KM Charge (₹)</label>
@@ -228,7 +228,7 @@
 
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block font-medium text-slate-600 mb-0.5">Parking / Airport Parking (₹)</label>
+            <label class="block font-medium text-slate-600 mb-0.5">Parking / Airport (₹)</label>
             <input id="billParking" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
           <div>
@@ -244,7 +244,7 @@
             <span id="summaryBaseFare" class="font-bold">₹0</span>
           </div>
           <div class="flex justify-between text-slate-600">
-            <span>Total Extras (KM/Waiting/Toll/Night):</span>
+            <span>Total Extras Added:</span>
             <span id="summaryTotalExtras" class="font-bold">₹0</span>
           </div>
           <div class="flex justify-between text-slate-900 font-extrabold pt-1 border-t border-slate-200 text-xs">
@@ -296,7 +296,7 @@
             <b id="popupBaseFare" class="font-bold text-slate-900">₹0</b>
           </div>
           <div class="flex justify-between">
-            <span>Extra KM & Waiting & Extras:</span>
+            <span>Extra KM & Extras Added:</span>
             <b id="popupExtras" class="font-bold text-slate-900">₹0</b>
           </div>
           <div class="flex justify-between pt-2 border-t border-slate-200 text-sm font-black text-slate-900">
@@ -306,8 +306,8 @@
         </div>
 
         <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900 text-[11px]">
-          <p class="font-bold mb-0.5">⚠️ Confirmation Required:</p>
-          <p>Kya aapne customer se poora bill collect kar liya hai aur booking close karna chahte hain?</p>
+          <p class="font-bold mb-0.5">⚠️ Final Confirmation:</p>
+          <p>Kya aapko yeh bill confirm karke booking close karni hai? (Vendor settlement aur 15% commission automatic update ho jayega).</p>
         </div>
 
         <div class="grid grid-cols-2 gap-2 pt-1">
@@ -315,7 +315,7 @@
             ✏️ Edit Bill
           </button>
           <button type="button" onclick="confirmAndFinalizeTrip()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1">
-            ✓ Close Booking
+            ✓ Confirm & Close
           </button>
         </div>
       </div>
@@ -483,6 +483,7 @@
     let allBookingsCache = [];
     let videoStream = null;
     let capturedSelfieBase64 = null;
+    let isUserManuallyEditingExtraKm = false; // Flag to prevent unwanted auto-overwrite
 
     function getTierLevel(vehicleStr) {
       const str = (vehicleStr || '').toLowerCase();
@@ -825,7 +826,7 @@
       let cutTotal = 0;
       myAssignedRides.forEach(b => {
         if (b.status !== 'Cancelled') {
-          // Dynamic calculation based on grandTotal if trip is closed, else b.total
+          // Dynamic calculation based on updated grandTotal if closed
           const fare = Number(b.grandTotal || b.total) || 0;
           const comm = Math.round(fare * 0.15);
           cutTotal += comm;
@@ -924,7 +925,7 @@
         `;
       } else {
         myRidesContainer.innerHTML = myAssignedRides.map(b => {
-          // Dynamic calculation based on grandTotal if closed
+          // Dynamic calculation based on updated grandTotal if closed
           const totalFare = Number(b.grandTotal || b.total) || 0;
           const fee15 = Math.round(totalFare * 0.15);
           const vendorNet = totalFare - fee15;
@@ -1131,6 +1132,15 @@
       document.getElementById('billCashCollected').value = Number(b.total) || 0;
 
       window.activeBillingBooking = b;
+      
+      // Auto estimate extra KM based on actual route distance if available
+      const startKm = Number(b.startKm) || 0;
+      const routeDistance = Number(b.distance) || 0;
+      // Pre-fill end KM estimation if route distance exists as a convenience
+      if (routeDistance > 0 && startKm > 0) {
+        document.getElementById('billEndKm').value = startKm + routeDistance;
+      }
+
       calculateFareAndBilling();
       openModal('tripBillingModal');
     }
@@ -1144,7 +1154,7 @@
       const totalKmRun = endKm > startKm ? (endKm - startKm) : 0;
       document.getElementById('displayTotalKmRun').innerText = totalKmRun + ' KM';
 
-      // Waiting duration calculation (Scheduled time vs Actual trip start time)
+      // Waiting duration calculation
       let waitingMins = 0;
       if (b.tripStartedAt && b.time) {
         const tripStartDate = b.tripStartedAt.toDate?.() || new Date(b.tripStartedAt);
@@ -1164,22 +1174,22 @@
       }
       document.getElementById('displayWaitingTime').innerText = waitingMins + ' Mins';
 
-      const autoWaitingCharge = waitingMins * 3;
-      if (document.getElementById('billWaitingCharge').value == 0 && autoWaitingCharge > 0) {
-        document.getElementById('billWaitingCharge').value = autoWaitingCharge;
-      }
+      // Flexible Extra KM calculation based on actual booking route distance (e.g., 670 KM for Ujjain to Delhi)
+      const routeDistance = Number(b.distance) || 0;
+      let extraKmChargeInput = document.getElementById('billExtraKmCharge');
 
-      let autoExtraKmCharge = 0;
-      if (totalKmRun > 120) {
-        const extraKm = totalKmRun - 120;
-        autoExtraKmCharge = extraKm * 12;
-        if (document.getElementById('billExtraKmCharge').value == 0) {
-          document.getElementById('billExtraKmCharge').value = autoExtraKmCharge;
+      if (routeDistance > 0 && totalKmRun > routeDistance) {
+        const extraKm = totalKmRun - routeDistance;
+        const autoExtraCharge = extraKm * 12; // ₹12 per extra KM standard slab
+        // Only auto-fill if user hasn't explicitly set it or if it's 0
+        if (extraKmChargeInput.value == 0 || extraKmChargeInput.dataset.autoFilled === "true") {
+          extraKmChargeInput.value = autoExtraCharge;
+          extraKmChargeInput.dataset.autoFilled = "true";
         }
       }
 
       const baseFare = Number(b.total) || 0;
-      const extraKmCharge = Number(document.getElementById('billExtraKmCharge').value) || 0;
+      const extraKmCharge = Number(extraKmChargeInput.value) || 0;
       const waitingCharge = Number(document.getElementById('billWaitingCharge').value) || 0;
       const night = Number(document.getElementById('billNight').value) || 0;
       const toll = Number(document.getElementById('billToll').value) || 0;
@@ -1207,7 +1217,7 @@
       }
 
       const totalKmRun = endKm - startKm;
-      if (totalKmRun > 1500 && !confirm("⚠️ Dhyan dein: Total distance " + totalKmRun + " KM dikh rahi hai. Kya aapko yakin hai ki yeh reading sahi hai?")) {
+      if (totalKmRun > 3000 && !confirm("⚠️ Dhyan dein: Total distance " + totalKmRun + " KM dikh rahi hai. Kya aapko yakin hai ki yeh reading sahi hai?")) {
         return;
       }
 
