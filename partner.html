@@ -456,7 +456,7 @@
           </div>
         </div>
 
-        <button type="button" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
+        <button type="button" id="submitKycBtn" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-cloud-arrow-up"></i> Save Partner Profile
         </button>
       </div>
@@ -548,7 +548,6 @@
     let allBookingsCache = [];
     let videoStream = null;
     let capturedSelfieBase64 = null;
-    let userManuallyEditedExtraKm = false;
 
     function getTierLevel(vehicleStr) {
       const str = (vehicleStr || '').toLowerCase();
@@ -927,6 +926,7 @@
           const pickupFuel = b.pickupPay || Math.round(totalFare * 0.45);
           const dropBal = totalFare - pickupFuel;
           const vehicleBadgeHtml = getVehicleBadge(b.vehicle || b.type);
+          const includedKmStr = b.distance || b.kmLimit || b.baseKm || b.packageKm || 'Standard';
 
           return `
             <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
@@ -944,8 +944,11 @@
                   <span>•</span>
                   ${vehicleBadgeHtml}
                 </div>
+                <div class="mt-1 text-[11px] font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded inline-block">
+                  <i class="fa-solid fa-road mr-1"></i> Included KM: ${includedKmStr}
+                </div>
                 ${b.carrierRequired ? `
-                  <div class="mt-2 bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md text-[10px] font-bold inline-flex items-center gap-1">
+                  <div class="mt-1.5 bg-amber-100 text-amber-900 px-2 py-0.5 rounded-md text-[10px] font-bold inline-flex items-center gap-1">
                     <i class="fa-solid fa-truck-ramp-box"></i> Roof Carrier Required (+₹300 Included)
                   </div>
                 ` : ''}
@@ -1004,6 +1007,7 @@
 
           const isDriverAssigned = Boolean(b.driverName && b.cabNumber);
           const vehicleBadgeHtml = getVehicleBadge(b.vehicle || b.type);
+          const includedKmStr = b.distance || b.kmLimit || b.baseKm || b.packageKm || 'Standard';
 
           return `
             <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
@@ -1020,6 +1024,9 @@
                   <span>${b.date} • ${b.time}</span>
                   <span>•</span>
                   ${vehicleBadgeHtml}
+                </div>
+                <div class="mt-1 text-[11px] font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded inline-block">
+                  <i class="fa-solid fa-road mr-1"></i> Included KM: ${includedKmStr}
                 </div>
                 ${b.carrierRequired ? `
                   <span class="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded mt-1 inline-block">Roof Carrier Cab</span>
@@ -1203,8 +1210,8 @@
       document.getElementById('billCarrier').value = b.carrierRequired ? 300 : 0;
       document.getElementById('billCashCollected').value = Number(b.total) || 0;
 
-      // Robustly extract base route KM (e.g. 670)
-      const rawDist = b.distance || b.baseKm || b.packageKm || 0;
+      // Extract base route KM safely from multiple possible fields
+      const rawDist = b.distance || b.kmLimit || b.baseKm || b.packageKm || 0;
       const routeDistance = parseFloat(String(rawDist).replace(/[^0-9.]/g, '')) || 0;
       document.getElementById('billBaseKmInput').value = routeDistance;
 
@@ -1243,7 +1250,7 @@
       openModal('tripDetailsModal');
     }
 
-    // REAL-TIME INSTANT FARE & BILLING CALCULATION WITH VEHICLE MODEL RATES
+    // REAL-TIME INSTANT FARE & BILLING CALCULATION WITH MODEL-WISE RATES
     function calculateFareAndBilling() {
       const b = window.activeBillingBooking;
       if (!b) return;
