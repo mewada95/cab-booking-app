@@ -166,7 +166,6 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹11/KM</span>
                   </div>
-                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -184,7 +183,6 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹12/KM</span>
                   </div>
-                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -202,7 +200,6 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹14/KM</span>
                   </div>
-                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -220,7 +217,6 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹20/KM</span>
                   </div>
-                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -272,7 +268,7 @@
             <button type="button" onclick="openModal('termsModal')" class="text-blue-600 underline font-semibold">Terms & Cancellation Policy</button>
           </div>
 
-          <button id="bookSubmitBtn" class="w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
+          <button id="bookSubmitBtn" onclick="handleBooking()" class="w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
             Confirm Booking <i class="fa-solid fa-chevron-right text-xs"></i>
           </button>
         </div>
@@ -376,7 +372,7 @@
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
         <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare & Settlement Summary</h4>
         <div class="flex justify-between text-slate-600">
-          <span id="receiptFareLabel">Base Package Fare (Inc. Driver Allowance)</span>
+          <span id="receiptFareLabel">Base Package Fare</span>
           <span id="receiptTotalFare" class="font-bold text-sm text-slate-900">₹0</span>
         </div>
         <div id="receiptCarrierRow" class="hidden flex justify-between text-slate-600">
@@ -647,8 +643,8 @@
     const CAB_CONFIG = {
       'Hatchback': { baseRate: 11, oneWayMultiplier: 1.65, extraKmRate: 11 },
       'Sedan':     { baseRate: 12, oneWayMultiplier: 1.70, extraKmRate: 12 },
-      'MUV':       { baseRate: 14, oneWayMultiplier: 1.85, extraKmRate: 15 },
-      'SUV':       { baseRate: 20, oneWayMultiplier: 2.00, extraKmRate: 18 }
+      'MUV':       { baseRate: 14, oneWayMultiplier: 1.85, extraKmRate: 14 },
+      'SUV':       { baseRate: 20, oneWayMultiplier: 2.00, extraKmRate: 20 }
     };
 
     let selectedTripType = 'One Way';
@@ -1406,7 +1402,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (isRound) {
                 window.lastStoredDist = dist;
                 const dropVal = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value.toLowerCase() : "";
-                const s250 = ["madhya pradesh", "rajasthan", "uttar pradesh", "delhi", "chhattisgarh", "haryana", "punjab", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "bhilwara", "sikar", "pali", "chaksu", "ujjain", "indore"];
+                const s250 = ["madhya pradesh", "rajasthan", "uttar pradesh", "delhi", "chhattisgarh", "haryana", "punjab", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "chaksu", "ujjain", "indore"];
                 const s300 = ["maharashtra", "gujarat", "goa", "tamil nadu", "telangana", "andhra pradesh", "west bengal", "jharkhand", "odisha"];
                 
                 let baseMinKmPerDay = 250;
@@ -1461,6 +1457,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const lbl = cb.closest("label") || cb.parentElement;
             const txt = lbl ? lbl.innerText.toLowerCase() : "";
             if (txt.includes("roof") || txt.includes("carrier") || txt.includes("luggage")) {
+                cb.checked = false;
                 cb.disabled = isRaj;
                 if (lbl) {
                     lbl.style.opacity = isRaj ? "0.4" : "1";
@@ -1474,74 +1471,77 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }, 400);
 
-    const submitBookBtn = document.getElementById("bookSubmitBtn");
-    if (submitBookBtn) {
-        submitBookBtn.addEventListener("click", function(e) {
-            if (!window.previewConfirmed && !document.getElementById("currentPreviewModal")) {
-                e.preventDefault();
-                e.stopPropagation();
+    const bookBtns = document.querySelectorAll("button, input[type='submit']");
+    bookBtns.forEach(btn => {
+        const txt = btn.innerText ? btn.innerText.toLowerCase() : "";
+        if (txt.includes("book") || txt.includes("confirm") || txt.includes("proceed")) {
+            btn.addEventListener("click", function(e) {
+                if (!window.previewConfirmed && !document.getElementById("currentPreviewModal")) {
+                    e.preventDefault();
+                    e.stopPropagation();
 
-                const pickup = document.getElementById("pickupLocation") ? document.getElementById("pickupLocation").value : "Pickup";
-                const drop = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value : "Drop";
-                const duration = getTripDuration();
-                const driverAmt = duration.days * 300;
-                const nightAmt = duration.nights * 300;
+                    const pickup = document.getElementById("pickupLocation") ? document.getElementById("pickupLocation").value : "Pickup";
+                    const drop = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value : "Drop";
+                    const duration = getTripDuration();
+                    const driverAmt = duration.days * 300;
+                    const nightAmt = duration.nights * 300;
 
-                const nightText = nightAmt > 0 
-                    ? `₹300 × ${duration.nights} = ₹${nightAmt} (Direct Payment to Driver)` 
-                    : `₹300 (Not Included / Direct Payment to Driver if applicable)`;
+                    const nightText = nightAmt > 0 
+                        ? `₹300 × ${duration.nights} = ₹${nightAmt} (Direct Payment to Driver)` 
+                        : `₹300 (Not Included / Direct Payment to Driver if applicable)`;
 
-                const modal = document.createElement("div");
-                modal.id = "currentPreviewModal";
-                modal.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; display:flex; align-items:center; justify-content:center;";
-                modal.innerHTML = `
-                    <div style="background:#fff; padding:25px; border-radius:10px; width:90%; max-width:420px; box-shadow:0 4px 15px rgba(0,0,0,0.3); font-family:sans-serif;">
-                        <h3 style="margin-top:0; color:#333; border-bottom:1px solid #eee; padding-bottom:10px;">Booking Preview & Terms</h3>
-                        <p style="margin:5px 0;"><strong>From:</strong> ${pickup}</p>
-                        <p style="margin:5px 0;"><strong>To:</strong> ${drop}</p>
-                        <div style="background:#f8f9fa; padding:12px; border-radius:6px; margin:12px 0; font-size:13px; line-height:1.6;">
-                            <p style="margin:3px 0; font-size:15px; color:#0056b3; font-weight:bold;">Total Confirm Fare: ${window.lastSelectedFare}</p>
-                            <hr style="border:0; border-top:1px solid #dee2e6; margin:8px 0;">
-                            <p style="margin:3px 0;">Trip Duration: <strong>${duration.days} Day(s)</strong></p>
-                            <p style="margin:3px 0;">Driver Allowance: ₹300 × ${duration.days} = <strong>₹${driverAmt} (Included in Fare)</strong></p>
-                            <p style="margin:3px 0; color:#d9534f;">Night Allowance (10 PM - 6 AM): <strong>${nightText}</strong></p>
-                            <p style="margin:3px 0; color:#0056b3; font-weight:bold;">Toll, State Tax & Parking Extra (Paid directly)</p>
+                    const modal = document.createElement("div");
+                    modal.id = "currentPreviewModal";
+                    modal.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; display:flex; align-items:center; justify-content:center;";
+                    modal.innerHTML = `
+                        <div style="background:#fff; padding:25px; border-radius:10px; width:90%; max-width:420px; box-shadow:0 4px 15px rgba(0,0,0,0.3); font-family:sans-serif;">
+                            <h3 style="margin-top:0; color:#333; border-bottom:1px solid #eee; padding-bottom:10px;">Booking Preview & Terms</h3>
+                            <p style="margin:5px 0;"><strong>From:</strong> ${pickup}</p>
+                            <p style="margin:5px 0;"><strong>To:</strong> ${drop}</p>
+                            <div style="background:#f8f9fa; padding:12px; border-radius:6px; margin:12px 0; font-size:13px; line-height:1.6;">
+                                <p style="margin:3px 0; font-size:15px; color:#0056b3; font-weight:bold;">Total Confirm Fare: ${window.lastSelectedFare}</p>
+                                <hr style="border:0; border-top:1px solid #dee2e6; margin:8px 0;">
+                                <p style="margin:3px 0;">Trip Duration: <strong>${duration.days} Day(s)</strong></p>
+                                <p style="margin:3px 0;">Driver Allowance: ₹300 × ${duration.days} = <strong>₹${driverAmt} (Included in Fare)</strong></p>
+                                <p style="margin:3px 0; color:#d9534f;">Night Allowance (10 PM - 6 AM): <strong>${nightText}</strong></p>
+                                <p style="margin:3px 0; color:#0056b3; font-weight:bold;">Toll, State Tax & Parking Extra (Paid directly)</p>
+                            </div>
+                            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+                                <button id="cancelPreview" style="padding:8px 15px; border:1px solid #ccc; background:#fff; border-radius:5px; cursor:pointer;">Edit</button>
+                                <button id="confirmBookingFinal" style="padding:8px 15px; background:#0056b3; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Confirm Booking</button>
+                            </div>
                         </div>
-                        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
-                            <button id="cancelPreview" style="padding:8px 15px; border:1px solid #ccc; background:#fff; border-radius:5px; cursor:pointer;">Edit</button>
-                            <button id="confirmBookingFinal" style="padding:8px 15px; background:#0056b3; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Confirm Booking</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
+                    `;
+                    document.body.appendChild(modal);
 
-                document.getElementById("cancelPreview").onclick = () => modal.remove();
-                document.getElementById("confirmBookingFinal").onclick = () => {
-                    window.previewConfirmed = true;
-                    modal.remove();
+                    document.getElementById("cancelPreview").onclick = () => modal.remove();
+                    document.getElementById("confirmBookingFinal").onclick = () => {
+                        window.previewConfirmed = true;
+                        modal.remove();
 
-                    setTimeout(() => {
-                        const successBox = document.querySelector(".booking-error, .success-card, #bookingResult, .confirmation-details, form") || document.body;
-                        const termsCard = document.createElement("div");
-                        termsCard.style.cssText = "background:#eef9ff; border:1px solid #bce8f1; padding:15px; margin:15px 0; border-radius:8px; font-size:13px; color:#31708f; box-sizing:border-box;";
-                        termsCard.innerHTML = `
-                            <h4 style="margin:0 0 8px 0; color:#0056b3;">Booking Terms & Fare Breakdown</h4>
-                            <ul style="margin:0; padding-left:20px; line-height:1.5;">
-                                <li>Total Fare: <strong>${window.lastSelectedFare}</strong></li>
-                                <li>Trip Duration: <strong>${duration.days} Day(s)</strong></li>
-                                <li>Driver Allowance: <strong>₹${driverAmt}</strong> (Included in online booking)</li>
-                                <li>Night Allowance (10 PM - 6 AM): <strong>${nightText}</strong></li>
-                                <li>Toll, State Tax & Parking: Extra as per actuals (Paid directly)</li>
-                            </ul>
-                        `;
-                        successBox.prepend(termsCard);
-                    }, 1200);
+                        setTimeout(() => {
+                            const successBox = document.querySelector(".booking-error, .success-card, #bookingResult, .confirmation-details, form") || document.body;
+                            const termsCard = document.createElement("div");
+                            termsCard.style.cssText = "background:#eef9ff; border:1px solid #bce8f1; padding:15px; margin:15px 0; border-radius:8px; font-size:13px; color:#31708f; box-sizing:border-box;";
+                            termsCard.innerHTML = `
+                                <h4 style="margin:0 0 8px 0; color:#0056b3;">Booking Terms & Fare Breakdown</h4>
+                                <ul style="margin:0; padding-left:20px; line-height:1.5;">
+                                    <li>Total Fare: <strong>${window.lastSelectedFare}</strong></li>
+                                    <li>Trip Duration: <strong>${duration.days} Day(s)</strong></li>
+                                    <li>Driver Allowance: <strong>₹${driverAmt}</strong> (Included in online booking)</li>
+                                    <li>Night Allowance (10 PM - 6 AM): <strong>${nightText}</strong></li>
+                                    <li>Toll, State Tax & Parking: Extra as per actuals (Paid directly)</li>
+                                </ul>
+                            `;
+                            successBox.prepend(termsCard);
+                        }, 1200);
 
-                    submitBookBtn.click();
-                };
-            }
-        }, true);
-    }
+                        btn.click();
+                    };
+                }
+            }, true);
+        }
+    });
 
     const allTravelKeywords = [
         "Outstation cab service", "Outstation cab", "Outstation taxi service", "Outstation taxi",
