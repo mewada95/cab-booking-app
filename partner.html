@@ -23,7 +23,7 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide">Tripvyom Partner</h1>
-        <p class="text-[10px] text-slate-400">Smart Model-wise KM & Real-time Billing</p>
+        <p class="text-[10px] text-slate-400">Smart Model-wise KM & Cash Collection Control</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -172,8 +172,8 @@
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
-          <h3 class="font-bold text-slate-800 text-sm">Trip Settlement & Real-time Billing</h3>
-          <p class="text-[10px] text-slate-500">Automatic model-wise extra KM calculations</p>
+          <h3 class="font-bold text-slate-800 text-sm">Trip Settlement & Smart Billing</h3>
+          <p class="text-[10px] text-slate-500">Model-wise extra KM rates & live calculation</p>
         </div>
         <button type="button" onclick="closeModal('tripBillingModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -207,7 +207,7 @@
           </div>
         </div>
 
-        <!-- Extra Charges Grid (Extra KM is Non-Editable & Auto-Calculated) -->
+        <!-- Extra Charges Grid (Non-Editable Extra KM as requested) -->
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label id="extraKmLabel" class="block font-medium text-slate-600 mb-0.5">Extra KM Charge (₹)</label>
@@ -291,6 +291,10 @@
             <span>Grand Total Bill:</span>
             <b id="popupGrandTotal" class="font-bold text-slate-900">₹0</b>
           </div>
+          <div class="flex justify-between text-emerald-900 font-bold pt-1 border-t border-slate-200">
+            <span>Cash Collected:</span>
+            <b id="popupCashCollected" class="text-emerald-700 text-sm">₹0</b>
+          </div>
           <div class="flex justify-between text-blue-700">
             <span>Tripvyom Platform Fee (15%):</span>
             <b id="popupCompanyCommission">₹0</b>
@@ -366,6 +370,10 @@
           <div class="flex justify-between pt-2 border-t border-slate-200 text-sm font-black text-slate-900">
             <span>Grand Total Bill:</span>
             <span id="detailGrandTotal" class="text-blue-600">₹0</span>
+          </div>
+          <div class="flex justify-between pt-1 border-t border-slate-200 text-emerald-900 font-bold">
+            <span>Cash Collected:</span>
+            <span id="detailCashCollected" class="text-emerald-700">₹0</span>
           </div>
         </div>
 
@@ -560,10 +568,10 @@
     // Model-wise Extra KM per/km rates
     function getExtraKmRate(vehicleStr) {
       const str = (vehicleStr || '').toLowerCase();
-      if (str.includes('crysta') || str.includes('suv')) return 18; // SUV Crysta: ₹18/km
-      if (str.includes('ertiga') || str.includes('muv')) return 15; // MUV: ₹15/km
-      if (str.includes('sedan')) return 12; // Sedan: ₹12/km
-      return 11; // Hatchback: ₹11/km
+      if (str.includes('crysta') || str.includes('suv')) return 18; // ₹18/km
+      if (str.includes('ertiga') || str.includes('muv')) return 15; // ₹15/km
+      if (str.includes('sedan')) return 12; // ₹12/km
+      return 11; // ₹11/km for Hatchback
     }
 
     function getVehicleBadge(vehicleType) {
@@ -927,7 +935,7 @@
           const dropBal = totalFare - pickupFuel;
           const vehicleBadgeHtml = getVehicleBadge(b.vehicle || b.type);
           
-          const rawDist = b.includedKm || b.distance || b.kmLimit || b.baseKm || b.packageKm || 'As per package';
+          const rawDist = b.includedKm || b.distance || b.kmLimit || b.baseKm || b.packageKm || 'Standard';
 
           return `
             <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-sm text-xs space-y-3">
@@ -1215,7 +1223,7 @@
       document.getElementById('billCarrier').value = b.carrierRequired ? 300 : 0;
       document.getElementById('billCashCollected').value = Number(b.total) || 0;
 
-      // Extract base route KM safely from multiple possible fields
+      // Robustly extract base route KM safely from multiple possible fields
       const rawDist = b.includedKm || b.distance || b.kmLimit || b.baseKm || b.packageKm || 0;
       const routeDistance = parseFloat(String(rawDist).replace(/[^0-9.]/g, '')) || 0;
       document.getElementById('billBaseKmInput').value = routeDistance;
@@ -1249,6 +1257,7 @@
       document.getElementById('detailWaitingCharge').innerText = '₹' + (b.waitingCharge || 0).toLocaleString('en-IN');
       document.getElementById('detailExtras').innerText = '₹' + ((b.tollCharge || 0) + (b.parkingCharge || 0) + (b.carrierCharge || 0)).toLocaleString('en-IN');
       document.getElementById('detailGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
+      document.getElementById('detailCashCollected').innerText = '₹' + (Number(b.cashCollected) || 0).toLocaleString('en-IN');
       document.getElementById('detailCommission').innerText = '₹' + comm.toLocaleString('en-IN') + ' (15%)';
       document.getElementById('detailVendorPayout').innerText = '₹' + payout.toLocaleString('en-IN');
 
@@ -1300,7 +1309,7 @@
         const extraKm = totalKmRun - baseKmIncluded;
         extraKmCharge = extraKm * perKmRate;
       }
-      extraKmInput.value = extraKmCharge; // Automatic and non-editable
+      extraKmInput.value = extraKmCharge; // Non-editable, real-time auto updated
 
       const baseFare = Number(b.total) || 0;
       const waitingCharge = Number(document.getElementById('billWaitingCharge').value) || 0;
@@ -1349,6 +1358,7 @@
 
       document.getElementById('popupBookingId').innerText = b.bookingId || 'MTZ';
       document.getElementById('popupGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
+      document.getElementById('popupCashCollected').innerText = '₹' + (Number(document.getElementById('billCashCollected').value) || 0).toLocaleString('en-IN');
       document.getElementById('popupCompanyCommission').innerText = '₹' + companyCommission.toLocaleString('en-IN') + ' (15%)';
       document.getElementById('popupVendorPayout').innerText = '₹' + vendorPayout.toLocaleString('en-IN');
 
