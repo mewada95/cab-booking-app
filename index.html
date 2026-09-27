@@ -166,6 +166,7 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹11/KM</span>
                   </div>
+                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -183,6 +184,7 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹12/KM</span>
                   </div>
+                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -200,6 +202,7 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹14/KM</span>
                   </div>
+                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -217,6 +220,7 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹20/KM</span>
                   </div>
+                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -372,7 +376,7 @@
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
         <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare & Settlement Summary</h4>
         <div class="flex justify-between text-slate-600">
-          <span id="receiptFareLabel">Base Package Fare</span>
+          <span id="receiptFareLabel">Base Package Fare (Inc. Driver Allowance)</span>
           <span id="receiptTotalFare" class="font-bold text-sm text-slate-900">₹0</span>
         </div>
         <div id="receiptCarrierRow" class="hidden flex justify-between text-slate-600">
@@ -643,8 +647,8 @@
     const CAB_CONFIG = {
       'Hatchback': { baseRate: 11, oneWayMultiplier: 1.65, extraKmRate: 11 },
       'Sedan':     { baseRate: 12, oneWayMultiplier: 1.70, extraKmRate: 12 },
-      'MUV':       { baseRate: 14, oneWayMultiplier: 1.85, extraKmRate: 14 },
-      'SUV':       { baseRate: 20, oneWayMultiplier: 2.00, extraKmRate: 20 }
+      'MUV':       { baseRate: 14, oneWayMultiplier: 1.85, extraKmRate: 15 },
+      'SUV':       { baseRate: 20, oneWayMultiplier: 2.00, extraKmRate: 18 }
     };
 
     let selectedTripType = 'One Way';
@@ -1402,7 +1406,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (isRound) {
                 window.lastStoredDist = dist;
                 const dropVal = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value.toLowerCase() : "";
-                const s250 = ["madhya pradesh", "rajasthan", "uttar pradesh", "delhi", "chhattisgarh", "haryana", "punjab", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "chaksu", "ujjain", "indore"];
+                const s250 = ["madhya pradesh", "rajasthan", "uttar pradesh", "delhi", "chhattisgarh", "haryana", "punjab", "rajsamand", "nathdwara", "udaipur", "jaipur", "jodhpur", "kota", "ajmer", "bikaner", "alwar", "bhilwara", "sikar", "pali", "chaksu", "ujjain", "indore"];
                 const s300 = ["maharashtra", "gujarat", "goa", "tamil nadu", "telangana", "andhra pradesh", "west bengal", "jharkhand", "odisha"];
                 
                 let baseMinKmPerDay = 250;
@@ -1446,6 +1450,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, true);
 
+    // FIX: Removed the buggy 'cb.checked = false' that was causing the carrier checkbox to untick stably!
     setInterval(() => {
         const drop = document.getElementById("dropLocation");
         if (!drop) return;
@@ -1457,7 +1462,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const lbl = cb.closest("label") || cb.parentElement;
             const txt = lbl ? lbl.innerText.toLowerCase() : "";
             if (txt.includes("roof") || txt.includes("carrier") || txt.includes("luggage")) {
-                cb.checked = false;
                 cb.disabled = isRaj;
                 if (lbl) {
                     lbl.style.opacity = isRaj ? "0.4" : "1";
