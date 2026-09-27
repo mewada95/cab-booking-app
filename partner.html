@@ -23,7 +23,7 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide">Tripvyom Partner</h1>
-        <p class="text-[10px] text-slate-400">Transparent Commission & Earnings Control</p>
+        <p class="text-[10px] text-slate-400">Smart KM & Flexible Billing Control</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -203,11 +203,11 @@
           </div>
         </div>
 
-        <!-- Extra Charges Grid -->
+        <!-- Extra Charges Grid (Fully Editable & Zero-allowed) -->
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Extra KM Charge (₹)</label>
-            <input id="billExtraKmCharge" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
+            <input id="billExtraKmCharge" type="number" value="0" oninput="markUserEditedExtraKm(); calculateFareAndBilling();" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold text-slate-800" />
           </div>
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Waiting Charge (₹)</label>
@@ -265,7 +265,7 @@
     </div>
   </div>
 
-  <!-- STEP 4: CUSTOMER BILL CONFIRMATION POPUP WITH TRANSPARENT EARNINGS -->
+  <!-- STEP 4: CUSTOMER BILL CONFIRMATION POPUP -->
   <div id="customerBillPopupModal" class="fixed inset-0 bg-slate-900/80 z-[85] hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-emerald-50 text-emerald-900">
@@ -383,7 +383,7 @@
           </div>
         </div>
 
-        <button type="button" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+        <button type="button" id="submitKycBtn" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
           <i class="fa-solid fa-cloud-arrow-up"></i> Save Partner Profile
         </button>
       </div>
@@ -785,7 +785,7 @@
       } else if (status === "Trip Started") {
         actionBtn = '<button onclick="openTripBillingModal(\'' + b.docId + '\')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> 4. End Trip & Bill Fare</button>';
       } else {
-        actionBtn = '<div class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl text-purple-900 space-y-0.5 text-[11px]"><p class="font-bold">Trip Completed & Closed ✓</p><p>Total KM: <b>' + (b.totalKmRun || 0) + ' KM</b> | Waiting: <b>' + (b.waitingMins || 0) + ' Mins</b> | Cash: <b>₹' + (b.cashCollected || 0) + '</b></p></div>';
+        actionBtn = '<div onclick="openClosedTripDetails(\'' + b.docId + '\')" class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl text-purple-900 space-y-0.5 text-[11px] cursor-pointer hover:bg-purple-100 transition"><p class="font-bold flex justify-between items-center"><span>Trip Completed & Closed ✓</span> <i class="fa-solid fa-chevron-right text-[10px]"></i></p><p>Total KM: <b>' + (b.totalKmRun || 0) + ' KM</b> | Net Payout: <b>₹' + (b.vendorPayout || 0) + '</b></p></div>';
       }
 
       return timestampsHtml + '<div class="pt-1.5">' + actionBtn + '</div>';
@@ -817,9 +817,8 @@
       let cutTotal = 0;
       myAssignedRides.forEach(b => {
         if (b.status !== 'Cancelled') {
-          // Dynamic calculation based on updated grandTotal if closed
           const fare = Number(b.grandTotal || b.total) || 0;
-          const comm = Math.round(fare * 0.15);
+          const comm = Number(b.companyCommission) || Math.round((Number(b.total) || 0) * 0.15);
           cutTotal += comm;
           netPayoutTotal += (fare - comm);
         }
@@ -916,10 +915,9 @@
         `;
       } else {
         myRidesContainer.innerHTML = myAssignedRides.map(b => {
-          // Dynamic calculation based on updated grandTotal if closed
           const totalFare = Number(b.grandTotal || b.total) || 0;
-          const fee15 = Math.round(totalFare * 0.15);
-          const vendorNet = totalFare - fee15;
+          const comm = Number(b.companyCommission) || Math.round((Number(b.total) || 0) * 0.15);
+          const vendorNet = totalFare - comm;
 
           const isDriverAssigned = Boolean(b.driverName && b.cabNumber);
           const vehicleBadgeHtml = getVehicleBadge(b.vehicle || b.type);
@@ -979,7 +977,7 @@
               </div>
 
               <div class="flex justify-between items-center text-[11px] font-bold pt-1">
-                <span>Net Vendor Settlement (85%):</span>
+                <span>Net Vendor Payout (85%):</span>
                 <span class="text-emerald-700 font-black text-sm">₹${vendorNet}</span>
               </div>
 
@@ -1114,25 +1112,38 @@
       document.getElementById('billEndKm').value = '';
       document.getElementById('displayTotalKmRun').innerText = '0 KM';
       document.getElementById('displayWaitingTime').innerText = '0 Mins';
-      document.getElementById('billExtraKmCharge').value = 0;
-      document.getElementById('billWaitingCharge').value = 0;
-      document.getElementById('billNight').value = 0;
-      document.getElementById('billToll').value = 0;
-      document.getElementById('billParking').value = 0;
-      document.getElementById('billCarrier').value = b.carrierRequired ? 300 : 0;
-      document.getElementById('billCashCollected').value = Number(b.total) || 0;
+      document.getElementById('billExtraKmCharge').value = b.extraKmCharge || 0;
+      document.getElementById('billWaitingCharge').value = b.waitingCharge || 0;
+      document.getElementById('billNight').value = b.nightCharge || 0;
+      document.getElementById('billToll').value = b.tollCharge || 0;
+      document.getElementById('billParking').value = b.parkingCharge || b.airportParkingCharge || 0;
+      document.getElementById('billCarrier').value = b.carrierCharge || (b.carrierRequired ? 300 : 0);
+      document.getElementById('billCashCollected').value = Number(b.cashCollected || b.total) || 0;
 
       window.activeBillingBooking = b;
-      
-      // Auto estimate extra KM based on actual booking route distance (e.g., 670 KM for Ujjain to Delhi)
-      const startKm = Number(b.startKm) || 0;
-      const routeDistance = Number(b.distance || b.baseKm || b.packageKm) || 0;
-      if (routeDistance > 0 && startKm > 0) {
-        document.getElementById('billEndKm').value = startKm + routeDistance;
-      }
-
       calculateFareAndBilling();
       openModal('tripBillingModal');
+    }
+
+    // OPEN CLOSED TRIP DETAILS VIEW FOR VENDOR
+    function openClosedTripDetails(docId) {
+      const b = allBookingsCache.find(item => item.docId === docId);
+      if (!b) return;
+
+      const grandTotal = Number(b.grandTotal || b.total) || 0;
+      const comm = Number(b.companyCommission) || Math.round((Number(b.total) || 0) * 0.15);
+      const payout = Number(b.vendorPayout) || (grandTotal - comm);
+
+      alert("🧾 Trip Invoice Summary (" + (b.bookingId || 'MTZ') + "):\n\n" +
+            "• Base Fare: ₹" + (b.total || 0) + "\n" +
+            "• Extra KM Charge: ₹" + (b.extraKmCharge || 0) + "\n" +
+            "• Waiting Charge: ₹" + (b.waitingCharge || 0) + "\n" +
+            "• Toll, Parking & Carrier: ₹" + ((b.tollCharge || 0) + (b.parkingCharge || 0) + (b.carrierCharge || 0)) + "\n" +
+            "----------------------------------------\n" +
+            "• Grand Total Bill: ₹" + grandTotal + "\n" +
+            "• Platform Fee (15% on Fare): ₹" + comm + " (Toll/Parking excluded)\n" +
+            "• Your Net Payout (85%): ₹" + payout + "\n" +
+            "• Cash Collected: ₹" + (b.cashCollected || 0));
     }
 
     // REAL-TIME INSTANT FARE & BILLING CALCULATION
@@ -1165,7 +1176,7 @@
       }
       document.getElementById('displayWaitingTime').innerText = waitingMins + ' Mins';
 
-      // Smart Flexible Extra KM Calculation using actual route distance from booking
+      // Smart Flexible Extra KM Calculation based on booking route distance
       const routeDistance = Number(b.distance || b.baseKm || b.packageKm) || 0;
       const extraKmInput = document.getElementById('billExtraKmCharge');
 
@@ -1190,7 +1201,6 @@
       document.getElementById('summaryGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
     }
 
-    // Mark extra KM field as user-edited when manually changed
     document.addEventListener('input', (e) => {
       if (e.target && e.target.id === 'billExtraKmCharge') {
         e.target.dataset.userEdited = "true";
@@ -1222,8 +1232,7 @@
       const grandTotal = baseFare + totalExtras;
       const waitingMins = Number(document.getElementById('displayWaitingTime').innerText.replace(' Mins', '')) || 0;
 
-      // Commission and Vendor Payout calculation (Excluding Toll & Parking from commission base as requested)
-      // Commission is calculated on service fare (Base Fare + Extra KM + Waiting + Night + Carrier)
+      // Commission calculated on service fare ONLY (Excluding Toll, Parking, and State Tax)
       const commissionableFare = baseFare + extraKmCharge + waitingCharge + night + carrier;
       const companyCommission = Math.round(commissionableFare * 0.15);
       const vendorPayout = grandTotal - companyCommission;
