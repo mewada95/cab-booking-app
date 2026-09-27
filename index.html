@@ -166,7 +166,7 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹11/KM</span>
                   </div>
-                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
+                  <p class="driver-allowance-notice text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -184,7 +184,7 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹12/KM</span>
                   </div>
-                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
+                  <p class="driver-allowance-notice text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -202,7 +202,7 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹14/KM</span>
                   </div>
-                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
+                  <p class="driver-allowance-notice text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -220,7 +220,7 @@
                     <span class="text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded inc-km-tag">Included: 0 KM</span>
                     <span class="text-slate-600">Extra: ₹20/KM</span>
                   </div>
-                  <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
+                  <p class="driver-allowance-notice text-[10px] text-emerald-700 font-semibold mt-0.5">Includes Driver Allowance (₹300/day)</p>
                 </div>
               </div>
               <div class="text-right">
@@ -376,7 +376,7 @@
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-4 text-xs space-y-2.5">
         <h4 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Fare & Settlement Summary</h4>
         <div class="flex justify-between text-slate-600">
-          <span id="receiptFareLabel">Base Package Fare (Inc. Driver Allowance)</span>
+          <span id="receiptFareLabel">Base Package Fare</span>
           <span id="receiptTotalFare" class="font-bold text-sm text-slate-900">₹0</span>
         </div>
         <div id="receiptCarrierRow" class="hidden flex justify-between text-slate-600">
@@ -655,7 +655,7 @@
     let selectedVehicle = 'Hatchback';
     let baseFare = 0;
     let currentDisplayKm = 0;
-    const driverAllowance = 300;
+    let driverAllowance = 300;
     let currentDocId = '';
     let currentBookingData = null;
     let unsubscribeBooking = null;
@@ -900,17 +900,24 @@
       const pkgSelect = document.getElementById('localPackageSelect');
       const selectedPkg = pkgSelect ? pkgSelect.value : '';
 
-      if (tripType === 'Local Rental' && selectedPkg) {
+      if (tripType === 'Local Rental') {
         const cityData = adminLocalRentals[pickupCityName || 'bhopal'] || adminLocalRentals['bhopal'] || {};
         const cabPkg = cityData[vehicleType] || cityData['Sedan'];
-        if (cabPkg) return { fare: Number(cabPkg.baseFare) || 1800, isCsvPackage: true, displayKm: `${cabPkg.includedKm} KM / ${cabPkg.includedHours} Hrs` };
-        return { fare: selectedPkg === '4h/40km' ? 1800 : 3200, isCsvPackage: true, displayKm: selectedPkg };
+        if (cabPkg && cabPkg.baseFare) {
+          return { fare: Number(cabPkg.baseFare), isCsvPackage: true, displayKm: `${cabPkg.includedKm} KM / ${cabPkg.includedHours} Hrs` };
+        }
+        const localDefaults = { 'Hatchback': 1800, 'Sedan': 2100, 'MUV': 2800, 'SUV': 3500 };
+        return { fare: localDefaults[vehicleType] || 1800, isCsvPackage: true, displayKm: selectedPkg || '8h/80km' };
       }
 
       if (tripType === 'Airport Transfer') {
         const cityData = adminLocalRentals[pickupCityName || 'bhopal'] || adminLocalRentals['bhopal'] || {};
         const cabPkg = cityData[vehicleType] || cityData['Sedan'];
-        return { fare: cabPkg ? Math.round(Number(cabPkg.baseFare) * 0.9) : 1600, isCsvPackage: true, displayKm: 'Airport Transfer Package' };
+        if (cabPkg && cabPkg.baseFare) {
+          return { fare: Math.round(Number(cabPkg.baseFare) * 0.9), isCsvPackage: true, displayKm: 'Airport Transfer Package' };
+        }
+        const airportDefaults = { 'Hatchback': 1500, 'Sedan': 1800, 'MUV': 2400, 'SUV': 3000 };
+        return { fare: airportDefaults[vehicleType] || 1600, isCsvPackage: true, displayKm: 'Airport Transfer Package' };
       }
 
       if (tripType === 'One Way' && (!pickupCityName || !dropCityName)) return { fare: 0, isCsvPackage: false, displayKm: '0 KM' };
@@ -931,6 +938,9 @@
 
     function updateDynamicVehicleFares(distanceKm) {
       const dist = distanceKm || calculatedDistanceKm || 0;
+      const hasAllowance = (selectedTripType === 'One Way' || selectedTripType === 'Round Trip');
+      driverAllowance = hasAllowance ? 300 : 0;
+
       const hRes = calculateSegmentFare('Hatchback', dist, selectedTripType);
       const sRes = calculateSegmentFare('Sedan', dist, selectedTripType);
       const mRes = calculateSegmentFare('MUV', dist, selectedTripType);
@@ -947,6 +957,10 @@
 
       document.getElementById('rateModeBadge').innerText = cur.isCsvPackage ? "CSV Package Active" : "All Exclusive Fare";
       document.querySelectorAll('.inc-km-tag').forEach(el => el.innerText = `Included: ${currentDisplayKm}`);
+
+      document.querySelectorAll('.driver-allowance-notice').forEach(el => {
+        el.style.display = hasAllowance ? 'block' : 'none';
+      });
     }
 
     function selectTripType(type, element) {
@@ -982,6 +996,8 @@
     function selectVehicle(name, element) {
       selectedVehicle = name;
       const res = calculateSegmentFare(name, calculatedDistanceKm || 0, selectedTripType);
+      const hasAllowance = (selectedTripType === 'One Way' || selectedTripType === 'Round Trip');
+      driverAllowance = hasAllowance ? 300 : 0;
       baseFare = res.fare > 0 ? res.fare + driverAllowance : 0;
       document.querySelectorAll('.vehicle-card').forEach(c => c.className = "flex items-center justify-between p-3 border border-slate-200 rounded-xl cursor-pointer vehicle-card");
       element.className = "flex items-center justify-between p-3 border-2 border-blue-600 bg-blue-50/50 rounded-xl cursor-pointer vehicle-card";
@@ -1310,7 +1326,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         const distVal = window.lastStoredDist || 200;
                         const baseMinKm = 250 * duration.days;
                         const eff = Math.max(distVal * 2, baseMinKm);
-                        const newTotal = Math.round((eff * ratePerKm) + (duration.days * 300));
+                        const hasAllowance = (window.activeTripType !== 'local' && window.activeTripType !== 'airport');
+                        const alloc = hasAllowance ? (duration.days * 300) : 0;
+                        const newTotal = Math.round((eff * ratePerKm) + alloc);
                         
                         priceTag.innerText = "₹" + newTotal.toLocaleString("en-IN");
                         window.lastSelectedFare = priceTag.innerText;
@@ -1423,7 +1441,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 const cfg = (typeof CAB_CONFIG !== "undefined" && CAB_CONFIG[vType]) ? CAB_CONFIG[vType] : { baseRate: 11 };
 
                 let baseFare = effKm * cfg.baseRate;
-                let driverAllowance = duration.days * 300;
+                const hasAllowance = (window.activeTripType !== 'local' && window.activeTripType !== 'airport');
+                let driverAllowance = hasAllowance ? (duration.days * 300) : 0;
 
                 let totalFare = Math.round(baseFare + driverAllowance);
                 window.lastSelectedFare = "₹" + totalFare.toLocaleString("en-IN");
@@ -1484,12 +1503,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 const pickup = document.getElementById("pickupLocation") ? document.getElementById("pickupLocation").value : "Pickup";
                 const drop = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value : "Drop";
                 const duration = getTripDuration();
-                const driverAmt = duration.days * 300;
+                const hasAllowance = (window.activeTripType !== 'local' && window.activeTripType !== 'airport');
+                const driverAmt = hasAllowance ? (duration.days * 300) : 0;
                 const nightAmt = duration.nights * 300;
 
                 const nightText = nightAmt > 0 
                     ? `₹300 × ${duration.nights} = ₹${nightAmt} (Direct Payment to Driver)` 
                     : `₹300 (Not Included / Direct Payment to Driver if applicable)`;
+
+                const driverLineHtml = hasAllowance 
+                    ? `<p style="margin:3px 0;">Driver Allowance: ₹300 × ${duration.days} = <strong>₹${driverAmt} (Included in Fare)</strong></p>` 
+                    : '';
 
                 const modal = document.createElement("div");
                 modal.id = "currentPreviewModal";
@@ -1503,7 +1527,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <p style="margin:3px 0; font-size:15px; color:#0056b3; font-weight:bold;">Total Confirm Fare: ${window.lastSelectedFare}</p>
                             <hr style="border:0; border-top:1px solid #dee2e6; margin:8px 0;">
                             <p style="margin:3px 0;">Trip Duration: <strong>${duration.days} Day(s)</strong></p>
-                            <p style="margin:3px 0;">Driver Allowance: ₹300 × ${duration.days} = <strong>₹${driverAmt} (Included in Fare)</strong></p>
+                            ${driverLineHtml}
                             <p style="margin:3px 0; color:#d9534f;">Night Allowance (10 PM - 6 AM): <strong>${nightText}</strong></p>
                             <p style="margin:3px 0; color:#0056b3; font-weight:bold;">Toll, State Tax & Parking Extra (Paid directly)</p>
                         </div>
@@ -1519,114 +1543,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("confirmBookingFinal").onclick = () => {
                     window.previewConfirmed = true;
                     modal.remove();
-
-                    setTimeout(() => {
-                        const successBox = document.querySelector(".booking-error, .success-card, #bookingResult, .confirmation-details, form") || document.body;
-                        const termsCard = document.createElement("div");
-                        termsCard.style.cssText = "background:#eef9ff; border:1px solid #bce8f1; padding:15px; margin:15px 0; border-radius:8px; font-size:13px; color:#31708f; box-sizing:border-box;";
-                        termsCard.innerHTML = `
-                            <h4 style="margin:0 0 8px 0; color:#0056b3;">Booking Terms & Fare Breakdown</h4>
-                            <ul style="margin:0; padding-left:20px; line-height:1.5;">
-                                <li>Total Fare: <strong>${window.lastSelectedFare}</strong></li>
-                                <li>Trip Duration: <strong>${duration.days} Day(s)</strong></li>
-                                <li>Driver Allowance: <strong>₹${driverAmt}</strong> (Included in online booking)</li>
-                                <li>Night Allowance (10 PM - 6 AM): <strong>${nightText}</strong></li>
-                                <li>Toll, State Tax & Parking: Extra as per actuals (Paid directly)</li>
-                            </ul>
-                        `;
-                        successBox.prepend(termsCard);
-                    }, 1200);
-
                     submitBookBtn.click();
                 };
             }
         }, true);
     }
-
-    const allTravelKeywords = [
-        "Outstation cab service", "Outstation cab", "Outstation taxi service", "Outstation taxi",
-        "Travel agent from bhopal", "Bhopal taxi service", "Intercity cab", "Cab from bhopal",
-        "Taxi from bhopal", "Bhopal to indore taxi", "Indore to ujjain taxi", "Bhopal to indore cab",
-        "Taxi service in bhopal", "Cab service in bhopal", "Best cab service in bhopal", "Best cab service in indore",
-        "Cheap flights from bhopal", "Bhopal to delhi flight booking", "Indore to mumbai flight tickets",
-        "Bhopal to indore bus booking", "Bus ticket booking online", "AC bus from bhopal to jaipur",
-        "Best hotels in ujjain", "Hotel booking in bhopal", "Luxury hotels in udaipur", "Budget hotel booking online"
-    ];
-
-    const top250Hubs = [
-        "Bhopal", "Indore", "Ujjain", "Gwalior", "Jabalpur", "Sagar", "Rewa",
-        "Jaipur", "Udaipur", "Jodhpur", "Kota", "Ajmer", "Bikaner", "Alwar", "Pushkar",
-        "Delhi", "Gurugram", "Noida", "Lucknow", "Kanpur", "Agra", "Varanasi",
-        "Mumbai", "Pune", "Nagpur", "Nashik", "Ahmedabad", "Surat", "Vadodara",
-        "Bengaluru", "Mysuru", "Hyderabad", "Chennai", "Kolkata", "Patna", "Ranchi"
-    ];
-
-    function updateProgrammaticSEO() {
-        let activeTab = "Cabs";
-        const activeBtn = document.querySelector(".nav-link.active, .tab.active, button.active");
-        if (activeBtn) activeTab = activeBtn.innerText.trim();
-
-        const pickup = document.getElementById("pickupLocation") ? document.getElementById("pickupLocation").value : "Bhopal";
-        const drop = document.getElementById("dropLocation") ? document.getElementById("dropLocation").value : "Indore";
-
-        let title = "Tripvyom.in | Outstation Cabs, Flights, Buses & Hotels Booking";
-        let desc = "Book outstation cabs, cheap flights, luxury buses, and verified hotels across 250+ Indian cities with best price guarantee on tripvyom.in.";
-
-        if (activeTab.includes("Flight") || window.activeCategory === "flights") {
-            title = `Book Cheap Flights from ${pickup} to ${drop} | Airfare Deals - Tripvyom`;
-            desc = `Find and book low-cost flight tickets across 250+ cities instantly on tripvyom.in. Compare airline schedules and get exclusive discounts.`;
-        } else if (activeTab.includes("Bus") || window.activeCategory === "buses") {
-            title = `${pickup} to ${drop} Bus Booking: AC/Non-AC Tickets & Timings - Tripvyom`;
-            desc = `Book online bus tickets across top Indian cities. Verified operators, live tracking, and best price guarantee on tripvyom.in.`;
-        } else if (activeTab.includes("Hotel") || window.activeCategory === "hotels") {
-            title = `Best Hotels in ${drop || pickup} | Budget & Luxury Hotel Booking - Tripvyom`;
-            desc = `Explore top-rated hotels with verified reviews, amenities, and best price guarantee across 250+ destinations on tripvyom.in.`;
-        } else {
-            title = `Outstation Cab Service & Taxi Booking from ${pickup} | Tripvyom`;
-            desc = `Looking for an outstation cab or reliable travel agent from Bhopal? Book outstation taxi services with transparent pricing on tripvyom.in.`;
-        }
-
-        document.title = title;
-
-        let metaDesc = document.querySelector("meta[name='description']");
-        if (!metaDesc) {
-            metaDesc = document.createElement("meta");
-            metaDesc.name = "description";
-            document.head.appendChild(metaDesc);
-        }
-        metaDesc.content = desc;
-
-        let metaKeys = document.querySelector("meta[name='keywords']");
-        if (!metaKeys) {
-            metaKeys = document.createElement("meta");
-            metaKeys.name = "keywords";
-            document.head.appendChild(metaKeys);
-        }
-        metaKeys.content = allTravelKeywords.join(", ");
-    }
-
-    function injectSchemaMarkup() {
-        if (document.getElementById("tripSchema")) return;
-        const schema = document.createElement("script");
-        schema.id = "tripSchema";
-        schema.type = "application/ld+json";
-        schema.text = JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "TravelAgency",
-            "name": "Tripvyom",
-            "url": "https://tripvyom.in",
-            "logo": "https://tripvyom.in/logo.png",
-            "description": "Comprehensive travel platform providing outstation cabs, flights, buses, and hotels across 250+ Indian cities.",
-            "areaServed": top250Hubs,
-            "knowsAbout": allTravelKeywords,
-            "priceRange": "₹₹"
-        });
-        document.head.appendChild(schema);
-    }
-
-    updateProgrammaticSEO();
-    injectSchemaMarkup();
-    setInterval(updateProgrammaticSEO, 2000);
 });
 </script>
 <!-- RUNTIME_OVERRIDE_END -->
