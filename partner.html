@@ -464,7 +464,7 @@
           </div>
         </div>
 
-        <button type="button" id="submitKycBtn" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
+        <button type="button" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-cloud-arrow-up"></i> Save Partner Profile
         </button>
       </div>
@@ -629,7 +629,7 @@
         vAvail.classList.add('hidden');
         vRides.classList.remove('hidden');
         btnAvail.className = "flex-1 py-2.5 rounded-xl text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1.5 transition";
-        btnRides.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 transition";
+        btnRides.className = "flex-1 py-2.5 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-1.5 shadow-sm transition";
       }
     }
 
@@ -1249,6 +1249,7 @@
       const grandTotal = Number(b.grandTotal || b.total) || 0;
       const comm = Number(b.companyCommission) || Math.round((Number(b.total) || 0) * 0.15);
       const payout = Number(b.vendorPayout) || (grandTotal - comm);
+      const cashCollected = Number(b.grandTotal || b.cashCollected || b.total) || 0;
 
       document.getElementById('detailModalBookingId').innerText = b.bookingId || 'MTZ';
       document.getElementById('detailRoute').innerText = (b.from || 'Bhopal') + ' ➔ ' + (b.to || 'Indore');
@@ -1259,7 +1260,7 @@
       document.getElementById('detailWaitingCharge').innerText = '₹' + (b.waitingCharge || 0).toLocaleString('en-IN');
       document.getElementById('detailExtras').innerText = '₹' + ((b.tollCharge || 0) + (b.parkingCharge || 0) + (b.carrierCharge || 0)).toLocaleString('en-IN');
       document.getElementById('detailGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
-      document.getElementById('detailCashCollected').innerText = '₹' + (Number(b.cashCollected) || grandTotal).toLocaleString('en-IN');
+      document.getElementById('detailCashCollected').innerText = '₹' + cashCollected.toLocaleString('en-IN');
       document.getElementById('detailCommission').innerText = '₹' + comm.toLocaleString('en-IN') + ' (15%)';
       document.getElementById('detailVendorPayout').innerText = '₹' + payout.toLocaleString('en-IN');
 
