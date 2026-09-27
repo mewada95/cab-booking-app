@@ -23,7 +23,7 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide">Tripvyom Partner</h1>
-        <p class="text-[10px] text-slate-400">Advanced Fleet Lifecycle & Waiting Billing</p>
+        <p class="text-[10px] text-slate-400">Advanced Fleet Lifecycle & Dynamic Billing</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -102,7 +102,7 @@
     <!-- TAB VIEW 2: ACCEPTED / ACTIVE FLEET RIDES -->
     <div id="viewMyRides" class="hidden space-y-3">
       <div class="flex justify-between items-center px-1">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Assigned Trips & Lifecycle</span>
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Assigned Trips & Dispatch</span>
         <span class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">Fleet Control</span>
       </div>
 
@@ -332,9 +332,14 @@
           </h3>
           <p class="text-[10px] text-slate-500">Live selfie & basic details</p>
         </div>
-        <button type="button" onclick="closeModal('kycModal')" class="text-slate-400 hover:text-slate-600 p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="skipKycForNow()" class="text-[11px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-xl transition">
+            Skip for Now ➔
+          </button>
+          <button type="button" onclick="closeModal('kycModal')" class="text-slate-400 hover:text-slate-600 p-1">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
       </div>
 
       <div class="p-4 overflow-y-auto space-y-4 text-xs">
@@ -820,7 +825,8 @@
       let cutTotal = 0;
       myAssignedRides.forEach(b => {
         if (b.status !== 'Cancelled') {
-          const fare = Number(b.total) || 0;
+          // Dynamic calculation based on grandTotal if trip is closed, else b.total
+          const fare = Number(b.grandTotal || b.total) || 0;
           const comm = Math.round(fare * 0.15);
           cutTotal += comm;
           netPayoutTotal += (fare - comm);
@@ -918,7 +924,8 @@
         `;
       } else {
         myRidesContainer.innerHTML = myAssignedRides.map(b => {
-          const totalFare = Number(b.total) || 0;
+          // Dynamic calculation based on grandTotal if closed
+          const totalFare = Number(b.grandTotal || b.total) || 0;
           const fee15 = Math.round(totalFare * 0.15);
           const vendorNet = totalFare - fee15;
 
@@ -980,11 +987,11 @@
               </div>
 
               <div class="flex justify-between items-center text-[11px] font-bold pt-1">
-                <span>Net Vendor Settlement:</span>
+                <span>Net Vendor Settlement (85%):</span>
                 <span class="text-emerald-700 font-black text-sm">₹${vendorNet}</span>
               </div>
 
-              <!-- LIFECYCLE WORKFLOW BUTTONS WITH TIMESTAMPS -->
+              <!-- LIFECYCLE WORKFLOW BUTTONS -->
               <div class="pt-1 space-y-2">
                 ${getWorkflowButtonsHtml(b)}
               </div>
@@ -1141,7 +1148,6 @@
       let waitingMins = 0;
       if (b.tripStartedAt && b.time) {
         const tripStartDate = b.tripStartedAt.toDate?.() || new Date(b.tripStartedAt);
-        // Parse scheduled time string (e.g. "10:30 AM")
         const [timeStr, modifier] = b.time.split(' ');
         let [hours, minutes] = timeStr.split(':').map(Number);
         if (modifier === 'PM' && hours < 12) hours += 12;
@@ -1152,24 +1158,21 @@
 
         const diffMs = tripStartDate - scheduledDate;
         const diffMins = Math.floor(diffMs / (1000 * 60));
-        // Free waiting time: 45 minutes allowed, after that ₹3 per minute or configurable
         if (diffMins > 45) {
           waitingMins = diffMins - 45;
         }
       }
       document.getElementById('displayWaitingTime').innerText = waitingMins + ' Mins';
 
-      // Auto waiting charge calculation (₹3 per extra minute or ₹150/hr)
       const autoWaitingCharge = waitingMins * 3;
       if (document.getElementById('billWaitingCharge').value == 0 && autoWaitingCharge > 0) {
         document.getElementById('billWaitingCharge').value = autoWaitingCharge;
       }
 
-      // Auto Extra KM calculation (Assuming 100 KM included or standard calculation rule)
       let autoExtraKmCharge = 0;
-      if (totalKmRun > 120) { // Standard threshold example
+      if (totalKmRun > 120) {
         const extraKm = totalKmRun - 120;
-        autoExtraKmCharge = extraKm * 12; // ₹12 per extra KM
+        autoExtraKmCharge = extraKm * 12;
         if (document.getElementById('billExtraKmCharge').value == 0) {
           document.getElementById('billExtraKmCharge').value = autoExtraKmCharge;
         }
@@ -1220,7 +1223,6 @@
       const grandTotal = baseFare + totalExtras;
       const waitingMins = Number(document.getElementById('displayWaitingTime').innerText.replace(' Mins', '')) || 0;
 
-      // Populate confirmation popup fields
       document.getElementById('popupBookingId').innerText = b.bookingId || 'MTZ';
       document.getElementById('popupTotalKm').innerText = totalKmRun + ' KM';
       document.getElementById('popupWaitingMins').innerText = waitingMins + ' Mins';
@@ -1228,7 +1230,6 @@
       document.getElementById('popupExtras').innerText = '₹' + totalExtras.toLocaleString('en-IN');
       document.getElementById('popupGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
 
-      // Cache final calculated data
       window.finalBillingData = {
         docId: b.docId,
         endKm: endKm,
@@ -1270,7 +1271,7 @@
         tripClosedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
         closeModal('customerBillPopupModal');
-        alert("🎉 Trip successfully closed & bill settled!");
+        alert("🎉 Trip successfully closed & bill settled! Commission & payout updated.");
       }).catch(err => alert("Error: " + err.message));
     }
 
