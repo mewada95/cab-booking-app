@@ -23,7 +23,7 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide">Tripvyom Partner</h1>
-        <p class="text-[10px] text-slate-400">Driver & Fleet Dispatch Control</p>
+        <p class="text-[10px] text-slate-400">Odometer KM & Fare Billing Control</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -136,29 +136,29 @@
         </div>
 
         <div>
-          <label class="block font-semibold text-slate-600 mb-1">Select Cab Model (Hatchback / Sedan / MUV / SUV) *</label>
-          <select id="modalCabTypeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold text-slate-800">
+          <label class="block font-semibold text-slate-600 mb-1">Select Cab Model *</label>
+          <select id="modalCabTypeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800">
             <option value="Hatchback">Hatchback (WagonR / Swift)</option>
             <option value="Sedan">Sedan (Dzire / Etios)</option>
             <option value="MUV Ertiga">MUV Ertiga / Carens</option>
             <option value="SUV Crysta">SUV Innova Crysta</option>
           </select>
-          <p class="text-[10px] text-amber-700 mt-1">⚠️ Rule: Downgrade allowed nahi hai (e.g. SUV ki jagah Sedan nahi bhej sakte).</p>
+          <p class="text-[10px] text-amber-700 mt-1">⚠️ Rule: Downgrade allowed nahi hai.</p>
         </div>
 
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Driver Name *</label>
-          <input id="modalDriverName" type="text" placeholder="e.g. Ramesh Kumar" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+          <input id="modalDriverName" type="text" placeholder="e.g. Ramesh Kumar" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold" />
         </div>
 
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Driver Mobile Number *</label>
-          <input id="modalDriverPhone" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-semibold" />
+          <input id="modalDriverPhone" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold" />
         </div>
 
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Commercial Cab Number *</label>
-          <input id="modalCabNumber" type="text" placeholder="e.g. MP04TB5049" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 font-mono font-bold uppercase" />
+          <input id="modalCabNumber" type="text" placeholder="e.g. MP04TB5049" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-bold uppercase" />
         </div>
 
         <button type="button" id="modalSaveDriverBtn" onclick="saveDriverCabDetails()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
@@ -168,63 +168,96 @@
     </div>
   </div>
 
-  <!-- STEP 3: TRIP SETTLEMENT & EXTRAS MODAL -->
+  <!-- STEP 3: ODOMETER & FARE BILLING MODAL (END TRIP) -->
   <div id="tripBillingModal" class="fixed inset-0 bg-slate-900/70 z-[75] hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
         <div>
-          <h3 class="font-bold text-slate-800 text-sm">Trip Settlement & Extras</h3>
-          <p class="text-[10px] text-slate-500">Add toll, km, parking & cash collection</p>
+          <h3 class="font-bold text-slate-800 text-sm">Trip Billing & Fare Settlement</h3>
+          <p class="text-[10px] text-slate-500">Enter End KM & extra charges (One-Way / Round Trip)</p>
         </div>
         <button type="button" onclick="closeModal('tripBillingModal')" class="text-slate-400 hover:text-slate-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
-      <div class="p-4 space-y-2.5 text-xs overflow-y-auto max-h-[80vh]">
+      <div class="p-4 space-y-3 text-xs overflow-y-auto max-h-[82vh]">
         <input type="hidden" id="billingDocId" />
 
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block font-medium text-slate-600 mb-0.5">Extra KM Charges (₹)</label>
-            <input id="billExtraKm" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+        <!-- KM Readings Card -->
+        <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100 space-y-2 text-blue-900">
+          <div class="flex justify-between items-center">
+            <span>Start KM (Garage/Pickup):</span>
+            <b id="displayStartKm" class="font-mono text-sm">0</b>
           </div>
           <div>
-            <label class="block font-medium text-slate-600 mb-0.5">Night Charges (₹)</label>
-            <input id="billNight" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+            <label class="block font-bold mb-1">End KM Reading (Odometer) *</label>
+            <input id="billEndKm" type="number" placeholder="e.g. 45280" oninput="calculateFareAndBilling()" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2 font-mono font-bold text-sm text-blue-900 focus:outline-none" />
+          </div>
+          <div class="flex justify-between items-center pt-1 border-t border-blue-200 text-xs">
+            <span>Total Distance Run:</span>
+            <b id="displayTotalKmRun" class="font-black text-blue-700">0 KM</b>
+          </div>
+        </div>
+
+        <!-- Extra Charges Grid -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-slate-600 mb-0.5">Extra KM Charge (₹)</label>
+            <input id="billExtraKmCharge" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+          </div>
+          <div>
+            <label class="block font-medium text-slate-600 mb-0.5">Night Charge (₹)</label>
+            <input id="billNight" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Toll Tax (₹)</label>
-            <input id="billToll" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+            <input id="billToll" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
           </div>
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Regular Parking (₹)</label>
-            <input id="billParking" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+            <input id="billParking" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Airport Parking (₹)</label>
-            <input id="billAirportParking" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+            <input id="billAirportParking" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
           </div>
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Roof Carrier (₹)</label>
-            <input id="billCarrier" type="number" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
+            <input id="billCarrier" type="number" value="0" oninput="calculateFareAndBilling()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-semibold" />
           </div>
         </div>
 
-        <div class="pt-2 border-t border-slate-100">
-          <label class="block font-bold text-slate-700 mb-1">Cash Collected By Driver (₹)</label>
-          <input id="billCashCollected" type="number" value="0" class="w-full bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl px-3 py-2 font-black text-sm" />
-          <p class="text-[10px] text-slate-400 mt-0.5">Driver ne customer se kitna cash total collect kiya</p>
+        <!-- Calculation Summary Box -->
+        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1.5 text-[11px]">
+          <div class="flex justify-between text-slate-600">
+            <span>Base Package Fare:</span>
+            <span id="summaryBaseFare" class="font-bold">₹0</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Total Extras (Toll/KM/Night/Parking):</span>
+            <span id="summaryTotalExtras" class="font-bold">₹0</span>
+          </div>
+          <div class="flex justify-between text-slate-900 font-extrabold pt-1 border-t border-slate-200 text-xs">
+            <span>Grand Total Fare:</span>
+            <span id="summaryGrandTotal" class="text-blue-600 text-sm">₹0</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Cash Collected By Driver from Customer (₹)</label>
+          <input id="billCashCollected" type="number" value="0" class="w-full bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl px-3 py-2 font-black text-sm focus:outline-none" />
+          <p class="text-[10px] text-slate-400 mt-0.5">Driver dwara customer se total cash kitna liya gaya</p>
         </div>
 
         <button type="button" onclick="submitTripBillingAndClose()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 mt-2">
-          <i class="fa-solid fa-flag-checkered"></i> Complete & Close Trip
+          <i class="fa-solid fa-flag-checkered"></i> Finalize & Close Trip
         </button>
       </div>
     </div>
@@ -271,7 +304,7 @@
           </div>
 
           <div class="grid grid-cols-2 gap-2 pt-1">
-            <button type="button" id="startCamBtn" onclick="startLiveCamera()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1">
+            <button type="button" onclick="startLiveCamera()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1">
               <i class="fa-solid fa-video"></i> Start Camera
             </button>
             <button type="button" id="snapCamBtn" onclick="captureLiveSelfie()" disabled class="bg-slate-200 text-slate-400 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1 cursor-not-allowed">
@@ -392,13 +425,12 @@
     let videoStream = null;
     let capturedSelfieBase64 = null;
 
-    // VEHICLE HIERARCHY TIER SYSTEM (Anti-Downgrade Check)
     function getTierLevel(vehicleStr) {
       const str = (vehicleStr || '').toLowerCase();
       if (str.includes('crysta') || str.includes('suv')) return 4;
       if (str.includes('ertiga') || str.includes('muv')) return 3;
       if (str.includes('sedan')) return 2;
-      return 1; // Hatchback
+      return 1;
     }
 
     function getVehicleBadge(vehicleType) {
@@ -433,23 +465,12 @@
       }
     }
 
-    function openVendorAuthModal() {
-      openModal('vendorAuthModal');
-    }
-
+    function openVendorAuthModal() { openModal('vendorAuthModal'); }
     function openKycModal() {
-      if (!currentVendor) {
-        alert("Pehle Partner Login karein!");
-        openVendorAuthModal();
-        return;
-      }
+      if (!currentVendor) { alert("Pehle Partner Login karein!"); openVendorAuthModal(); return; }
       openModal('kycModal');
     }
-
-    function skipKycForNow() {
-      closeModal('kycModal');
-      alert("Aapne profile verification baad ke liye skip kar diya hai.");
-    }
+    function skipKycForNow() { closeModal('kycModal'); }
 
     function switchVendorTab(tab) {
       const vAvail = document.getElementById('viewAvailable');
@@ -707,11 +728,11 @@
       } else if (status === "Dispatched from Garage") {
         return '<button onclick="updateTripStatus(\'' + b.docId + '\', \'Reached Pickup Point\')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-map-pin mr-1"></i> 2. Reached Pickup Point</button>';
       } else if (status === "Reached Pickup Point") {
-        return '<button onclick="updateTripStatus(\'' + b.docId + '\', \'Trip Started\')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-play mr-1"></i> 3. Start Trip</button>';
+        return '<button onclick="promptStartTrip(\'' + b.docId + '\')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-play mr-1"></i> 3. Start Trip (Enter Start KM)</button>';
       } else if (status === "Trip Started") {
-        return '<button onclick="openTripBillingModal(\'' + b.docId + '\')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> 4. End Trip & Add Extras</button>';
+        return '<button onclick="openTripBillingModal(\'' + b.docId + '\')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> 4. End Trip & Bill Fare</button>';
       } else {
-        return '<div class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl text-purple-900 space-y-0.5 text-[11px]"><p class="font-bold">Trip Completed & Closed ✓</p><p>Cash Collected: <b>₹' + (b.cashCollected || 0) + '</b> | Extras: <b>₹' + (b.totalExtras || 0) + '</b></p></div>';
+        return '<div class="bg-purple-50 border border-purple-200 p-2.5 rounded-xl text-purple-900 space-y-0.5 text-[11px]"><p class="font-bold">Trip Completed & Settled ✓</p><p>Total KM: <b>' + (b.totalKmRun || 0) + ' KM</b> | Cash: <b>₹' + (b.cashCollected || 0) + '</b></p></div>';
       }
     }
 
@@ -967,12 +988,11 @@
         return alert("Driver Name, 10-digit Phone aur Commercial Cab Number bharna compulsory hai!");
       }
 
-      // ANTI-DOWNGRADE VALIDATION CHECK
       const bookedTier = getTierLevel(bookedVehicle);
       const assignedTier = getTierLevel(assignedCabType);
 
       if (assignedTier < bookedTier) {
-        alert("⚠️ Downgrade Not Allowed!\nCustomer ne '" + bookedVehicle + "' book kiya hai. Aap usse chhota model ('" + assignedCabType + "') assign nahi kar sakte. Barabar ya upgraded gaadi hi chunein.");
+        alert("⚠️ Downgrade Not Allowed!\nCustomer ne '" + bookedVehicle + "' book kiya hai. Aap usse chhota model ('" + assignedCabType + "') assign nahi kar sakte.");
         return;
       }
 
@@ -990,7 +1010,7 @@
         btn.innerText = "Save & Send Details to Customer";
         btn.disabled = false;
         closeModal('assignDriverModal');
-        alert("Driver aur Cab details successfully save ho gayi! Customer ke screen par live reflect ho gayi hain.");
+        alert("Driver aur Cab details successfully save ho gayi!");
       }).catch(err => {
         btn.innerText = "Save & Send Details to Customer";
         btn.disabled = false;
@@ -1007,21 +1027,81 @@
       }
     }
 
+    function promptStartTrip(docId) {
+      const startKm = prompt("Kripya Gaadi ki Starting Odometer Reading (Start KM) darj karein:");
+      if (!startKm || isNaN(startKm)) {
+        alert("Valid Start KM anivarya hai!");
+        return;
+      }
+
+      db.collection("bookings").doc(docId).update({
+        status: "Trip Started",
+        startKm: Number(startKm),
+        tripStartedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert("Trip Started! Start KM recorded: " + startKm);
+      });
+    }
+
     function openTripBillingModal(docId) {
+      const b = allBookingsCache.find(item => item.docId === docId);
+      if (!b) return;
+
       document.getElementById('billingDocId').value = docId;
-      document.getElementById('billExtraKm').value = 0;
+      document.getElementById('displayStartKm').innerText = b.startKm || '0';
+      document.getElementById('billEndKm').value = '';
+      document.getElementById('displayTotalKmRun').innerText = '0 KM';
+      document.getElementById('billExtraKmCharge').value = 0;
       document.getElementById('billNight').value = 0;
       document.getElementById('billToll').value = 0;
       document.getElementById('billParking').value = 0;
       document.getElementById('billAirportParking').value = 0;
-      document.getElementById('billCarrier').value = 0;
+      document.getElementById('billCarrier').value = b.carrierRequired ? 300 : 0;
       document.getElementById('billCashCollected').value = 0;
+
+      window.activeBillingBooking = b;
+      calculateFareAndBilling();
       openModal('tripBillingModal');
+    }
+
+    function calculateFareAndBilling() {
+      const b = window.activeBillingBooking;
+      if (!b) return;
+
+      const startKm = Number(b.startKm) || 0;
+      const endKm = Number(document.getElementById('billEndKm').value) || 0;
+      const totalKmRun = endKm > startKm ? (endKm - startKm) : 0;
+      document.getElementById('displayTotalKmRun').innerText = totalKmRun + ' KM';
+
+      const baseFare = Number(b.total) || 0;
+      const extraKmCharge = Number(document.getElementById('billExtraKmCharge').value) || 0;
+      const night = Number(document.getElementById('billNight').value) || 0;
+      const toll = Number(document.getElementById('billToll').value) || 0;
+      const parking = Number(document.getElementById('billParking').value) || 0;
+      const airportParking = Number(document.getElementById('billAirportParking').value) || 0;
+      const carrier = Number(document.getElementById('billCarrier').value) || 0;
+
+      const totalExtras = extraKmCharge + night + toll + parking + airportParking + carrier;
+      const grandTotal = baseFare + totalExtras;
+
+      document.getElementById('summaryBaseFare').innerText = '₹' + baseFare.toLocaleString('en-IN');
+      document.getElementById('summaryTotalExtras').innerText = '₹' + totalExtras.toLocaleString('en-IN');
+      document.getElementById('summaryGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
     }
 
     function submitTripBillingAndClose() {
       const docId = document.getElementById('billingDocId').value;
-      const extraKm = Number(document.getElementById('billExtraKm').value) || 0;
+      const b = window.activeBillingBooking;
+      const endKm = Number(document.getElementById('billEndKm').value) || 0;
+      const startKm = Number(b?.startKm) || 0;
+
+      if (endKm <= startKm) {
+        alert("⚠️ End KM, Start KM se zyada hona chahiye!");
+        return;
+      }
+
+      const totalKmRun = endKm - startKm;
+      const extraKmCharge = Number(document.getElementById('billExtraKmCharge').value) || 0;
       const night = Number(document.getElementById('billNight').value) || 0;
       const toll = Number(document.getElementById('billToll').value) || 0;
       const parking = Number(document.getElementById('billParking').value) || 0;
@@ -1029,17 +1109,21 @@
       const carrier = Number(document.getElementById('billCarrier').value) || 0;
       const cashCollected = Number(document.getElementById('billCashCollected').value) || 0;
 
-      const totalExtras = extraKm + night + toll + parking + airportParking + carrier;
+      const totalExtras = extraKmCharge + night + toll + parking + airportParking + carrier;
+      const grandTotal = (Number(b?.total) || 0) + totalExtras;
 
       db.collection("bookings").doc(docId).update({
         status: "Trip Completed & Closed",
-        extraKmCharge: extraKm,
+        endKm: endKm,
+        totalKmRun: totalKmRun,
+        extraKmCharge: extraKmCharge,
         nightCharge: night,
         tollCharge: toll,
         parkingCharge: parking,
         airportParkingCharge: airportParking,
         carrierCharge: carrier,
         totalExtras: totalExtras,
+        grandTotal: grandTotal,
         cashCollected: cashCollected,
         tripClosedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
