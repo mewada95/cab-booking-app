@@ -314,6 +314,75 @@
     </div>
   </div>
 
+  <!-- STEP 5: CLOSED TRIP DETAILS MODAL (FOR VENDOR EARNINGS & INVOICE) -->
+  <div id="tripDetailsModal" class="fixed inset-0 bg-slate-900/80 z-[90] hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
+      <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-900 text-white">
+        <div>
+          <h3 class="font-bold text-sm flex items-center gap-1.5">
+            <i class="fa-solid fa-receipt text-emerald-400"></i> Closed Trip Invoice & Earnings
+          </h3>
+          <p id="detailModalBookingId" class="text-[10px] text-slate-400 font-mono">MTZ-XXXX</p>
+        </div>
+        <button type="button" onclick="closeModal('tripDetailsModal')" class="text-slate-300 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-3 text-xs overflow-y-auto max-h-[80vh]">
+        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2 text-slate-700">
+          <div class="flex justify-between">
+            <span>Route:</span>
+            <b id="detailRoute" class="text-slate-900">Bhopal ➔ Indore</b>
+          </div>
+          <div class="flex justify-between">
+            <span>Total Distance Run:</span>
+            <b id="detailTotalKm" class="font-bold text-slate-900">0 KM</b>
+          </div>
+          <div class="flex justify-between">
+            <span>Waiting Time:</span>
+            <b id="detailWaiting" class="font-bold text-slate-900">0 Mins</b>
+          </div>
+          <div class="flex justify-between pt-1 border-t border-slate-200">
+            <span>Base Package Fare:</span>
+            <b id="detailBaseFare">₹0</b>
+          </div>
+          <div class="flex justify-between">
+            <span>Extra KM Charge:</span>
+            <b id="detailExtraKm">₹0</b>
+          </div>
+          <div class="flex justify-between">
+            <span>Waiting Charge:</span>
+            <b id="detailWaitingCharge">₹0</b>
+          </div>
+          <div class="flex justify-between">
+            <span>Toll / Parking / Carrier:</span>
+            <b id="detailExtras">₹0</b>
+          </div>
+          <div class="flex justify-between pt-2 border-t border-slate-200 text-sm font-black text-slate-900">
+            <span>Grand Total Bill:</span>
+            <span id="detailGrandTotal" class="text-blue-600">₹0</span>
+          </div>
+        </div>
+
+        <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl space-y-1.5 text-emerald-900">
+          <div class="flex justify-between text-blue-700 text-[11px]">
+            <span>Platform Fee (15% on Fare):</span>
+            <b id="detailCommission">₹0</b>
+          </div>
+          <div class="flex justify-between text-emerald-800 font-black text-sm pt-1 border-t border-emerald-200">
+            <span>Your Net Payout (85%):</span>
+            <span id="detailVendorPayout">₹0</span>
+          </div>
+        </div>
+
+        <div class="text-[10px] text-slate-400 text-center">
+          * Toll & Parking are direct out-of-pocket expenses and are excluded from commission calculation.
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- PARTNER PROFILE MODAL -->
   <div id="kycModal" class="fixed inset-0 bg-slate-900/80 z-[85] hidden items-center justify-center p-3">
     <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden relative">
@@ -383,7 +452,7 @@
           </div>
         </div>
 
-        <button type="button" id="submitKycBtn" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+        <button type="button" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-cloud-arrow-up"></i> Save Partner Profile
         </button>
       </div>
@@ -1112,15 +1181,25 @@
       document.getElementById('billEndKm').value = '';
       document.getElementById('displayTotalKmRun').innerText = '0 KM';
       document.getElementById('displayWaitingTime').innerText = '0 Mins';
-      document.getElementById('billExtraKmCharge').value = b.extraKmCharge || 0;
-      document.getElementById('billWaitingCharge').value = b.waitingCharge || 0;
-      document.getElementById('billNight').value = b.nightCharge || 0;
-      document.getElementById('billToll').value = b.tollCharge || 0;
-      document.getElementById('billParking').value = b.parkingCharge || b.airportParkingCharge || 0;
-      document.getElementById('billCarrier').value = b.carrierCharge || (b.carrierRequired ? 300 : 0);
-      document.getElementById('billCashCollected').value = Number(b.cashCollected || b.total) || 0;
+      document.getElementById('billExtraKmCharge').value = 0;
+      document.getElementById('billWaitingCharge').value = 0;
+      document.getElementById('billNight').value = 0;
+      document.getElementById('billToll').value = 0;
+      document.getElementById('billParking').value = 0;
+      document.getElementById('billCarrier').value = b.carrierRequired ? 300 : 0;
+      document.getElementById('billCashCollected').value = Number(b.total) || 0;
 
       window.activeBillingBooking = b;
+      
+      // Auto extract route base KM safely using regex
+      const rawDist = b.distance || b.baseKm || b.packageKm || 0;
+      const routeDistance = parseFloat(String(rawDist).replace(/[^0-9.]/g, '')) || 0;
+      const startKm = Number(b.startKm) || 0;
+
+      if (routeDistance > 0 && startKm > 0) {
+        document.getElementById('billEndKm').value = startKm + routeDistance;
+      }
+
       calculateFareAndBilling();
       openModal('tripBillingModal');
     }
@@ -1134,19 +1213,22 @@
       const comm = Number(b.companyCommission) || Math.round((Number(b.total) || 0) * 0.15);
       const payout = Number(b.vendorPayout) || (grandTotal - comm);
 
-      alert("🧾 Trip Invoice Summary (" + (b.bookingId || 'MTZ') + "):\n\n" +
-            "• Base Fare: ₹" + (b.total || 0) + "\n" +
-            "• Extra KM Charge: ₹" + (b.extraKmCharge || 0) + "\n" +
-            "• Waiting Charge: ₹" + (b.waitingCharge || 0) + "\n" +
-            "• Toll, Parking & Carrier: ₹" + ((b.tollCharge || 0) + (b.parkingCharge || 0) + (b.carrierCharge || 0)) + "\n" +
-            "----------------------------------------\n" +
-            "• Grand Total Bill: ₹" + grandTotal + "\n" +
-            "• Platform Fee (15% on Fare): ₹" + comm + " (Toll/Parking excluded)\n" +
-            "• Your Net Payout (85%): ₹" + payout + "\n" +
-            "• Cash Collected: ₹" + (b.cashCollected || 0));
+      document.getElementById('detailModalBookingId').innerText = b.bookingId || 'MTZ';
+      document.getElementById('detailRoute').innerText = (b.from || 'Bhopal') + ' ➔ ' + (b.to || 'Indore');
+      document.getElementById('detailTotalKm').innerText = (b.totalKmRun || 0) + ' KM';
+      document.getElementById('detailWaiting').innerText = (b.waitingMins || 0) + ' Mins';
+      document.getElementById('detailBaseFare').innerText = '₹' + (b.total || 0).toLocaleString('en-IN');
+      document.getElementById('detailExtraKm').innerText = '₹' + (b.extraKmCharge || 0).toLocaleString('en-IN');
+      document.getElementById('detailWaitingCharge').innerText = '₹' + (b.waitingCharge || 0).toLocaleString('en-IN');
+      document.getElementById('detailExtras').innerText = '₹' + ((b.tollCharge || 0) + (b.parkingCharge || 0) + (b.carrierCharge || 0)).toLocaleString('en-IN');
+      document.getElementById('detailGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
+      document.getElementById('detailCommission').innerText = '₹' + comm.toLocaleString('en-IN') + ' (15%)';
+      document.getElementById('detailVendorPayout').innerText = '₹' + payout.toLocaleString('en-IN');
+
+      openModal('tripDetailsModal');
     }
 
-    // REAL-TIME INSTANT FARE & BILLING CALCULATION
+    // REAL-TIME INSTANT FARE & BILLING CALCULATION WITH ROBUST DISTANCE PARSING
     function calculateFareAndBilling() {
       const b = window.activeBillingBooking;
       if (!b) return;
@@ -1176,8 +1258,9 @@
       }
       document.getElementById('displayWaitingTime').innerText = waitingMins + ' Mins';
 
-      // Smart Flexible Extra KM Calculation based on booking route distance
-      const routeDistance = Number(b.distance || b.baseKm || b.packageKm) || 0;
+      // Robust Extra KM calculation using extracted base distance (e.g. 670 KM for Ujjain to Delhi)
+      const rawDist = b.distance || b.baseKm || b.packageKm || 0;
+      const routeDistance = parseFloat(String(rawDist).replace(/[^0-9.]/g, '')) || 0;
       const extraKmInput = document.getElementById('billExtraKmCharge');
 
       if (routeDistance > 0 && totalKmRun > routeDistance && extraKmInput.dataset.userEdited !== "true") {
