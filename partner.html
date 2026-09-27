@@ -23,7 +23,7 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide">Tripvyom Partner</h1>
-        <p class="text-[10px] text-slate-400">Real-time Fleet Lifecycle & Billing</p>
+        <p class="text-[10px] text-slate-400">Transparent Commission & Earnings Control</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -61,7 +61,7 @@
         <span class="text-[9px] text-emerald-600 font-bold">Accepted</span>
       </div>
       <div class="border-r border-slate-100 px-1">
-        <p class="text-[9px] uppercase font-bold text-slate-400">Gross Payout</p>
+        <p class="text-[9px] uppercase font-bold text-slate-400">Net Payout</p>
         <p id="kpiVendorNetPayout" class="text-lg font-black text-emerald-600 mt-0.5">₹0</p>
         <span class="text-[9px] text-slate-400">Net 85%</span>
       </div>
@@ -203,7 +203,7 @@
           </div>
         </div>
 
-        <!-- Extra Charges Grid (Fully Editable & Zero-allowed) -->
+        <!-- Extra Charges Grid -->
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-medium text-slate-600 mb-0.5">Extra KM Charge (₹)</label>
@@ -265,15 +265,15 @@
     </div>
   </div>
 
-  <!-- STEP 4: CUSTOMER BILL CONFIRMATION POPUP -->
+  <!-- STEP 4: CUSTOMER BILL CONFIRMATION POPUP WITH TRANSPARENT EARNINGS -->
   <div id="customerBillPopupModal" class="fixed inset-0 bg-slate-900/80 z-[85] hidden items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
       <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-emerald-50 text-emerald-900">
         <div>
           <h3 class="font-bold text-sm flex items-center gap-1.5">
-            <i class="fa-solid fa-file-invoice text-emerald-600"></i> Customer Final Bill Summary
+            <i class="fa-solid fa-file-invoice text-emerald-600"></i> Trip Settlement & Earnings Breakdown
           </h3>
-          <p class="text-[10px] text-emerald-700">Verify amount to be collected before closing</p>
+          <p class="text-[10px] text-emerald-700">Transparent Payout & Commission Calculation</p>
         </div>
       </div>
 
@@ -284,30 +284,22 @@
             <b id="popupBookingId" class="font-mono text-slate-900">MTZ-XXXX</b>
           </div>
           <div class="flex justify-between">
-            <span>Total Distance Run:</span>
-            <b id="popupTotalKm" class="font-bold text-slate-900">0 KM</b>
+            <span>Grand Total Bill:</span>
+            <b id="popupGrandTotal" class="font-bold text-slate-900">₹0</b>
           </div>
-          <div class="flex justify-between">
-            <span>Waiting Duration:</span>
-            <b id="popupWaitingMins" class="font-bold text-slate-900">0 Mins</b>
+          <div class="flex justify-between text-blue-700">
+            <span>Tripvyom Platform Fee (15%):</span>
+            <b id="popupCompanyCommission">₹0</b>
           </div>
-          <div class="flex justify-between">
-            <span>Base Fare:</span>
-            <b id="popupBaseFare" class="font-bold text-slate-900">₹0</b>
-          </div>
-          <div class="flex justify-between">
-            <span>Extra KM & Extras Added:</span>
-            <b id="popupExtras" class="font-bold text-slate-900">₹0</b>
-          </div>
-          <div class="flex justify-between pt-2 border-t border-slate-200 text-sm font-black text-slate-900">
-            <span>Grand Total Collectible:</span>
-            <span id="popupGrandTotal" class="text-emerald-600">₹0</span>
+          <div class="flex justify-between text-emerald-700 font-extrabold pt-1 border-t border-slate-200">
+            <span>Vendor Net Payout (85%):</span>
+            <span id="popupVendorPayout" class="text-sm">₹0</span>
           </div>
         </div>
 
-        <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900 text-[11px]">
-          <p class="font-bold mb-0.5">⚠️ Final Confirmation:</p>
-          <p>Kya aapko yeh bill confirm karke booking close karni hai? (Vendor settlement aur 15% commission automatic update ho jayega).</p>
+        <div class="bg-blue-50 border border-blue-200 p-2.5 rounded-xl text-blue-900 text-[10px] leading-relaxed">
+          <p class="font-bold mb-0.5">ℹ️ Note on Toll, Parking & Taxes:</p>
+          <p>Toll, Parking, aur State Tax direct expenses hote hain, isliye inhe company commission ya vendor earnings mein calculate <b>nahi</b> kiya jata hai.</p>
         </div>
 
         <div class="grid grid-cols-2 gap-2 pt-1">
@@ -391,7 +383,7 @@
           </div>
         </div>
 
-        <button type="button" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
+        <button type="button" onclick="submitPartnerKycForm()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
           <i class="fa-solid fa-cloud-arrow-up"></i> Save Partner Profile
         </button>
       </div>
@@ -483,7 +475,6 @@
     let allBookingsCache = [];
     let videoStream = null;
     let capturedSelfieBase64 = null;
-    let isUserManuallyEditingExtraKm = false; // Flag to prevent unwanted auto-overwrite
 
     function getTierLevel(vehicleStr) {
       const str = (vehicleStr || '').toLowerCase();
@@ -1133,10 +1124,9 @@
 
       window.activeBillingBooking = b;
       
-      // Auto estimate extra KM based on actual route distance if available
+      // Auto estimate extra KM based on actual booking route distance (e.g., 670 KM for Ujjain to Delhi)
       const startKm = Number(b.startKm) || 0;
-      const routeDistance = Number(b.distance) || 0;
-      // Pre-fill end KM estimation if route distance exists as a convenience
+      const routeDistance = Number(b.distance || b.baseKm || b.packageKm) || 0;
       if (routeDistance > 0 && startKm > 0) {
         document.getElementById('billEndKm').value = startKm + routeDistance;
       }
@@ -1145,6 +1135,7 @@
       openModal('tripBillingModal');
     }
 
+    // REAL-TIME INSTANT FARE & BILLING CALCULATION
     function calculateFareAndBilling() {
       const b = window.activeBillingBooking;
       if (!b) return;
@@ -1174,22 +1165,17 @@
       }
       document.getElementById('displayWaitingTime').innerText = waitingMins + ' Mins';
 
-      // Flexible Extra KM calculation based on actual booking route distance (e.g., 670 KM for Ujjain to Delhi)
-      const routeDistance = Number(b.distance) || 0;
-      let extraKmChargeInput = document.getElementById('billExtraKmCharge');
+      // Smart Flexible Extra KM Calculation using actual route distance from booking
+      const routeDistance = Number(b.distance || b.baseKm || b.packageKm) || 0;
+      const extraKmInput = document.getElementById('billExtraKmCharge');
 
-      if (routeDistance > 0 && totalKmRun > routeDistance) {
+      if (routeDistance > 0 && totalKmRun > routeDistance && extraKmInput.dataset.userEdited !== "true") {
         const extraKm = totalKmRun - routeDistance;
-        const autoExtraCharge = extraKm * 12; // ₹12 per extra KM standard slab
-        // Only auto-fill if user hasn't explicitly set it or if it's 0
-        if (extraKmChargeInput.value == 0 || extraKmChargeInput.dataset.autoFilled === "true") {
-          extraKmChargeInput.value = autoExtraCharge;
-          extraKmChargeInput.dataset.autoFilled = "true";
-        }
+        extraKmInput.value = extraKm * 12; // ₹12 per extra KM standard slab
       }
 
       const baseFare = Number(b.total) || 0;
-      const extraKmCharge = Number(extraKmChargeInput.value) || 0;
+      const extraKmCharge = Number(extraKmInput.value) || 0;
       const waitingCharge = Number(document.getElementById('billWaitingCharge').value) || 0;
       const night = Number(document.getElementById('billNight').value) || 0;
       const toll = Number(document.getElementById('billToll').value) || 0;
@@ -1204,6 +1190,13 @@
       document.getElementById('summaryGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
     }
 
+    // Mark extra KM field as user-edited when manually changed
+    document.addEventListener('input', (e) => {
+      if (e.target && e.target.id === 'billExtraKmCharge') {
+        e.target.dataset.userEdited = "true";
+      }
+    });
+
     function previewCustomerBillPopup() {
       const b = window.activeBillingBooking;
       if (!b) return;
@@ -1217,10 +1210,6 @@
       }
 
       const totalKmRun = endKm - startKm;
-      if (totalKmRun > 3000 && !confirm("⚠️ Dhyan dein: Total distance " + totalKmRun + " KM dikh rahi hai. Kya aapko yakin hai ki yeh reading sahi hai?")) {
-        return;
-      }
-
       const baseFare = Number(b.total) || 0;
       const extraKmCharge = Number(document.getElementById('billExtraKmCharge').value) || 0;
       const waitingCharge = Number(document.getElementById('billWaitingCharge').value) || 0;
@@ -1233,12 +1222,16 @@
       const grandTotal = baseFare + totalExtras;
       const waitingMins = Number(document.getElementById('displayWaitingTime').innerText.replace(' Mins', '')) || 0;
 
+      // Commission and Vendor Payout calculation (Excluding Toll & Parking from commission base as requested)
+      // Commission is calculated on service fare (Base Fare + Extra KM + Waiting + Night + Carrier)
+      const commissionableFare = baseFare + extraKmCharge + waitingCharge + night + carrier;
+      const companyCommission = Math.round(commissionableFare * 0.15);
+      const vendorPayout = grandTotal - companyCommission;
+
       document.getElementById('popupBookingId').innerText = b.bookingId || 'MTZ';
-      document.getElementById('popupTotalKm').innerText = totalKmRun + ' KM';
-      document.getElementById('popupWaitingMins').innerText = waitingMins + ' Mins';
-      document.getElementById('popupBaseFare').innerText = '₹' + baseFare.toLocaleString('en-IN');
-      document.getElementById('popupExtras').innerText = '₹' + totalExtras.toLocaleString('en-IN');
       document.getElementById('popupGrandTotal').innerText = '₹' + grandTotal.toLocaleString('en-IN');
+      document.getElementById('popupCompanyCommission').innerText = '₹' + companyCommission.toLocaleString('en-IN') + ' (15%)';
+      document.getElementById('popupVendorPayout').innerText = '₹' + vendorPayout.toLocaleString('en-IN');
 
       window.finalBillingData = {
         docId: b.docId,
@@ -1253,6 +1246,8 @@
         carrierCharge: carrier,
         totalExtras: totalExtras,
         grandTotal: grandTotal,
+        companyCommission: companyCommission,
+        vendorPayout: vendorPayout,
         cashCollected: Number(document.getElementById('billCashCollected').value) || 0
       };
 
@@ -1277,6 +1272,8 @@
         carrierCharge: data.carrierCharge,
         totalExtras: data.totalExtras,
         grandTotal: data.grandTotal,
+        companyCommission: data.companyCommission,
+        vendorPayout: data.vendorPayout,
         cashCollected: data.cashCollected,
         tripClosedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
