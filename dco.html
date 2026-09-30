@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tripvyom - Vendor & Driver Cab Portal</title>
+  <title>Tripvyom - Vendor, Driver & Admin Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
@@ -20,7 +20,7 @@
       <div class="bg-white/20 p-2 rounded-xl">
         <i class="fa-solid fa-car text-lg"></i>
       </div>
-      <h1 class="text-base font-extrabold tracking-tight">Tripvyom Vendor Portal</h1>
+      <h1 class="text-base font-extrabold tracking-tight">Tripvyom Portal</h1>
     </div>
     <div id="authStatusBadge" class="text-xs bg-blue-700 px-3 py-1.5 rounded-lg font-bold border border-blue-400/40">
       Not Logged In
@@ -31,23 +31,24 @@
   <main class="max-w-md mx-auto p-4 space-y-4">
 
     <!-- Navigation Tabs -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-1.5 grid grid-cols-4 gap-1 text-center text-xs font-bold">
-      <button onclick="switchTab('requirements')" id="tabReq" class="py-2.5 rounded-xl bg-blue-600 text-white transition">Market</button>
-      <button onclick="switchTab('post')" id="tabPost" class="py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition">Post Trip</button>
-      <button onclick="switchTab('myBookings')" id="tabMyBookings" class="py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition">My Trips</button>
-      <button onclick="switchTab('profile')" id="tabProfile" class="py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition">Profile</button>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-1.5 grid grid-cols-5 gap-1 text-center text-xs font-bold">
+      <button onclick="switchTab('requirements')" id="tabReq" class="py-2 rounded-xl bg-blue-600 text-white transition">Market</button>
+      <button onclick="switchTab('post')" id="tabPost" class="py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition">Post</button>
+      <button onclick="switchTab('myBookings')" id="tabMyBookings" class="py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition">My Trips</button>
+      <button onclick="switchTab('admin')" id="tabAdmin" class="py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition hidden">Admin</button>
+      <button onclick="switchTab('profile')" id="tabProfile" class="py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition">Profile</button>
     </div>
 
-    <!-- TAB 1: MARKETPLACE / REQUIREMENTS -->
+    <!-- TAB 1: MARKETPLACE / REQUIREMENTS (Live Bookings + WhatsApp Scraper Feed) -->
     <div id="sectionRequirements" class="space-y-3">
       <div class="flex justify-between items-center">
-        <h2 class="text-xs font-extrabold text-slate-700 uppercase tracking-wide">Live Cab Requirements</h2>
+        <h2 class="text-xs font-extrabold text-slate-700 uppercase tracking-wide">Live Bookings & WhatsApp Feed</h2>
         <button onclick="loadMarketplaceBookings()" class="text-xs text-blue-600 font-bold bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
           <i class="fa-solid fa-rotate-right mr-1"></i> Refresh
         </button>
       </div>
       <div id="marketplaceListContainer" class="space-y-3">
-        <!-- Dynamic marketplace cards will load here -->
+        <!-- Dynamic marketplace & scraped cards -->
       </div>
     </div>
 
@@ -131,37 +132,59 @@
       </div>
     </div>
 
-    <!-- TAB 4: PROFILE & AUTHENTICATION (Google + Compulsory Profile Fields) -->
+    <!-- TAB 4: ADMIN PANEL (Full Access & Control) -->
+    <div id="sectionAdmin" class="hidden space-y-3 text-xs">
+      <div class="bg-slate-900 text-white p-4 rounded-2xl space-y-2">
+        <h2 class="text-sm font-extrabold flex items-center gap-2"><i class="fa-solid fa-shield-halved text-amber-400"></i> Master Admin Dashboard</h2>
+        <p class="text-[11px] text-slate-300">Manage all system bookings, delete spam entries, and monitor scraper feeds.</p>
+      </div>
+      <div id="adminBookingsListContainer" class="space-y-3">
+        <!-- All system bookings for admin -->
+      </div>
+    </div>
+
+    <!-- TAB 5: PROFILE & PHONE AUTHENTICATION -->
     <div id="sectionProfile" class="hidden bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-4 text-xs">
       <div class="flex justify-between items-center border-b pb-3">
         <div>
-          <h2 class="text-sm font-extrabold text-blue-900" id="profileTitle">Vendor Account</h2>
-          <p class="text-[10px] text-slate-500">Google Login & Complete Profile Details</p>
+          <h2 class="text-sm font-extrabold text-blue-900">Vendor / Driver Profile</h2>
+          <p class="text-[10px] text-slate-500">Firebase Phone OTP Authentication</p>
         </div>
         <button id="logoutNavBtn" onclick="logoutVendor()" class="hidden bg-rose-50 text-rose-600 font-bold px-3 py-1.5 rounded-xl border border-rose-200">Logout</button>
       </div>
 
-      <!-- Google Sign-In Button (Visible when logged out) -->
-      <div id="authFormContainer" class="space-y-3">
-        <button onclick="loginWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-3 px-4 rounded-xl border border-slate-300 flex items-center justify-center gap-2.5 shadow-sm transition active:scale-95">
-          <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-          Sign in with Google
-        </button>
-        <p class="text-[10px] text-slate-400 text-center">Login karne ke baad apne Mobile No, Name, City aur State ko update karna zaroori hai.</p>
+      <!-- Phone Auth Container -->
+      <div id="phoneAuthBox" class="space-y-3">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Mobile Number (+91) *</label>
+          <div class="flex gap-2">
+            <input type="tel" id="phoneNumberInput" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+            <button onclick="sendOTP()" class="bg-blue-600 text-white px-4 rounded-xl font-bold whitespace-nowrap">Send OTP</button>
+          </div>
+        </div>
+
+        <div id="otpBoxContainer" class="hidden space-y-2">
+          <label class="block font-bold text-slate-700 mb-1">Enter 6-Digit OTP *</label>
+          <div class="flex gap-2">
+            <input type="text" id="otpInput" maxlength="6" placeholder="123456" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+            <button onclick="verifyOTP()" class="bg-emerald-600 text-white px-4 rounded-xl font-bold whitespace-nowrap">Verify</button>
+          </div>
+        </div>
+        <div id="recaptcha-container"></div>
       </div>
 
-      <!-- Compulsory Vendor Profile Details Form (Visible after Google Login) -->
+      <!-- Compulsory Vendor Details Form (Visible after OTP verification) -->
       <div id="vendorDetailsContainer" class="hidden space-y-3">
-        <div class="bg-blue-50 p-2.5 rounded-xl text-blue-900 font-bold text-[11px] mb-2">
-          <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> Google Account Connected! Kripya niche apni details bharein.
+        <div class="bg-emerald-50 p-2.5 rounded-xl text-emerald-900 font-bold text-[11px]">
+          <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> Phone Verified Successfully! Kripya details bharein.
         </div>
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Full Name *</label>
-          <input type="text" id="vendorNameInput" placeholder="Aapka naam ya company ka naam" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+          <label class="block font-bold text-slate-700 mb-1">Full Name / Company Name *</label>
+          <input type="text" id="vendorNameInput" placeholder="Mahakali Tours & Travels" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
         </div>
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Mobile Number *</label>
-          <input type="tel" id="vendorMobileInput" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+          <label class="block font-bold text-slate-700 mb-1">Verified Mobile Number</label>
+          <input type="text" id="vendorMobileInput" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl p-2.5 font-semibold text-slate-500" />
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
@@ -197,34 +220,48 @@
     const auth = firebase.auth();
 
     let currentUser = null;
+    let confirmationResultObj = null;
     let currentFilterMode = 'posted';
+
+    // Master Admin Email list (Aap yahan apna admin email dal sakte hain)
+    const adminEmails = ["admin@tripvyom.in", "pavan@gmail.com"];
 
     // Switch Tabs
     function switchTab(tab) {
       document.getElementById('sectionRequirements').classList.add('hidden');
       document.getElementById('sectionPost').classList.add('hidden');
       document.getElementById('sectionMyBookings').classList.add('hidden');
+      document.getElementById('sectionAdmin').classList.add('hidden');
       document.getElementById('sectionProfile').classList.add('hidden');
 
-      document.getElementById('tabReq').className = "py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
-      document.getElementById('tabPost').className = "py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
-      document.getElementById('tabMyBookings').className = "py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
-      document.getElementById('tabProfile').className = "py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
+      document.getElementById('tabReq').className = "py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
+      document.getElementById('tabPost').className = "py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
+      document.getElementById('tabMyBookings').className = "py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
+      document.getElementById('tabAdmin').className = "py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold hidden";
+      document.getElementById('tabProfile').className = "py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
+
+      if (currentUser && adminEmails.includes(currentUser.email)) {
+        document.getElementById('tabAdmin').classList.remove('hidden');
+      }
 
       if (tab === 'requirements') {
         document.getElementById('sectionRequirements').classList.remove('hidden');
-        document.getElementById('tabReq').className = "py-2.5 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
+        document.getElementById('tabReq').className = "py-2 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
         loadMarketplaceBookings();
       } else if (tab === 'post') {
         document.getElementById('sectionPost').classList.remove('hidden');
-        document.getElementById('tabPost').className = "py-2.5 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
+        document.getElementById('tabPost').className = "py-2 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
       } else if (tab === 'myBookings') {
         document.getElementById('sectionMyBookings').classList.remove('hidden');
-        document.getElementById('tabMyBookings').className = "py-2.5 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
+        document.getElementById('tabMyBookings').className = "py-2 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
         loadMyBookings();
+      } else if (tab === 'admin') {
+        document.getElementById('sectionAdmin').classList.remove('hidden');
+        document.getElementById('tabAdmin').className = "py-2 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
+        loadAdminBookings();
       } else if (tab === 'profile') {
         document.getElementById('sectionProfile').classList.remove('hidden');
-        document.getElementById('tabProfile').className = "py-2.5 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
+        document.getElementById('tabProfile').className = "py-2 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
       }
     }
 
@@ -259,7 +296,7 @@
     function handlePostSubmit(e) {
       e.preventDefault();
       if (!currentUser) {
-        alert("Kripya pehle Google Login karein!");
+        alert("Kripya pehle Phone Login karein!");
         switchTab('profile');
         return;
       }
@@ -288,8 +325,9 @@
         fare: fare || 'Calculated',
         remark: remark || 'No remark',
         status: 'Active',
+        source: 'App Vendor',
         vendorId: currentUser.uid,
-        vendorEmail: currentUser.email,
+        vendorEmail: currentUser.email || 'Phone User',
         assignedTo: '',
         assignedVendorId: '',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -302,7 +340,36 @@
       }).catch(err => alert("Error posting booking: " + err.message));
     }
 
-    // Load Marketplace Bookings (Auto Expiry check for past times)
+    // ==========================================
+    // WHATSAPP SCRAPER WEBHOOK / SIMULATOR FUNCTION
+    // ==========================================
+    function pushScrapedWhatsAppBooking(pickup, drop, cab, fare, date, time, remark, vendorName) {
+      const scrapedData = {
+        bookingId: 'WA-' + Math.floor(1000 + Math.random() * 9000),
+        tripType: drop ? 'Outstation' : 'Local',
+        pickupCity: pickup,
+        dropCity: drop || 'Local Rental',
+        cabType: cab || 'Sedan',
+        tripDate: date || new Date().toISOString().split('T')[0],
+        tripTime: time || '10:00',
+        packageType: 'N/A',
+        fare: fare || 'As per call',
+        remark: remark || 'WhatsApp Scraped Group Booking',
+        status: 'Active',
+        source: 'WhatsApp Scraper (' + vendorName + ')',
+        vendorId: 'whatsapp_scraper_bot',
+        vendorEmail: 'bot@tripvyom.in',
+        assignedTo: '',
+        assignedVendorId: '',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      db.collection("bookings").add(scrapedData).then(() => {
+        console.log("WhatsApp Scraped Booking Added Successfully!");
+      });
+    }
+
+    // Load Marketplace Bookings (Auto Expiry check + Scraper support)
     function loadMarketplaceBookings() {
       db.collection("bookings").orderBy("createdAt", "desc").get().then((snapshot) => {
         const container = document.getElementById('marketplaceListContainer');
@@ -320,11 +387,13 @@
 
           if (b.status === 'Expired' || b.status === 'Cancelled') return;
 
+          const isScraped = b.source && b.source.includes('WhatsApp');
+
           html += `
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2.5 text-xs">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border ${isScraped ? 'border-emerald-300 bg-emerald-50/20' : 'border-slate-200'} space-y-2.5 text-xs">
               <div class="flex justify-between items-start border-b pb-2">
                 <div>
-                  <span class="text-[10px] bg-blue-100 text-blue-800 font-extrabold px-2 py-0.5 rounded">${b.tripType}</span>
+                  <span class="text-[10px] ${isScraped ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'} font-extrabold px-2 py-0.5 rounded">${b.tripType} • ${b.source || 'Vendor'}</span>
                   <p class="text-sm font-extrabold text-slate-900 mt-1">${b.pickupCity} ➔ ${b.dropCity}</p>
                 </div>
                 <span class="text-[11px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded border border-amber-200">${b.tripDate}, ${b.tripTime}</span>
@@ -370,8 +439,8 @@
       if (!currentUser) {
         document.getElementById('myBookingsListContainer').innerHTML = `
           <div class="text-center py-8 text-slate-500">
-            <p class="font-bold mb-2">Please login with Google to view your trips.</p>
-            <button onclick="switchTab('profile')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Google Login</button>
+            <p class="font-bold mb-2">Please login with Phone OTP to view your trips.</p>
+            <button onclick="switchTab('profile')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Phone Login</button>
           </div>`;
         return;
       }
@@ -418,6 +487,53 @@
       });
     }
 
+    // ==========================================
+    // ADMIN PANEL FUNCTIONS (Full Master Control)
+    // ==========================================
+    function loadAdminBookings() {
+      db.collection("bookings").orderBy("createdAt", "desc").get().then((snapshot) => {
+        const container = document.getElementById('adminBookingsListContainer');
+        let html = '';
+
+        snapshot.forEach(docSnap => {
+          const b = docSnap.data();
+          const docId = docSnap.id;
+
+          html += `
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2 text-slate-800">
+              <div class="flex justify-between items-center border-b pb-1.5">
+                <span class="font-extrabold text-blue-700">${b.bookingId} (${b.source || 'Vendor'})</span>
+                <span class="text-[10px] bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded border border-rose-200">${b.status}</span>
+              </div>
+              <p class="font-bold">${b.pickupCity} ➔ ${b.dropCity} | ${b.cabType}</p>
+              <p class="text-[11px] text-slate-500">Date: ${b.tripDate} ${b.tripTime} | Fare: ₹${b.fare}</p>
+              <div class="flex gap-2 pt-2">
+                <button onclick="adminDeleteBooking('${docId}')" class="bg-rose-600 text-white px-3 py-1.5 rounded-lg font-bold text-[11px]">Delete Booking</button>
+                <button onclick="adminForceStatus('${docId}', 'Cancelled')" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold text-[11px]">Force Cancel</button>
+              </div>
+            </div>`;
+        });
+
+        container.innerHTML = html || `<div class="text-center py-8 text-slate-400">No bookings in system.</div>`;
+      });
+    }
+
+    function adminDeleteBooking(docId) {
+      if (confirm("Admin Warning: Are you sure you want to permanently delete this booking?")) {
+        db.collection("bookings").doc(docId).delete().then(() => {
+          alert("Booking deleted successfully.");
+          loadAdminBookings();
+        });
+      }
+    }
+
+    function adminForceStatus(docId, status) {
+      db.collection("bookings").doc(docId).update({ status: status }).then(() => {
+        alert("Status updated by Admin.");
+        loadAdminBookings();
+      });
+    }
+
     // Update Status
     function updateBookingStatus(docId, newStatus) {
       db.collection("bookings").doc(docId).update({ status: newStatus }).then(() => {
@@ -441,47 +557,80 @@
       }
     }
 
-    // Google Login Function
-    function loginWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then((result) => {
-        const u = result.user;
-        db.collection("vendors").doc(u.uid).set({
-          email: u.email || '',
-          photo: u.photoURL || '',
-          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-        alert("Google Login Successful! Kripya apna Naam, Mobile, City aur State bharein.");
-      }).catch(err => alert("Google Login Error: " + err.message));
+    // ==========================================
+    // FIREBASE PHONE AUTHENTICATION SETUP
+    // ==========================================
+    function setupRecaptcha() {
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+          'size': 'invisible'
+        });
+      }
+    }
+
+    function sendOTP() {
+      setupRecaptcha();
+      const phoneInput = document.getElementById('phoneNumberInput').value.trim();
+      if (!phoneInput || phoneInput.length < 10) {
+        alert("Kripya valid 10-digit mobile number daalein!");
+        return;
+      }
+      const phoneNumber = "+91" + phoneInput;
+      const appVerifier = window.recaptchaVerifier;
+
+      auth.signInWithPhoneNumber(phoneNumber, appVerifier)
+        .then((confirmationResult) => {
+          confirmationResultObj = confirmationResult;
+          document.getElementById('otpBoxContainer').classList.remove('hidden');
+          alert("OTP successfully sent to " + phoneNumber);
+        }).catch((error) => {
+          alert("SMS Error: " + error.message);
+        });
+    }
+
+    function verifyOTP() {
+      const otp = document.getElementById('otpInput').value.trim();
+      if (!otp || otp.length !== 6) {
+        alert("Kripya 6-digit OTP daalein!");
+        return;
+      }
+
+      confirmationResultObj.confirm(otp).then((result) => {
+        currentUser = result.user;
+        alert("Phone Authentication Successful!");
+        document.getElementById('phoneAuthBox').classList.add('hidden');
+        document.getElementById('vendorDetailsContainer').classList.remove('hidden');
+        document.getElementById('vendorMobileInput').value = currentUser.phoneNumber;
+      }).catch((error) => {
+        alert("Invalid OTP: " + error.message);
+      });
     }
 
     // Firebase Auth State Listener
     auth.onAuthStateChanged((user) => {
       currentUser = user;
       const badge = document.getElementById('authStatusBadge');
-      const authForm = document.getElementById('authFormContainer');
+      const phoneBox = document.getElementById('phoneAuthBox');
       const vendorDetails = document.getElementById('vendorDetailsContainer');
       const logoutBtn = document.getElementById('logoutNavBtn');
 
       if (user) {
-        if (badge) { badge.innerText = "Verified Vendor"; badge.className = "text-xs bg-emerald-600 px-3 py-1.5 rounded-lg font-bold text-white"; }
-        if (authForm) authForm.classList.add('hidden');
-        if (vendorDetails) vendorDetails.classList.remove('hidden');
+        if (badge) { badge.innerText = "Verified User"; badge.className = "text-xs bg-emerald-600 px-3 py-1.5 rounded-lg font-bold text-white"; }
         if (logoutBtn) logoutBtn.classList.remove('hidden');
 
         db.collection("vendors").doc(user.uid).get().then(doc => {
           if (doc.exists) {
             const data = doc.data();
-            document.getElementById('vendorNameInput').value = data.name || user.displayName || '';
-            document.getElementById('vendorMobileInput').value = data.mobile || '';
+            document.getElementById('vendorNameInput').value = data.name || '';
+            document.getElementById('vendorMobileInput').value = data.mobile || user.phoneNumber || '';
             document.getElementById('vendorCityInput').value = data.city || '';
             document.getElementById('vendorStateInput').value = data.state || '';
+            if (phoneBox) phoneBox.classList.add('hidden');
+            if (vendorDetails) vendorDetails.classList.remove('hidden');
           }
         });
       } else {
         if (badge) { badge.innerText = "Not Logged In"; badge.className = "text-xs bg-blue-700 px-3 py-1.5 rounded-lg font-bold text-white"; }
-        if (authForm) authForm.classList.remove('hidden');
-        if (vendorDetails) vendorDetails.classList.add('hidden');
         if (logoutBtn) logoutBtn.classList.add('hidden');
       }
     });
@@ -489,7 +638,7 @@
     function logoutVendor() {
       auth.signOut().then(() => {
         alert("Logged out successfully.");
-        switchTab('requirements');
+        location.reload();
       });
     }
 
@@ -497,17 +646,17 @@
     function saveVendorProfile() {
       if (!currentUser) return alert("Please login first!");
       const name = document.getElementById('vendorNameInput').value.trim();
-      const mobile = document.getElementById('vendorMobileInput').value.trim();
+      const mobile = document.getElementById('vendorMobileInput').value.trim() || currentUser.phoneNumber;
       const city = document.getElementById('vendorCityInput').value.trim();
       const state = document.getElementById('vendorStateInput').value.trim();
 
-      if (!name || mobile.length < 10 || !city || !state) {
-        alert("Kripya Name, 10-digit Mobile Number, City aur State sabhi fields thik se bharein!");
+      if (!name || !city || !state) {
+        alert("Kripya Name, City aur State sabhi fields thik se bharein!");
         return;
       }
 
       db.collection("vendors").doc(currentUser.uid).set({
-        name, mobile, city, state, email: currentUser.email, updatedAt: new Date().toISOString()
+        name, mobile, city, state, updatedAt: new Date().toISOString()
       }, { merge: true }).then(() => {
         alert("Profile Saved Successfully!");
         switchTab('requirements');
