@@ -1,0 +1,198 @@
+import React, { useState } from 'react';
+import { db } from './firebase';
+import { collection, addDoc } from 'firebase/firestore';
+
+function AddBookingScreen({ user, onBookingAdded }) {
+  const [bookingData, setBookingData] = useState({
+    tripType: 'Outstation', // Outstation or Local
+    pickupCity: '',
+    dropCity: '',
+    cabType: 'Sedan',
+    tripDate: '',
+    tripTime: '',
+    fare: '',
+    packageType: '12 hour - 120 km', // Only for local
+    remark: '',
+    status: 'Active' // Active, Accepted, Cancelled
+  });
+
+  // Booking Date & Time Validation Function
+  const validateBookingTime = (tripDate, tripTime) => {
+    const selectedDateTime = new Date(`${tripDate}T${tripTime}`);
+    const currentDateTime = new Date();
+
+    if (selectedDateTime <= currentDateTime) {
+      alert('Error: Aap past (back-date ya back-time) ki booking create nahi kar sakte!');
+      return false; // Booking submit nahi hogi
+    }
+    return true; // Booking valid hai
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // 1. Validate mandatory fields
+    if (!bookingData.pickupCity || !bookingData.tripDate || !bookingData.tripTime) {
+      alert('Kripya pickup city, date aur time zaroor bharein!');
+      return;
+    }
+
+    // 2. Run Back-date / Back-time Validation
+    const isValidTime = validateBookingTime(bookingData.tripDate, bookingData.tripTime);
+    if (!isValidTime) {
+      return; // Agar time invalid hai toh aage process nahi hoga
+    }
+
+    try {
+      // 3. Firestore me booking save karein
+      await addDoc(collection(db, 'bookings'), {
+        ...bookingData,
+        vendorId: user?.uid || 'anonymous',
+        vendorName: user?.displayName || 'Vendor',
+        vendorMobile: user?.phoneNumber || '',
+        createdAt: new Date().toISOString()
+      });
+
+      alert('Booking Successfully Post Ho Gayi!');
+      if (onBookingAdded) onBookingAdded();
+    } catch (error) {
+      console.error('Error adding booking: ', error);
+      alert('Booking post karne me error aayi.');
+    }
+  };
+
+  return (
+    <div className="p-4 max-w-lg mx-auto bg-white shadow rounded-lg">
+      <h2 className="text-xl font-bold mb-4 text-blue-600">Post New Cab Requirement</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        
+        {/* Trip Type */}
+        <div>
+          <label className="block font-semibold">Trip Type *</label>
+          <select 
+            className="w-full border p-2 rounded"
+            value={bookingData.tripType}
+            onChange={(e) => setBookingData({...bookingData, tripType: e.target.value})}
+          >
+            <option value="Outstation">Outstation</option>
+            <option value="Local">Local</option>
+          </select>
+        </div>
+
+        {/* Pickup City */}
+        <div>
+          <label className="block font-semibold">Pickup City *</label>
+          <input 
+            type="text" 
+            className="w-full border p-2 rounded"
+            placeholder="Jaise: Ahmedabad"
+            value={bookingData.pickupCity}
+            onChange={(e) => setBookingData({...bookingData, pickupCity: e.target.value})}
+            required 
+          />
+        </div>
+
+        {/* Drop City (Visible only if Outstation) */}
+        {bookingData.tripType === 'Outstation' && (
+          <div>
+            <label className="block font-semibold">Drop City *</label>
+            <input 
+              type="text" 
+              className="w-full border p-2 rounded"
+              placeholder="Jaise: Udaipur"
+              value={bookingData.dropCity}
+              onChange={(e) => setBookingData({...bookingData, dropCity: e.target.value})}
+              required={bookingData.tripType === 'Outstation'}
+            />
+          </div>
+        )}
+
+        {/* Cab Type */}
+        <div>
+          <label className="block font-semibold">Cab Type *</label>
+          <select 
+            className="w-full border p-2 rounded"
+            value={bookingData.cabType}
+            onChange={(e) => setBookingData({...bookingData, cabType: e.target.value})}
+          >
+            <option value="Hatchback">Hatchback</option>
+            <option value="Sedan">Sedan</option>
+            <option value="Ertiga">Ertiga</option>
+            <option value="Innova Crysta">Innova Crysta</option>
+            <option value="Tempo Traveler">Tempo Traveler</option>
+          </select>
+        </div>
+
+        {/* Trip Date */}
+        <div>
+          <label className="block font-semibold">Trip Date *</label>
+          <input 
+            type="date" 
+            className="w-full border p-2 rounded"
+            value={bookingData.tripDate}
+            onChange={(e) => setBookingData({...bookingData, tripDate: e.target.value})}
+            required 
+          />
+        </div>
+
+        {/* Trip Time */}
+        <div>
+          <label className="block font-semibold">Trip Time *</label>
+          <input 
+            type="time" 
+            className="w-full border p-2 rounded"
+            value={bookingData.tripTime}
+            onChange={(e) => setBookingData({...bookingData, tripTime: e.target.value})}
+            required 
+          />
+        </div>
+
+        {/* Package Type (Visible only if Local) */}
+        {bookingData.tripType === 'Local' && (
+          <div>
+            <label className="block font-semibold">Package Type *</label>
+            <select 
+              className="w-full border p-2 rounded"
+              value={bookingData.packageType}
+              onChange={(e) => setBookingData({...bookingData, packageType: e.target.value})}
+            >
+              <option value="1 hour - 10 km">1 hour - 10 km</option>
+              <option value="12 hour - 120 km">12 hour - 120 km</option>
+            </select>
+          </div>
+        )}
+
+        {/* Fare / Quotation */}
+        <div>
+          <label className="block font-semibold">Fare / Quotation (₹)</label>
+          <input 
+            type="number" 
+            className="w-full border p-2 rounded"
+            placeholder="Enter Fare or calculate automatically"
+            value={bookingData.fare}
+            onChange={(e) => setBookingData({...bookingData, fare: e.target.value})}
+          />
+        </div>
+
+        {/* Remark */}
+        <div>
+          <label className="block font-semibold">Remark</label>
+          <textarea 
+            className="w-full border p-2 rounded"
+            placeholder="Jaise: Parking excluded, only call me..."
+            value={bookingData.remark}
+            onChange={(e) => setBookingData({...bookingData, remark: e.target.value})}
+          />
+        </div>
+
+        {/* Submit Button */}
+        <button type="submit" className="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700">
+          Post Booking
+        </button>
+
+      </form>
+    </div>
+  );
+}
+
+export default AddBookingScreen;
