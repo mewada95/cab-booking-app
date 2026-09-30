@@ -131,41 +131,37 @@
       </div>
     </div>
 
-    <!-- TAB 4: PROFILE & AUTHENTICATION -->
+    <!-- TAB 4: PROFILE & AUTHENTICATION (Google + Compulsory Profile Fields) -->
     <div id="sectionProfile" class="hidden bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-4 text-xs">
       <div class="flex justify-between items-center border-b pb-3">
         <div>
           <h2 class="text-sm font-extrabold text-blue-900" id="profileTitle">Vendor Account</h2>
-          <p class="text-[10px] text-slate-500">Manage login & profile details</p>
+          <p class="text-[10px] text-slate-500">Google Login & Complete Profile Details</p>
         </div>
         <button id="logoutNavBtn" onclick="logoutVendor()" class="hidden bg-rose-50 text-rose-600 font-bold px-3 py-1.5 rounded-xl border border-rose-200">Logout</button>
       </div>
 
-      <!-- Auth Form (Login / Signup) -->
+      <!-- Google Sign-In Button (Visible when logged out) -->
       <div id="authFormContainer" class="space-y-3">
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Email Address *</label>
-          <input type="email" id="authEmail" placeholder="vendor@gmail.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
-        </div>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Password *</label>
-          <input type="password" id="authPassword" placeholder="Minimum 6 characters" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
-        </div>
-        <div class="grid grid-cols-2 gap-2 pt-1">
-          <button onclick="handleFirebaseLogin(false)" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 rounded-xl shadow transition">Sign In</button>
-          <button onclick="handleFirebaseLogin(true)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold py-3 rounded-xl transition">Create Account</button>
-        </div>
+        <button onclick="loginWithGoogle()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold py-3 px-4 rounded-xl border border-slate-300 flex items-center justify-center gap-2.5 shadow-sm transition active:scale-95">
+          <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          Sign in with Google
+        </button>
+        <p class="text-[10px] text-slate-400 text-center">Login karne ke baad apne Mobile No, Name, City aur State ko update karna zaroori hai.</p>
       </div>
 
-      <!-- Vendor Profile Details Form -->
+      <!-- Compulsory Vendor Profile Details Form (Visible after Google Login) -->
       <div id="vendorDetailsContainer" class="hidden space-y-3">
+        <div class="bg-blue-50 p-2.5 rounded-xl text-blue-900 font-bold text-[11px] mb-2">
+          <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> Google Account Connected! Kripya niche apni details bharein.
+        </div>
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Business / Vendor Name *</label>
-          <input type="text" id="vendorNameInput" placeholder="Mahakali Tours & Travels" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+          <label class="block font-bold text-slate-700 mb-1">Full Name *</label>
+          <input type="text" id="vendorNameInput" placeholder="Aapka naam ya company ka naam" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
         </div>
         <div>
           <label class="block font-bold text-slate-700 mb-1">Mobile Number *</label>
-          <input type="tel" id="vendorMobileInput" maxlength="10" placeholder="10-digit mobile" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+          <input type="tel" id="vendorMobileInput" maxlength="10" placeholder="10-digit mobile number" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
@@ -178,7 +174,7 @@
           </div>
         </div>
         <button onclick="saveVendorProfile()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow transition">
-          Save Profile Details
+          Save Profile & Continue
         </button>
       </div>
     </div>
@@ -248,7 +244,7 @@
       }
     }
 
-    // Back-date & Back-time Validation Check + Expiry Check
+    // Back-date & Back-time Validation Check
     function validateBookingTime(tripDate, tripTime) {
       const selectedDateTime = new Date(`${tripDate}T${tripTime}`);
       const currentDateTime = new Date();
@@ -263,7 +259,7 @@
     function handlePostSubmit(e) {
       e.preventDefault();
       if (!currentUser) {
-        alert("Kripya pehle Login karein!");
+        alert("Kripya pehle Google Login karein!");
         switchTab('profile');
         return;
       }
@@ -317,7 +313,6 @@
           const b = docSnap.data();
           const tripDateTime = new Date(`${b.tripDate}T${b.tripTime}`);
 
-          // Automatic Expiry check
           if (tripDateTime <= now && b.status === 'Active') {
             db.collection("bookings").doc(docSnap.id).update({ status: 'Expired' });
             return;
@@ -375,8 +370,8 @@
       if (!currentUser) {
         document.getElementById('myBookingsListContainer').innerHTML = `
           <div class="text-center py-8 text-slate-500">
-            <p class="font-bold mb-2">Please login to view your trips.</p>
-            <button onclick="switchTab('profile')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Login Now</button>
+            <p class="font-bold mb-2">Please login with Google to view your trips.</p>
+            <button onclick="switchTab('profile')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Google Login</button>
           </div>`;
         return;
       }
@@ -446,6 +441,20 @@
       }
     }
 
+    // Google Login Function
+    function loginWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then((result) => {
+        const u = result.user;
+        db.collection("vendors").doc(u.uid).set({
+          email: u.email || '',
+          photo: u.photoURL || '',
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        alert("Google Login Successful! Kripya apna Naam, Mobile, City aur State bharein.");
+      }).catch(err => alert("Google Login Error: " + err.message));
+    }
+
     // Firebase Auth State Listener
     auth.onAuthStateChanged((user) => {
       currentUser = user;
@@ -463,7 +472,7 @@
         db.collection("vendors").doc(user.uid).get().then(doc => {
           if (doc.exists) {
             const data = doc.data();
-            document.getElementById('vendorNameInput').value = data.name || '';
+            document.getElementById('vendorNameInput').value = data.name || user.displayName || '';
             document.getElementById('vendorMobileInput').value = data.mobile || '';
             document.getElementById('vendorCityInput').value = data.city || '';
             document.getElementById('vendorStateInput').value = data.state || '';
@@ -477,23 +486,6 @@
       }
     });
 
-    // Login / Signup Handler
-    function handleFirebaseLogin(isSignUp) {
-      const email = document.getElementById('authEmail').value.trim();
-      const password = document.getElementById('authPassword').value.trim();
-      if (!email || password.length < 6) return alert("Valid email aur 6-digit password daalein!");
-
-      if (isSignUp) {
-        auth.createUserWithEmailAndPassword(email, password)
-          .then(() => alert("Account Created! Now save your profile details below."))
-          .catch(err => alert("Error: " + err.message));
-      } else {
-        auth.signInWithEmailAndPassword(email, password)
-          .then(() => alert("Logged In Successfully!"))
-          .catch(err => alert("Error: " + err.message));
-      }
-    }
-
     function logoutVendor() {
       auth.signOut().then(() => {
         alert("Logged out successfully.");
@@ -501,7 +493,7 @@
       });
     }
 
-    // Save Profile
+    // Save Profile (Compulsory: Name, Mobile, City, State)
     function saveVendorProfile() {
       if (!currentUser) return alert("Please login first!");
       const name = document.getElementById('vendorNameInput').value.trim();
@@ -510,15 +502,16 @@
       const state = document.getElementById('vendorStateInput').value.trim();
 
       if (!name || mobile.length < 10 || !city || !state) {
-        alert("Sabhi profile fields bharna compulsory hai!");
+        alert("Kripya Name, 10-digit Mobile Number, City aur State sabhi fields thik se bharein!");
         return;
       }
 
       db.collection("vendors").doc(currentUser.uid).set({
-        name, mobile, city, state, updatedAt: new Date().toISOString()
+        name, mobile, city, state, email: currentUser.email, updatedAt: new Date().toISOString()
       }, { merge: true }).then(() => {
         alert("Profile Saved Successfully!");
-      });
+        switchTab('requirements');
+      }).catch(err => alert("Error saving profile: " + err.message));
     }
 
     // On Load Initializer
