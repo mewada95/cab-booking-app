@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tripvyom - Vendor, Driver & Admin Portal</title>
+  <title>Tripvyom - Vendor, Driver & WhatsApp Leads Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <!-- Firebase SDKs (Compatible v8 for Scraper & v10 core support) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen pb-24">
 
@@ -33,26 +33,56 @@
     <!-- Navigation Tabs -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-1.5 grid grid-cols-5 gap-1 text-center text-xs font-bold">
       <button onclick="switchTab('requirements')" id="tabReq" class="py-2 rounded-xl bg-blue-600 text-white transition">Market</button>
+      <button onclick="switchTab('whatsapp')" id="tabWhatsapp" class="py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition relative">
+        WA Feed <span id="waTabBadge" class="bg-red-500 text-white text-[9px] px-1.5 py-0.2 rounded-full absolute -top-1 -right-1">0</span>
+      </button>
       <button onclick="switchTab('post')" id="tabPost" class="py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition">Post</button>
       <button onclick="switchTab('myBookings')" id="tabMyBookings" class="py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition">My Trips</button>
-      <button onclick="switchTab('admin')" id="tabAdmin" class="py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition hidden">Admin</button>
       <button onclick="switchTab('profile')" id="tabProfile" class="py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition">Profile</button>
     </div>
 
-    <!-- TAB 1: MARKETPLACE / REQUIREMENTS (Live Bookings + WhatsApp Scraper Feed) -->
+    <!-- TAB 1: MARKETPLACE / VENDOR REQUIREMENTS -->
     <div id="sectionRequirements" class="space-y-3">
       <div class="flex justify-between items-center">
-        <h2 class="text-xs font-extrabold text-slate-700 uppercase tracking-wide">Live Bookings & WhatsApp Feed</h2>
+        <h2 class="text-xs font-extrabold text-slate-700 uppercase tracking-wide">Live Vendor Bookings</h2>
         <button onclick="loadMarketplaceBookings()" class="text-xs text-blue-600 font-bold bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
           <i class="fa-solid fa-rotate-right mr-1"></i> Refresh
         </button>
       </div>
       <div id="marketplaceListContainer" class="space-y-3">
-        <!-- Dynamic marketplace & scraped cards -->
+        <p class="text-sm text-slate-400 text-center py-4">Loading marketplace requirements...</p>
       </div>
     </div>
 
-    <!-- TAB 2: POST BOOKING FORM -->
+    <!-- TAB 2: LIVE WHATSAPP SCRAPER FEED (Smart Parsing & Auto-Expiry) -->
+    <div id="sectionWhatsapp" class="hidden space-y-3">
+      <div class="bg-emerald-700 text-white p-3.5 rounded-2xl flex justify-between items-center shadow-sm">
+        <div>
+          <h2 class="text-xs font-extrabold uppercase tracking-wide flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-sm"></i> Live WhatsApp Leads Feed</h2>
+          <p class="text-[10px] text-emerald-100">Auto-fetched from WhatsApp groups (Termux / Scraper)</p>
+        </div>
+        <span id="activeWhatsAppCount" class="bg-white text-emerald-800 text-xs font-extrabold px-2.5 py-1 rounded-xl">0 Active</span>
+      </div>
+
+      <div class="flex border-b border-slate-200 mb-2 gap-4 text-xs font-bold">
+        <button onclick="switchWaSubTab('active')" id="waSubTabActive" class="pb-2 text-green-700 border-b-2 border-green-600">Active Leads</button>
+        <button onclick="switchWaSubTab('history')" id="waSubTabHistory" class="pb-2 text-slate-400 hover:text-slate-700">Expired / History</button>
+      </div>
+
+      <div id="waSectionActive" class="space-y-3">
+        <div id="whatsappActiveContainer" class="space-y-3">
+          <p class="text-xs text-slate-400 text-center py-4">Loading WhatsApp leads...</p>
+        </div>
+      </div>
+
+      <div id="waSectionHistory" class="space-y-3 hidden">
+        <div id="whatsappHistoryContainer" class="space-y-3">
+          <p class="text-xs text-slate-400 text-center py-4">No expired leads found.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: POST BOOKING FORM -->
     <div id="sectionPost" class="hidden bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
       <h2 class="text-sm font-extrabold text-blue-900 border-b pb-2">Post New Cab Requirement</h2>
       
@@ -121,26 +151,24 @@
       </form>
     </div>
 
-    <!-- TAB 3: MY BOOKINGS & ASSIGNMENTS -->
+    <!-- TAB 4: MY BOOKINGS & ASSIGNMENTS -->
     <div id="sectionMyBookings" class="hidden space-y-3">
       <div class="flex gap-2">
         <button onclick="filterMyTrips('posted')" id="filterPostedBtn" class="flex-1 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold transition">My Posted</button>
         <button onclick="filterMyTrips('assigned')" id="filterAssignedBtn" class="flex-1 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold transition">Assigned To Me</button>
       </div>
       <div id="myBookingsListContainer" class="space-y-3">
-        <!-- Dynamic My Bookings list -->
+        <p class="text-sm text-slate-400 text-center py-4">No trips found.</p>
       </div>
     </div>
 
-    <!-- TAB 4: ADMIN PANEL (Full Access & Control) -->
+    <!-- ADMIN PANEL SECTION (Visible for Master Admins) -->
     <div id="sectionAdmin" class="hidden space-y-3 text-xs">
       <div class="bg-slate-900 text-white p-4 rounded-2xl space-y-2">
         <h2 class="text-sm font-extrabold flex items-center gap-2"><i class="fa-solid fa-shield-halved text-amber-400"></i> Master Admin Dashboard</h2>
-        <p class="text-[11px] text-slate-300">Manage all system bookings, delete spam entries, and monitor scraper feeds.</p>
+        <p class="text-[11px] text-slate-300">Manage system bookings and WhatsApp scraper leads.</p>
       </div>
-      <div id="adminBookingsListContainer" class="space-y-3">
-        <!-- All system bookings for admin -->
-      </div>
+      <div id="adminBookingsListContainer" class="space-y-3"></div>
     </div>
 
     <!-- TAB 5: PROFILE & PHONE AUTHENTICATION -->
@@ -173,10 +201,10 @@
         <div id="recaptcha-container"></div>
       </div>
 
-      <!-- Compulsory Vendor Details Form (Visible after OTP verification) -->
+      <!-- Compulsory Vendor Details Form -->
       <div id="vendorDetailsContainer" class="hidden space-y-3">
         <div class="bg-emerald-50 p-2.5 rounded-xl text-emerald-900 font-bold text-[11px]">
-          <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> Phone Verified Successfully! Kripya details bharein.
+          <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> Phone Verified Successfully!
         </div>
         <div>
           <label class="block font-bold text-slate-700 mb-1">Full Name / Company Name *</label>
@@ -207,47 +235,47 @@
   <!-- Complete Application Script -->
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyAaHO2PxI2e_C82sN7lX3SIsobUWcKGVsQ",
-      authDomain: "maketripzy.firebaseapp.com",
-      projectId: "maketripzy",
-      storageBucket: "maketripzy.firebasestorage.app",
-      messagingSenderId: "484778826837",
-      appId: "1:484778826837:web:b9652dbd1fee4c1ccd08dc"
+      projectId: "maketripzy"
     };
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
     const db = firebase.firestore();
     const auth = firebase.auth();
 
     let currentUser = null;
     let confirmationResultObj = null;
     let currentFilterMode = 'posted';
-
-    // Master Admin Email list (Aap yahan apna admin email dal sakte hain)
     const adminEmails = ["admin@tripvyom.in", "pavan@gmail.com"];
 
     // Switch Tabs
     function switchTab(tab) {
       document.getElementById('sectionRequirements').classList.add('hidden');
+      document.getElementById('sectionWhatsapp').classList.add('hidden');
       document.getElementById('sectionPost').classList.add('hidden');
       document.getElementById('sectionMyBookings').classList.add('hidden');
       document.getElementById('sectionAdmin').classList.add('hidden');
       document.getElementById('sectionProfile').classList.add('hidden');
 
       document.getElementById('tabReq').className = "py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
+      document.getElementById('tabWhatsapp').className = "py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold relative";
       document.getElementById('tabPost').className = "py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
       document.getElementById('tabMyBookings').className = "py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
-      document.getElementById('tabAdmin').className = "py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold hidden";
       document.getElementById('tabProfile').className = "py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
 
       if (currentUser && adminEmails.includes(currentUser.email)) {
-        document.getElementById('tabAdmin').classList.remove('hidden');
+        // Admin tab handling if needed
       }
 
       if (tab === 'requirements') {
         document.getElementById('sectionRequirements').classList.remove('hidden');
         document.getElementById('tabReq').className = "py-2 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
         loadMarketplaceBookings();
+      } else if (tab === 'whatsapp') {
+        document.getElementById('sectionWhatsapp').classList.remove('hidden');
+        document.getElementById('tabWhatsapp').className = "py-2 rounded-xl bg-emerald-600 text-white transition font-bold shadow-sm relative";
       } else if (tab === 'post') {
         document.getElementById('sectionPost').classList.remove('hidden');
         document.getElementById('tabPost').className = "py-2 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
@@ -255,13 +283,23 @@
         document.getElementById('sectionMyBookings').classList.remove('hidden');
         document.getElementById('tabMyBookings').className = "py-2 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
         loadMyBookings();
-      } else if (tab === 'admin') {
-        document.getElementById('sectionAdmin').classList.remove('hidden');
-        document.getElementById('tabAdmin').className = "py-2 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
-        loadAdminBookings();
       } else if (tab === 'profile') {
         document.getElementById('sectionProfile').classList.remove('hidden');
         document.getElementById('tabProfile').className = "py-2 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
+      }
+    }
+
+    function switchWaSubTab(subTab) {
+      if (subTab === 'active') {
+        document.getElementById('waSectionActive').classList.remove('hidden');
+        document.getElementById('waSectionHistory').classList.add('hidden');
+        document.getElementById('waSubTabActive').className = "pb-2 text-green-700 border-b-2 border-green-600 font-bold";
+        document.getElementById('waSubTabHistory').className = "pb-2 text-slate-400 hover:text-slate-700";
+      } else {
+        document.getElementById('waSectionHistory').classList.remove('hidden');
+        document.getElementById('waSectionActive').classList.add('hidden');
+        document.getElementById('waSubTabHistory').className = "pb-2 text-green-700 border-b-2 border-green-600 font-bold";
+        document.getElementById('waSubTabActive').className = "pb-2 text-slate-400 hover:text-slate-700";
       }
     }
 
@@ -327,7 +365,7 @@
         status: 'Active',
         source: 'App Vendor',
         vendorId: currentUser.uid,
-        vendorEmail: currentUser.email || 'Phone User',
+        vendorEmail: currentUser.phoneNumber || 'Phone User',
         assignedTo: '',
         assignedVendorId: '',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -340,60 +378,26 @@
       }).catch(err => alert("Error posting booking: " + err.message));
     }
 
-    // ==========================================
-    // WHATSAPP SCRAPER WEBHOOK / SIMULATOR FUNCTION
-    // ==========================================
-    function pushScrapedWhatsAppBooking(pickup, drop, cab, fare, date, time, remark, vendorName) {
-      const scrapedData = {
-        bookingId: 'WA-' + Math.floor(1000 + Math.random() * 9000),
-        tripType: drop ? 'Outstation' : 'Local',
-        pickupCity: pickup,
-        dropCity: drop || 'Local Rental',
-        cabType: cab || 'Sedan',
-        tripDate: date || new Date().toISOString().split('T')[0],
-        tripTime: time || '10:00',
-        packageType: 'N/A',
-        fare: fare || 'As per call',
-        remark: remark || 'WhatsApp Scraped Group Booking',
-        status: 'Active',
-        source: 'WhatsApp Scraper (' + vendorName + ')',
-        vendorId: 'whatsapp_scraper_bot',
-        vendorEmail: 'bot@tripvyom.in',
-        assignedTo: '',
-        assignedVendorId: '',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
-      db.collection("bookings").add(scrapedData).then(() => {
-        console.log("WhatsApp Scraped Booking Added Successfully!");
-      });
-    }
-
-    // Load Marketplace Bookings (Auto Expiry check + Scraper support)
+    // Load Marketplace Bookings
     function loadMarketplaceBookings() {
       db.collection("bookings").orderBy("createdAt", "desc").get().then((snapshot) => {
         const container = document.getElementById('marketplaceListContainer');
         let html = '';
-        const now = new Date();
+
+        if(snapshot.empty) {
+          container.innerHTML = `<div class="text-center py-8 text-slate-400 font-medium">No active bookings available right now.</div>`;
+          return;
+        }
 
         snapshot.forEach(docSnap => {
           const b = docSnap.data();
-          const tripDateTime = new Date(`${b.tripDate}T${b.tripTime}`);
-
-          if (tripDateTime <= now && b.status === 'Active') {
-            db.collection("bookings").doc(docSnap.id).update({ status: 'Expired' });
-            return;
-          }
-
           if (b.status === 'Expired' || b.status === 'Cancelled') return;
 
-          const isScraped = b.source && b.source.includes('WhatsApp');
-
           html += `
-            <div class="bg-white rounded-2xl p-4 shadow-sm border ${isScraped ? 'border-emerald-300 bg-emerald-50/20' : 'border-slate-200'} space-y-2.5 text-xs">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2.5 text-xs">
               <div class="flex justify-between items-start border-b pb-2">
                 <div>
-                  <span class="text-[10px] ${isScraped ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'} font-extrabold px-2 py-0.5 rounded">${b.tripType} • ${b.source || 'Vendor'}</span>
+                  <span class="text-[10px] bg-blue-100 text-blue-800 font-extrabold px-2 py-0.5 rounded">${b.tripType}</span>
                   <p class="text-sm font-extrabold text-slate-900 mt-1">${b.pickupCity} ➔ ${b.dropCity}</p>
                 </div>
                 <span class="text-[11px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded border border-amber-200">${b.tripDate}, ${b.tripTime}</span>
@@ -404,7 +408,6 @@
               </div>
               <div class="bg-slate-50 p-2.5 rounded-xl text-slate-600">
                 <p><strong>Remark:</strong> ${b.remark}</p>
-                <p class="text-[10px] text-slate-400 mt-1">Status: <span class="font-bold text-emerald-600">${b.status}</span></p>
               </div>
               <div class="grid grid-cols-2 gap-2 pt-1">
                 <a href="tel:918889637244" class="bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 rounded-xl font-bold text-center border border-blue-200 flex items-center justify-center gap-1.5">
@@ -419,6 +422,161 @@
 
         container.innerHTML = html || `<div class="text-center py-8 text-slate-400 font-medium">No active bookings available right now.</div>`;
       });
+    }
+
+    // ==========================================
+    // WHATSAPP SCRAPER SMART PARSING & SYNC ENGINE
+    // ==========================================
+    function parseLeadData(lead) {
+      let rawText = lead.route || lead.text || lead.message || "";
+      let lowerText = rawText.toLowerCase();
+
+      let isSpam = false;
+      if (
+        !lead.route || 
+        lead.route === "Not Specified" || 
+        lowerText.includes("chat.whatsapp.com") || 
+        lowerText.includes("join my whatsapp group") || 
+        lowerText.includes("http://") || 
+        lowerText.includes("https://") ||
+        lowerText.includes("group link") ||
+        rawText.trim().length < 5
+      ) {
+        isSpam = true;
+      }
+
+      let route = lead.route;
+      if (!route || route === "Not Specified") {
+        isSpam = true;
+      }
+
+      let tripType = "One-Way";
+      if (lowerText.includes("round") || lowerText.includes("return") || lowerText.includes("roundtrip") || lowerText.includes("aana jana") || lowerText.includes("both side")) {
+        tripType = "Round Trip";
+      }
+
+      let timeStr = "As soon as possible";
+      let targetHour = null;
+      let targetMinute = 0;
+
+      let timeMatch = rawText.match(/(\d{1,2})[:.](\d{2})\s*(am|pm)?/i);
+      let simpleHourMatch = rawText.match(/(\d{1,2})\s*(?:am|pm|baje|o'clock)/i);
+
+      if (timeMatch) {
+        targetHour = parseInt(timeMatch[1]);
+        targetMinute = parseInt(timeMatch[2]);
+        if (timeMatch[3] && timeMatch[3].toLowerCase() === 'pm' && targetHour < 12) targetHour += 12;
+        timeStr = `${targetHour}:${targetMinute < 10 ? '0' : ''}${targetMinute}`;
+      } else if (simpleHourMatch) {
+        targetHour = parseInt(simpleHourMatch[1]);
+        if (rawText.toLowerCase().includes('pm') && targetHour < 12) targetHour += 12;
+        timeStr = `${targetHour}:00`;
+      }
+
+      return {
+        isSpam,
+        route,
+        tripType,
+        time: timeStr,
+        targetHour,
+        targetMinute,
+        raw: rawText
+      };
+    }
+
+    // Real-time listener for WhatsApp leads collection
+    db.collection('whatsapp_leads').onSnapshot((snapshot) => {
+      const activeContainer = document.getElementById('whatsappActiveContainer');
+      const historyContainer = document.getElementById('whatsappHistoryContainer');
+      
+      activeContainer.innerHTML = '';
+      historyContainer.innerHTML = '';
+      
+      if (snapshot.empty) {
+        activeContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No WhatsApp leads found.</p>';
+        historyContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No history leads.</p>';
+        document.getElementById('activeWhatsAppCount').innerText = '0 Active';
+        document.getElementById('waTabBadge').innerText = '0';
+        return;
+      }
+
+      let activeCount = 0;
+      let expiredCount = 0;
+      const now = new Date();
+
+      snapshot.forEach(docSnap => {
+        const lead = docSnap.data();
+        const key = docSnap.id;
+        const parsed = parseLeadData(lead);
+
+        if (parsed.isSpam) return;
+
+        let isManuallyExpired = lead.status && lead.status === 'expired';
+        let leadCreationTime = lead.timestamp ? (lead.timestamp.seconds ? lead.timestamp.seconds * 1000 : lead.timestamp) : now.getTime();
+        let ageInMinutes = (now.getTime() - leadCreationTime) / (1000 * 60);
+
+        let isTimeExpired = ageInMinutes > 30;
+        const isExpired = isManuallyExpired || isTimeExpired;
+
+        if (isTimeExpired && !isManuallyExpired) {
+          db.collection('whatsapp_leads').doc(key).update({ status: 'expired' }).catch(() => {});
+        }
+
+        const phoneNum = lead.phone ? lead.phone : 'Not Available';
+        const hasValidPhone = lead.phone ? true : false;
+
+        const cardHTML = `
+          <div class="border border-slate-200 rounded-xl p-3 bg-white shadow-sm flex flex-col gap-2.5 text-xs">
+            <div class="flex justify-between items-start gap-2">
+              <span class="font-extrabold text-slate-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-route text-green-600"></i> ${parsed.route}
+              </span>
+              <span class="${hasValidPhone ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'} text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap">${phoneNum}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-slate-700">
+              <div class="bg-slate-50 p-1.5 rounded-lg">Type: <b>${parsed.tripType}</b></div>
+              <div class="bg-slate-50 p-1.5 rounded-lg">Time: <b>${parsed.time}</b></div>
+            </div>
+            <div class="flex items-center justify-between pt-1 border-t border-slate-100 gap-2">
+              ${hasValidPhone ? `
+                <a href="tel:${phoneNum}" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold flex items-center gap-1">
+                  <i class="fa-solid fa-phone"></i> Call
+                </a>
+                <a href="https://wa.me/${phoneNum}?text=Hello,%20regarding%20cab%20requirement" target="_blank" class="bg-green-600 text-white px-3 py-1.5 rounded-lg font-bold flex items-center gap-1">
+                  <i class="fa-brands fa-whatsapp"></i> Chat
+                </a>
+              ` : '<span class="text-slate-400 italic">No phone</span>'}
+              <div class="flex gap-1">
+                ${!isExpired ? `<button onclick="markLeadExpired('${key}')" class="bg-amber-100 text-amber-800 px-2 py-1.5 rounded-lg font-medium">Expire</button>` : '<span class="text-red-500 font-bold">Expired</span>'}
+                <button onclick="deleteWhatsAppLead('${key}')" class="bg-red-100 text-red-700 px-2 py-1.5 rounded-lg font-medium"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          </div>`;
+
+        if (isExpired) {
+          expiredCount++;
+          historyContainer.insertAdjacentHTML('beforeend', cardHTML);
+        } else {
+          activeCount++;
+          activeContainer.insertAdjacentHTML('beforeend', cardHTML);
+        }
+      });
+
+      if(activeCount === 0) activeContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No active WhatsApp leads right now.</p>';
+      if(expiredCount === 0) historyContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No expired leads in history.</p>';
+
+      document.getElementById('activeWhatsAppCount').innerText = `${activeCount} Active`;
+      document.getElementById('waTabBadge').innerText = activeCount;
+    });
+
+    function markLeadExpired(docId) {
+      db.collection('whatsapp_leads').doc(docId).update({ status: 'expired' });
+    }
+
+    function deleteWhatsAppLead(docId) {
+      if(confirm("Delete this WhatsApp lead?")) {
+        db.collection('whatsapp_leads').doc(docId).delete();
+      }
     }
 
     // Filter My Trips
@@ -487,54 +645,6 @@
       });
     }
 
-    // ==========================================
-    // ADMIN PANEL FUNCTIONS (Full Master Control)
-    // ==========================================
-    function loadAdminBookings() {
-      db.collection("bookings").orderBy("createdAt", "desc").get().then((snapshot) => {
-        const container = document.getElementById('adminBookingsListContainer');
-        let html = '';
-
-        snapshot.forEach(docSnap => {
-          const b = docSnap.data();
-          const docId = docSnap.id;
-
-          html += `
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2 text-slate-800">
-              <div class="flex justify-between items-center border-b pb-1.5">
-                <span class="font-extrabold text-blue-700">${b.bookingId} (${b.source || 'Vendor'})</span>
-                <span class="text-[10px] bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded border border-rose-200">${b.status}</span>
-              </div>
-              <p class="font-bold">${b.pickupCity} ➔ ${b.dropCity} | ${b.cabType}</p>
-              <p class="text-[11px] text-slate-500">Date: ${b.tripDate} ${b.tripTime} | Fare: ₹${b.fare}</p>
-              <div class="flex gap-2 pt-2">
-                <button onclick="adminDeleteBooking('${docId}')" class="bg-rose-600 text-white px-3 py-1.5 rounded-lg font-bold text-[11px]">Delete Booking</button>
-                <button onclick="adminForceStatus('${docId}', 'Cancelled')" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold text-[11px]">Force Cancel</button>
-              </div>
-            </div>`;
-        });
-
-        container.innerHTML = html || `<div class="text-center py-8 text-slate-400">No bookings in system.</div>`;
-      });
-    }
-
-    function adminDeleteBooking(docId) {
-      if (confirm("Admin Warning: Are you sure you want to permanently delete this booking?")) {
-        db.collection("bookings").doc(docId).delete().then(() => {
-          alert("Booking deleted successfully.");
-          loadAdminBookings();
-        });
-      }
-    }
-
-    function adminForceStatus(docId, status) {
-      db.collection("bookings").doc(docId).update({ status: status }).then(() => {
-        alert("Status updated by Admin.");
-        loadAdminBookings();
-      });
-    }
-
-    // Update Status
     function updateBookingStatus(docId, newStatus) {
       db.collection("bookings").doc(docId).update({ status: newStatus }).then(() => {
         alert(`Status updated to ${newStatus}`);
@@ -542,7 +652,6 @@
       });
     }
 
-    // Assign / Reassign Trip
     function openAssignModal(docId, currentAssignee) {
       const assigneeName = prompt("Enter Driver or Vendor Name / Mobile to assign this booking:", currentAssignee || "");
       if (assigneeName !== null) {
@@ -606,7 +715,6 @@
       });
     }
 
-    // Firebase Auth State Listener
     auth.onAuthStateChanged((user) => {
       currentUser = user;
       const badge = document.getElementById('authStatusBadge');
@@ -642,7 +750,6 @@
       });
     }
 
-    // Save Profile (Compulsory: Name, Mobile, City, State)
     function saveVendorProfile() {
       if (!currentUser) return alert("Please login first!");
       const name = document.getElementById('vendorNameInput').value.trim();
@@ -663,7 +770,6 @@
       }).catch(err => alert("Error saving profile: " + err.message));
     }
 
-    // On Load Initializer
     window.addEventListener('load', () => {
       const today = new Date().toISOString().split('T')[0];
       const dateInp = document.getElementById('tripDate');
