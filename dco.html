@@ -1,198 +1,237 @@
-import React, { useState } from 'react';
-import { db } from './firebase';
-import { collection, addDoc } from 'firebase/firestore';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vendor & Driver Cab Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen pb-20">
 
-function AddBookingScreen({ user, onBookingAdded }) {
-  const [bookingData, setBookingData] = useState({
-    tripType: 'Outstation', // Outstation or Local
-    pickupCity: '',
-    dropCity: '',
-    cabType: 'Sedan',
-    tripDate: '',
-    tripTime: '',
-    fare: '',
-    packageType: '12 hour - 120 km', // Only for local
-    remark: '',
-    status: 'Active' // Active, Accepted, Cancelled
-  });
+  <!-- Top Header -->
+  <header class="bg-blue-600 text-white px-4 py-3 flex items-center justify-between shadow-md sticky top-0 z-50">
+    <div class="flex items-center gap-2">
+      <div class="bg-white/20 p-2 rounded-xl">
+        <i class="fa-solid fa-car text-lg"></i>
+      </div>
+      <h1 class="text-lg font-extrabold tracking-tight">Cab Vendor & Driver Portal</h1>
+    </div>
+    <div id="authStatusBadge" class="text-xs bg-blue-700 px-3 py-1.5 rounded-lg font-bold border border-blue-400/40">
+      Not Logged In
+    </div>
+  </header>
 
-  // Booking Date & Time Validation Function
-  const validateBookingTime = (tripDate, tripTime) => {
-    const selectedDateTime = new Date(`${tripDate}T${tripTime}`);
-    const currentDateTime = new Date();
+  <!-- Main Container -->
+  <main class="max-w-md mx-auto p-4 space-y-4">
 
-    if (selectedDateTime <= currentDateTime) {
-      alert('Error: Aap past (back-date ya back-time) ki booking create nahi kar sakte!');
-      return false; // Booking submit nahi hogi
-    }
-    return true; // Booking valid hai
-  };
+    <!-- Navigation Tabs -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-1.5 grid grid-cols-3 gap-1 text-center text-xs font-bold">
+      <button onclick="switchTab('requirements')" id="tabReq" class="py-2.5 rounded-xl bg-blue-600 text-white transition">Bookings</button>
+      <button onclick="switchTab('post')" id="tabPost" class="py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition">Post Trip</button>
+      <button onclick="switchTab('profile')" id="tabProfile" class="py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition">Profile</button>
+    </div>
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    <!-- TAB 1: REQUIREMENTS / BOOKINGS LIST -->
+    <div id="sectionRequirements" class="space-y-3">
+      <div class="flex justify-between items-center">
+        <h2 class="text-sm font-extrabold text-slate-700 uppercase tracking-wide">Live Vendor Requirements</h2>
+        <span class="text-xs text-blue-600 font-bold bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">Auto-Live</span>
+      </div>
 
-    // 1. Validate mandatory fields
-    if (!bookingData.pickupCity || !bookingData.tripDate || !bookingData.tripTime) {
-      alert('Kripya pickup city, date aur time zaroor bharein!');
-      return;
-    }
+      <!-- Sample Booking Card 1 -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+        <div class="flex justify-between items-start border-b border-slate-100 pb-2">
+          <div>
+            <span class="text-[10px] bg-blue-100 text-blue-800 font-extrabold px-2 py-0.5 rounded">Outstation</span>
+            <p class="text-sm font-extrabold text-slate-900 mt-1">Ahmedabad ➔ Udaipur</p>
+          </div>
+          <span class="text-xs font-mono font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded border border-amber-200">28 Sept, 11:00 AM</span>
+        </div>
 
-    // 2. Run Back-date / Back-time Validation
-    const isValidTime = validateBookingTime(bookingData.tripDate, bookingData.tripTime);
-    if (!isValidTime) {
-      return; // Agar time invalid hai toh aage process nahi hoga
-    }
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div><span class="text-slate-400">Cab Type:</span> <strong class="text-slate-700">Sedan</strong></div>
+          <div><span class="text-slate-400">Est. Fare:</span> <strong class="text-blue-600">₹2,000</strong></div>
+        </div>
 
-    try {
-      // 3. Firestore me booking save karein
-      await addDoc(collection(db, 'bookings'), {
-        ...bookingData,
-        vendorId: user?.uid || 'anonymous',
-        vendorName: user?.displayName || 'Vendor',
-        vendorMobile: user?.phoneNumber || '',
-        createdAt: new Date().toISOString()
-      });
+        <div class="bg-slate-50 p-2.5 rounded-xl text-xs text-slate-600">
+          <p><strong>Remark:</strong> Only call me. Parking excluded.</p>
+          <p class="text-[10px] text-slate-400 mt-1">Posted by: Salasar Tours & Travels (Verified)</p>
+        </div>
 
-      alert('Booking Successfully Post Ho Gayi!');
-      if (onBookingAdded) onBookingAdded();
-    } catch (error) {
-      console.error('Error adding booking: ', error);
-      alert('Booking post karne me error aayi.');
-    }
-  };
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <a href="tel:918889637244" class="bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 rounded-xl font-bold text-xs text-center border border-blue-200 flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-phone"></i> Call Vendor
+          </a>
+          <a href="https://wa.me/918889637244" target="_blank" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 py-2 rounded-xl font-bold text-xs text-center border border-emerald-200 flex items-center justify-center gap-1.5">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
 
-  return (
-    <div className="p-4 max-w-lg mx-auto bg-white shadow rounded-lg">
-      <h2 className="text-xl font-bold mb-4 text-blue-600">Post New Cab Requirement</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        
-        {/* Trip Type */}
+    <!-- TAB 2: POST BOOKING FORM -->
+    <div id="sectionPost" class="hidden bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+      <h2 class="text-sm font-extrabold text-blue-900 border-b pb-2">Post New Cab Requirement</h2>
+      
+      <form id="postBookingForm" onsubmit="handlePostSubmit(event)" class="space-y-3 text-xs">
         <div>
-          <label className="block font-semibold">Trip Type *</label>
-          <select 
-            className="w-full border p-2 rounded"
-            value={bookingData.tripType}
-            onChange={(e) => setBookingData({...bookingData, tripType: e.target.value})}
-          >
+          <label class="block font-bold text-slate-700 mb-1">Trip Type *</label>
+          <select id="tripType" onchange="toggleTripType()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold">
             <option value="Outstation">Outstation</option>
             <option value="Local">Local</option>
           </select>
         </div>
 
-        {/* Pickup City */}
         <div>
-          <label className="block font-semibold">Pickup City *</label>
-          <input 
-            type="text" 
-            className="w-full border p-2 rounded"
-            placeholder="Jaise: Ahmedabad"
-            value={bookingData.pickupCity}
-            onChange={(e) => setBookingData({...bookingData, pickupCity: e.target.value})}
-            required 
-          />
+          <label class="block font-bold text-slate-700 mb-1">Pickup City *</label>
+          <input type="text" id="pickupCity" required placeholder="e.g. Ahmedabad" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
         </div>
 
-        {/* Drop City (Visible only if Outstation) */}
-        {bookingData.tripType === 'Outstation' && (
-          <div>
-            <label className="block font-semibold">Drop City *</label>
-            <input 
-              type="text" 
-              className="w-full border p-2 rounded"
-              placeholder="Jaise: Udaipur"
-              value={bookingData.dropCity}
-              onChange={(e) => setBookingData({...bookingData, dropCity: e.target.value})}
-              required={bookingData.tripType === 'Outstation'}
-            />
-          </div>
-        )}
+        <div id="dropCityContainer">
+          <label class="block font-bold text-slate-700 mb-1">Drop City *</label>
+          <input type="text" id="dropCity" required placeholder="e.g. Udaipur" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+        </div>
 
-        {/* Cab Type */}
         <div>
-          <label className="block font-semibold">Cab Type *</label>
-          <select 
-            className="w-full border p-2 rounded"
-            value={bookingData.cabType}
-            onChange={(e) => setBookingData({...bookingData, cabType: e.target.value})}
-          >
-            <option value="Hatchback">Hatchback</option>
-            <option value="Sedan">Sedan</option>
-            <option value="Ertiga">Ertiga</option>
-            <option value="Innova Crysta">Innova Crysta</option>
+          <label class="block font-bold text-slate-700 mb-1">Cab Type *</label>
+          <select id="cabType" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold">
+            <option value="Hatchback">Hatchback (*12)</option>
+            <option value="Sedan">Sedan (*13)</option>
+            <option value="Ertiga">Ertiga (*15)</option>
+            <option value="Innova Crysta">Innova Crysta (*24)</option>
             <option value="Tempo Traveler">Tempo Traveler</option>
           </select>
         </div>
 
-        {/* Trip Date */}
-        <div>
-          <label className="block font-semibold">Trip Date *</label>
-          <input 
-            type="date" 
-            className="w-full border p-2 rounded"
-            value={bookingData.tripDate}
-            onChange={(e) => setBookingData({...bookingData, tripDate: e.target.value})}
-            required 
-          />
-        </div>
-
-        {/* Trip Time */}
-        <div>
-          <label className="block font-semibold">Trip Time *</label>
-          <input 
-            type="time" 
-            className="w-full border p-2 rounded"
-            value={bookingData.tripTime}
-            onChange={(e) => setBookingData({...bookingData, tripTime: e.target.value})}
-            required 
-          />
-        </div>
-
-        {/* Package Type (Visible only if Local) */}
-        {bookingData.tripType === 'Local' && (
+        <div class="grid grid-cols-2 gap-2">
           <div>
-            <label className="block font-semibold">Package Type *</label>
-            <select 
-              className="w-full border p-2 rounded"
-              value={bookingData.packageType}
-              onChange={(e) => setBookingData({...bookingData, packageType: e.target.value})}
-            >
-              <option value="1 hour - 10 km">1 hour - 10 km</option>
-              <option value="12 hour - 120 km">12 hour - 120 km</option>
-            </select>
+            <label class="block font-bold text-slate-700 mb-1">Trip Date *</label>
+            <input type="date" id="tripDate" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
           </div>
-        )}
-
-        {/* Fare / Quotation */}
-        <div>
-          <label className="block font-semibold">Fare / Quotation (₹)</label>
-          <input 
-            type="number" 
-            className="w-full border p-2 rounded"
-            placeholder="Enter Fare or calculate automatically"
-            value={bookingData.fare}
-            onChange={(e) => setBookingData({...bookingData, fare: e.target.value})}
-          />
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Trip Time *</label>
+            <input type="time" id="tripTime" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+          </div>
         </div>
 
-        {/* Remark */}
-        <div>
-          <label className="block font-semibold">Remark</label>
-          <textarea 
-            className="w-full border p-2 rounded"
-            placeholder="Jaise: Parking excluded, only call me..."
-            value={bookingData.remark}
-            onChange={(e) => setBookingData({...bookingData, remark: e.target.value})}
-          />
+        <div id="localPackageBox" class="hidden">
+          <label class="block font-bold text-slate-700 mb-1">Package Type *</label>
+          <select id="packageType" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold">
+            <option value="1 hour - 10 km">1 hour - 10 km</option>
+            <option value="12 hour - 120 km">12 hour - 120 km</option>
+          </select>
         </div>
 
-        {/* Submit Button */}
-        <button type="submit" className="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700">
-          Post Booking
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Remark / Notes</label>
+          <textarea id="tripRemark" placeholder="Parking excluded, only call me..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold h-16"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 rounded-xl shadow transition">
+          Post Booking Now
         </button>
-
       </form>
     </div>
-  );
-}
 
-export default AddBookingScreen;
+    <!-- TAB 3: PROFILE / REGISTRATION -->
+    <div id="sectionProfile" class="hidden bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3 text-xs">
+      <h2 class="text-sm font-extrabold text-blue-900 border-b pb-2">Vendor / Driver Profile</h2>
+      <div class="space-y-2.5">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Full Name *</label>
+          <input type="text" id="profName" placeholder="Aapka naam" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Mobile Number *</label>
+          <input type="tel" id="profMobile" maxlength="10" placeholder="10-digit number" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">City *</label>
+            <input type="text" id="profCity" placeholder="Ahmedabad" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">State *</label>
+            <input type="text" id="profState" placeholder="Gujarat" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold" />
+          </div>
+        </div>
+        <button onclick="saveProfile()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl shadow transition">
+          Save Profile
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- JavaScript Application Controls -->
+  <script>
+    function switchTab(tab) {
+      document.getElementById('sectionRequirements').classList.add('hidden');
+      document.getElementById('sectionPost').classList.add('hidden');
+      document.getElementById('sectionProfile').classList.add('hidden');
+
+      document.getElementById('tabReq').className = "py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
+      document.getElementById('tabPost').className = "py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
+      document.getElementById('tabProfile').className = "py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition font-bold";
+
+      if (tab === 'requirements') {
+        document.getElementById('sectionRequirements').classList.remove('hidden');
+        document.getElementById('tabReq').className = "py-2.5 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
+      } else if (tab === 'post') {
+        document.getElementById('sectionPost').classList.remove('hidden');
+        document.getElementById('tabPost').className = "py-2.5 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
+      } else if (tab === 'profile') {
+        document.getElementById('sectionProfile').classList.remove('hidden');
+        document.getElementById('tabProfile').className = "py-2.5 rounded-xl bg-blue-600 text-white transition font-bold shadow-sm";
+      }
+    }
+
+    function toggleTripType() {
+      const type = document.getElementById('tripType').value;
+      const dropContainer = document.getElementById('dropCityContainer');
+      const localBox = document.getElementById('localPackageBox');
+      
+      if (type === 'Local') {
+        dropContainer.style.display = 'none';
+        localBox.style.display = 'block';
+        document.getElementById('dropCity').required = false;
+      } else {
+        dropContainer.style.display = 'block';
+        localBox.style.display = 'none';
+        document.getElementById('dropCity').required = true;
+      }
+    }
+
+    // Back-date & Back-time Validation Check
+    function handlePostSubmit(e) {
+      e.preventDefault();
+      const date = document.getElementById('tripDate').value;
+      const time = document.getElementById('tripTime').value;
+
+      const selectedDateTime = new Date(`${date}T${time}`);
+      const currentDateTime = new Date();
+
+      if (selectedDateTime <= currentDateTime) {
+        alert('Error: Aap past (back-date ya back-time) ki booking create nahi kar sakte!');
+        return;
+      }
+
+      alert('Booking Successfully Validated & Posted!');
+      document.getElementById('postBookingForm').reset();
+      switchTab('requirements');
+    }
+
+    function saveProfileProfile() {
+      alert('Profile Saved Successfully!');
+    }
+
+    // Set min date to today on load
+    window.addEventListener('load', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const dateInp = document.getElementById('tripDate');
+      if (dateInp) dateInp.min = today;
+    });
+  </script>
+</body>
+</html>
